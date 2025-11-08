@@ -35,6 +35,33 @@ This Visual Studio Code extension provides syntax highlighting, IntelliSense, an
 - **Code length validation** - Warns when approaching Stationeers' 4096-byte limit
 - **Comprehensive instruction database** with latest Stationeers updates
 
+## FlorpyDorp additions
+
+This repository contains a rebranded and enhanced fork with additional UX and language-server improvements contributed under the "FlorpyDorp" updates. Key additions include:
+
+- Runtime diagnostics toggle and immediate UX improvements
+  - A runtime diagnostics toggle (configurable in the extension) clears squiggles immediately and restarts the language server so diagnostics stay in sync with the editor.
+
+- Completion and identifier handling
+  - Static parameter completions (LogicType, SlotLogicType, BatchMode) are case-insensitive and tolerant of leading spaces.
+  - Static completions use a token-like icon for better visual parity with the in-game tokens.
+
+- New logic / batch tokens
+  - Expanded instruction database with additional logic tokens such as ReferenceId, BestContactFilter, CelestialHash, EntityState, Apex, VelocityX/Y/Z, Orientation, Forward, Density, TotalQuantity, MinedQuantity, Channel0–Channel7 and more.
+
+- Type inference and ReferenceId acceptance
+  - Loads (l, lb, lbn and friends) now accept `ReferenceId` and certain aggregator batch modes and will mark registers that hold ReferenceId values as DeviceId where appropriate — reducing false-positive diagnostics.
+
+- Hover and signature improvements
+  - Hover tooltips better preserve and display IC10-style code blocks and examples. Special-case handling ensures logic-type names (e.g., `ReferenceId`) show helpful inline docs even when parsed as identifiers.
+
+- Inlay hints and UI polish
+  - Inlay hints were repositioned to appear to the right of typed operands so they don't obstruct typing and to mirror in-game signature hints.
+
+- Tests, build and packaging niceties
+  - Added tests and example IC10 files that exercise ReferenceId/lb/lbn patterns. The extension build process and a VS Code build task were also added to simplify packaging.
+
+
 ## Installation
 
 1. Open Visual Studio Code.
