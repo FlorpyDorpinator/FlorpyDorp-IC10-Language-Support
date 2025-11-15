@@ -1,19 +1,61 @@
 <#
-publish-local.ps1
+.SYNOPSIS
+    Build and package the IC10 VS Code extension with its Rust language server.
 
-Helper script to build the Rust language server, build the extension JS, package a VSIX and optionally publish to the Visual Studio Marketplace.
+.DESCRIPTION
+    This script automates the complete build and packaging process for the IC10 Language
+    Extension. It handles building the Rust language server (ic10lsp), bundling the
+    TypeScript extension, copying binaries, and creating a VSIX package.
+    
+    Optionally, it can also publish the extension to the Visual Studio Marketplace.
 
-Usage examples:
-  # Package only
-  .\tools\publish-local.ps1 -PackageOnly
+.PARAMETER PackageOnly
+    Only create the VSIX package without publishing to marketplace.
 
-  # Package and publish (recommended to pass PAT securely)
-  .\tools\publish-local.ps1 -Publish -PAT 'your-personal-access-token' -Publisher 'your-publisher-id'
+.PARAMETER Publish
+    Build, package, and publish to the Visual Studio Marketplace.
+    Requires a Personal Access Token (PAT) from Azure DevOps.
 
-Notes:
-- Requires: Rust (cargo), Node.js (npm), and Git (for versioning if you bump the package.json).
-- This script will build the `ic10lsp` release binary and copy it to the extension `bin` folder then run `npx @vscode/vsce` to package/publish.
-- Do NOT pass your PAT on a shared machine or commit it into files; prefer interactive prompt or environment variable.
+.PARAMETER PAT
+    Personal Access Token for publishing to the VS Marketplace.
+    Can also be set via the VSCE_PAT environment variable.
+    Keep this secure - never commit it to source control!
+
+.PARAMETER Publisher
+    Publisher ID for the VS Marketplace.
+    Can also be set via the VSCE_PUBLISHER environment variable.
+
+.EXAMPLE
+    # Package only (creates a .vsix file locally)
+    .\tools\publish-local.ps1 -PackageOnly
+
+.EXAMPLE
+    # Package and publish (securely pass PAT)
+    $env:VSCE_PAT = "your-personal-access-token"
+    .\tools\publish-local.ps1 -Publish
+
+.EXAMPLE
+    # Package and publish with inline parameters (less secure)
+    .\tools\publish-local.ps1 -Publish -PAT 'your-pat' -Publisher 'your-publisher-id'
+
+.NOTES
+    Requirements:
+    - Rust toolchain (cargo)
+    - Node.js (npm)
+    - Git (for versioning)
+    
+    The script will:
+    1. Auto-discover the ic10lsp and extension folders in the repository
+    2. Build ic10lsp in release mode (falls back to debug if release fails)
+    3. Copy the compiled binary to the extension's bin/ folder
+    4. Install npm dependencies if needed
+    5. Run esbuild to bundle the TypeScript code
+    6. Package everything into a .vsix file
+    7. Optionally publish to the marketplace
+
+.LINK
+    https://github.com/FlorpyDorpinator/IC10-Code-Extension
+
 #>
 
 param(
@@ -23,34 +65,53 @@ param(
     [string]$Publisher = $env:VSCE_PUBLISHER
 )
 
+# Enable strict mode for better error catching
 Set-StrictMode -Version Latest
+
+# ============================================================================
+# Path Discovery
+# ============================================================================
+# Find the root directory and locate ic10lsp and extension folders
 
 $root = Split-Path -Parent $MyInvocation.MyCommand.Definition
 $repoRoot = Resolve-Path "$root\.." | Select-Object -ExpandProperty Path
 
-# Adjust these relative paths if your repository layout differs
+# Initialize path variables
 $lspPath = $null
 $extensionPath = $null
 
-# Try known default locations first
+# Try known default locations first (fastest path)
 $knownLspCandidates = @(
     (Join-Path $repoRoot 'Stationeers-ic10-main\Stationeers-ic10-main\FlorpyDorp IC10\ic10lsp'),
     (Join-Path $repoRoot 'Stationeers-ic10-main\Stationeers-ic10-main\ic10lsp')
 )
 $knownExt = Join-Path $repoRoot 'Stationeers-ic10-main\Stationeers-ic10-main\FlorpyDorp IC10\FlorpyDorp Language Support'
 
-foreach ($cand in $knownLspCandidates) { if (-not $lspPath -and (Test-Path $cand)) { $lspPath = $cand } }
-if (Test-Path $knownExt) { $extensionPath = $knownExt }
+foreach ($cand in $knownLspCandidates) { 
+    if (-not $lspPath -and (Test-Path $cand)) { 
+        $lspPath = $cand 
+    } 
+}
+if (Test-Path $knownExt) { 
+    $extensionPath = $knownExt 
+}
 
-# Auto-discover if not found in known locations
+# ============================================================================
+# Auto-Discovery (fallback if known locations don't exist)
+# ============================================================================
+
 if (-not $lspPath) {
+    Write-Host "Known LSP paths not found, scanning repository..."
     $lspCandidate = Get-ChildItem -Path $repoRoot -Recurse -Directory -Filter ic10lsp -ErrorAction SilentlyContinue |
         Where-Object { Test-Path (Join-Path $_.FullName 'Cargo.toml') } |
         Select-Object -First 1
-    if ($lspCandidate) { $lspPath = $lspCandidate.FullName }
+    if ($lspCandidate) { 
+        $lspPath = $lspCandidate.FullName 
+    }
 }
 
 if (-not $extensionPath) {
+    Write-Host "Known extension path not found, scanning repository..."
     # Prefer the folder literally named "FlorpyDorp Language Support"
     $extCandidate = Get-ChildItem -Path $repoRoot -Recurse -Directory -Filter 'FlorpyDorp Language Support' -ErrorAction SilentlyContinue |
         Where-Object { Test-Path (Join-Path $_.FullName 'package.json') } |
@@ -66,12 +127,21 @@ if (-not $extensionPath) {
                     $extCandidate = Get-Item (Split-Path -Parent $pkg.FullName)
                     break
                 }
-            } catch { }
+            } catch { 
+                # Ignore JSON parse errors
+            }
         }
     }
 
-    if ($extCandidate) { $extensionPath = $extCandidate.FullName }
+    if ($extCandidate) { 
+        $extensionPath = $extCandidate.FullName 
+    }
 }
+
+# ============================================================================
+# Validation
+# ============================================================================
+# Ensure we found both required directories
 
 if (-not $lspPath) {
     Write-Error "ic10lsp folder not found. Tried default path and auto-discovery. Please verify the repository contains the 'ic10lsp' crate."
@@ -89,6 +159,12 @@ Write-Host "Repository root: $repoRoot"
 Write-Host "LSP path: $lspPath"
 Write-Host "Extension path: $extensionPath"
 
+# ============================================================================
+# Step 1: Build the Rust Language Server
+# ============================================================================
+# Build ic10lsp in release mode for optimal performance. Falls back to debug
+# mode if release build fails.
+
 Push-Location $lspPath
 Write-Host "Building ic10lsp (release) with cargo..."
 cargo build --release
@@ -98,6 +174,12 @@ if ($LASTEXITCODE -ne 0) {
     if ($LASTEXITCODE -ne 0) { Write-Error "Debug build also failed"; Pop-Location; exit $LASTEXITCODE }
 }
 Pop-Location
+
+# ============================================================================
+# Step 2: Copy the LSP Binary
+# ============================================================================
+# Copy the compiled ic10lsp binary to the extension's bin/ folder so it can
+# be packaged with the VSIX. Supports both Windows (.exe) and Unix binaries.
 
 New-Item -ItemType Directory -Force -Path $binPath | Out-Null
 
@@ -122,15 +204,32 @@ if (Test-Path ${exeSourceReleaseWin}) {
     Write-Warning "No ic10lsp binary found (release or debug). Check cargo build output for errors."
 }
 
+# ============================================================================
+# Step 3: Build the TypeScript Extension
+# ============================================================================
+# Install npm dependencies and bundle the extension using esbuild
+
 Push-Location $extensionPath
 Write-Host "Installing npm dependencies and building extension..."
 if (-not (Test-Path node_modules)) { npm install }
 npm run esbuild
 if ($LASTEXITCODE -ne 0) { Write-Error "esbuild failed"; exit $LASTEXITCODE }
 
+# ============================================================================
+# Step 4: Package the VSIX
+# ============================================================================
+# Create a .vsix file that can be installed in VS Code or published to the
+# Marketplace. The VSIX includes the bundled extension code and LSP binary.
+
 Write-Host "Packaging VSIX..."
 npx -y @vscode/vsce@latest package
 if ($LASTEXITCODE -ne 0) { Write-Error "VSIX packaging failed"; exit $LASTEXITCODE }
+
+# ============================================================================
+# Step 5: Publish to Marketplace (Optional)
+# ============================================================================
+# If -Publish flag is set and a PAT is provided, publish to the Visual Studio
+# Marketplace. This requires a Personal Access Token from Azure DevOps.
 
 if ($Publish -and $PAT) {
     Write-Host "Publishing VSIX to Visual Studio Marketplace..."

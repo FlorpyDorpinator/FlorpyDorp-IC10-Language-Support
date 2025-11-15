@@ -1,3 +1,27 @@
+/**
+ * IC10 Language Support Extension for Visual Studio Code
+ * 
+ * This extension provides comprehensive language support for the IC10 MIPS-like assembly
+ * language used in the game Stationeers. It connects VSCode to the ic10lsp language server
+ * and provides additional client-side enhancements.
+ * 
+ * Key Features:
+ * - Language server client initialization and management
+ * - Enhanced hover tooltips with game-style instruction signatures
+ * - Smart completion filtering and formatting
+ * - Diagnostic control (enable/disable syntax checking)
+ * - Inlay hints for instruction parameters
+ * - Command palette integration
+ * 
+ * Architecture:
+ * - Communicates with the Rust-based ic10lsp language server via LSP
+ * - Enhances server responses with client-side middleware
+ * - Manages server lifecycle (start/stop/restart)
+ * - Provides custom VS Code commands and UI features
+ * 
+ * @module extension
+ */
+
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
@@ -12,10 +36,20 @@ import {
     ExecuteCommandParams
 } from 'vscode-languageclient/node';
 
-// Removed dynamic example extraction from ProgrammableChip.cs (users won't have decompiled sources).
-// Retaining static examples only.
+// ============================================================================
+// Helper Functions
+// ============================================================================
 
-// Helper function to get instruction examples
+/**
+ * Retrieves instruction examples for hover tooltips and documentation.
+ * 
+ * These examples provide users with practical usage patterns for common IC10
+ * instructions. Each instruction includes 2-3 examples ranging from simple
+ * to intermediate complexity.
+ * 
+ * @param instruction - The IC10 instruction name (e.g., 'add', 'l', 's')
+ * @returns Array of example code strings with inline comments
+ */
 function getInstructionExamples(instruction: string): string[] {
     // Basic examples for common instructions - this could be expanded
     const examples: { [key: string]: string[] } = {
@@ -49,12 +83,56 @@ function getInstructionExamples(instruction: string): string[] {
     return examples[instruction.toLowerCase()] || [];
 }
 
+/**
+ * Retrieves the IC10 LSP configuration from VS Code settings.
+ * 
+ * This includes settings like max_lines, max_columns, max_bytes, and other
+ * language server configuration options that control diagnostics and validation.
+ * 
+ * @returns Configuration object with IC10 LSP settings
+ */
 function getLSPIC10Configurations(): vscode.WorkspaceConfiguration {
     return vscode.workspace.getConfiguration('ic10.lsp');
 }
 
-// This method is called when your extension is activated
-// Your extension is activated the very first time the command is executed
+// ============================================================================
+// Extension Activation
+// ============================================================================
+
+/**
+ * Called when the extension is activated (first time an IC10 file is opened).
+ * 
+ * This function:
+ * 1. Sets up the language server connection (local binary or remote TCP)
+ * 2. Registers middleware to enhance hover, completion, and diagnostic behavior
+ * 3. Starts the language server client
+ * 4. Registers custom commands (restart server, toggle diagnostics, etc.)
+ * 5. Sets up configuration change listeners
+ * 
+ * @param context - The extension context provided by VS Code
+ */
+/**
+ * Resolves VS Code variables in a string (e.g., ${workspaceFolder}, ${extensionPath})
+ * 
+ * @param str - String potentially containing VS Code variables
+ * @param context - Extension context for resolving paths
+ * @returns String with variables resolved to actual paths
+ */
+function resolveVariables(str: string, context: vscode.ExtensionContext): string {
+    if (!str) return str;
+    
+    // Get workspace folder (use first workspace if multiple)
+    const workspaceFolder = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath || '';
+    
+    // Replace common VS Code variables
+    return str
+        .replace(/\$\{workspaceFolder\}/gi, workspaceFolder)
+        .replace(/\$\{workspaceRoot\}/gi, workspaceFolder)
+        .replace(/\$\{extensionPath\}/gi, context.extensionPath)
+        .replace(/\$\{userHome\}/gi, process.env.HOME || process.env.USERPROFILE || '')
+        .replace(/~/g, process.env.HOME || process.env.USERPROFILE || '');
+}
+
 export function activate(context: vscode.ExtensionContext) {
 
     // Activate Notification through VSCode Notifications
@@ -62,12 +140,30 @@ export function activate(context: vscode.ExtensionContext) {
 
 
     const serverBinary = process.platform === "win32" ? "ic10lsp.exe" : "ic10lsp";
+    
     // Allow overriding the server path to avoid copy/lock issues during development
     const serverOverride = vscode.workspace.getConfiguration('ic10.lsp').get('serverPath') as string | undefined;
+    
+    // Resolve VS Code variables in the server path (e.g., ${workspaceFolder})
+    const resolvedServerOverride = serverOverride && serverOverride.trim().length > 0
+        ? resolveVariables(serverOverride.trim(), context)
+        : undefined;
+    
     // The server is implemented in the upstream language server
-    const serverModule = serverOverride && serverOverride.trim().length > 0
-        ? serverOverride
-        : context.asAbsolutePath(path.join('bin', serverBinary));
+    const serverModule = resolvedServerOverride || context.asAbsolutePath(path.join('bin', serverBinary));
+    
+    // Log the resolved server path for debugging
+    console.log(`IC10 LSP: Server path resolved to: ${serverModule}`);
+    
+    // Verify server binary exists
+    const fs = require('fs');
+    if (!fs.existsSync(serverModule)) {
+        const errorMsg = `IC10 Language Server binary not found at: ${serverModule}\n\n` +
+            `If using a custom serverPath, ensure the path is correct and uses forward slashes or escaped backslashes.\n` +
+            `You can use VS Code variables like \${workspaceFolder} for portable paths.`;
+        vscode.window.showErrorMessage(errorMsg);
+        console.error(`IC10 LSP: ${errorMsg}`);
+    }
 
     const config = vscode.workspace.getConfiguration();
 

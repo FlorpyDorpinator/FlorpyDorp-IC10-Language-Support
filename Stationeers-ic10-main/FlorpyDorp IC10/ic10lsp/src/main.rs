@@ -1,3 +1,27 @@
+//! # IC10 Language Server (ic10lsp)
+//!
+//! A comprehensive Language Server Protocol (LSP) implementation for the IC10 MIPS-like
+//! assembly language used in the game Stationeers. This server provides rich IDE features
+//! including syntax highlighting, autocompletion, hover documentation, diagnostics, and more.
+//!
+//! ## Key Features
+//! - Syntax validation and diagnostics (line/column/byte limits)
+//! - Intelligent code completion for instructions, registers, devices, and logic types
+//! - Hover documentation with instruction examples and register operation history
+//! - Go-to-definition for labels, aliases, and defines
+//! - HASH() function support with device name resolution
+//! - Semantic token coloring for better syntax highlighting
+//! - Inlay hints for device hashes and instruction signatures
+//! - Code actions and quick fixes
+//!
+//! ## Architecture
+//! This LSP uses the Tower LSP framework and Tree-sitter for parsing. The main components are:
+//! - Document management (parsing and caching)
+//! - Type tracking (aliases, defines, labels)
+//! - Diagnostic generation (syntax errors, length warnings)
+//! - Completion providers (instructions, parameters, enums)
+//! - Hover providers (documentation, examples, history)
+
 use ic10lsp::instructions::{self, DataType}; // access library module with instruction metadata
 use std::fs;
 use std::path::Path;
@@ -13,17 +37,35 @@ use tower_lsp::lsp_types::{Position as LspPosition, Range as LspRange};
 use tower_lsp::{LanguageServer, LspService, Server};
 use tree_sitter::{Node, Parser, Query, QueryCursor, Tree};
 
-// Bring in local modules implemented as standalone files in src/
+// ============================================================================
+// Module Imports
+// ============================================================================
+// These modules provide specialized functionality for the language server
+
+/// Additional language features like register analysis and code actions
 mod additional_features;
+
+/// Command-line interface handling
 mod cli;
+
+/// Device hash mappings and resolution (HASH() function support)
 mod device_hashes;
+
+/// Utility functions for hash computation and parsing
 mod hash_utils;
+
+/// Enhanced tooltip/hover documentation with examples
 mod tooltip_documentation;
 
-// Lint code identifiers
+// ============================================================================
+// Constants
+// ============================================================================
+
+/// Diagnostic code for absolute jump instructions (should use relative jumps)
 const LINT_ABSOLUTE_JUMP: &str = "absolute-jump";
 
-// Fallback semantic token legend (minimal set). Adjust as needed if extended scopes are introduced.
+/// Semantic token types supported by the LSP for syntax highlighting.
+/// These map to VSCode's semantic token system for rich colorization.
 const SEMANTIC_SYMBOL_LEGEND: &[SemanticTokenType] = &[
     SemanticTokenType::VARIABLE,
     SemanticTokenType::FUNCTION,
@@ -36,10 +78,25 @@ const SEMANTIC_SYMBOL_LEGEND: &[SemanticTokenType] = &[
     SemanticTokenType::MACRO,
 ];
 
+// ============================================================================
+// Data Type Unions for Parameter Validation
+// ============================================================================
+// These constants define which data types are acceptable for various
+// instruction parameters. Used for completion suggestions and type checking.
+
+/// Parameters that only accept LogicType (e.g., Temperature, Pressure)
 const LOGIC_ONLY: [DataType; 1] = [DataType::LogicType];
+
+/// Parameters that only accept SlotLogicType (e.g., Occupant, OccupantHash)
 const SLOT_ONLY: [DataType; 1] = [DataType::SlotLogicType];
+
+/// Parameters that only accept BatchMode (e.g., Average, Sum, Maximum)
 const BATCH_ONLY: [DataType; 1] = [DataType::BatchMode];
+
+/// Parameters that only accept ReagentMode
 const REAGENT_ONLY: [DataType; 1] = [DataType::ReagentMode];
+
+/// Parameters that only accept Name
 const NAME_ONLY: [DataType; 1] = [DataType::Name];
 const LOGIC_SLOT: [DataType; 2] = [DataType::LogicType, DataType::SlotLogicType];
 const LOGIC_BATCH: [DataType; 2] = [DataType::LogicType, DataType::BatchMode];

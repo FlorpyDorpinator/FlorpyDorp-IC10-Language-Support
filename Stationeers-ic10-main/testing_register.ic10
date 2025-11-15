@@ -1,3 +1,0 @@
-alias Foo r1
-move r1 5
-put d0 Setting r1
