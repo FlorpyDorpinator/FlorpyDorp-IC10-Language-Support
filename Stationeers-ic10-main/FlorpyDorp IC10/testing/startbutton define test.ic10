@@ -1,0 +1,4 @@
+define StartButton HASH("StructureLogicButton")
+
+sb StartButton Setting 34
+

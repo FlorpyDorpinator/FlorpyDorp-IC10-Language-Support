@@ -1,0 +1,791 @@
+[
+  {
+    "type": "comment",
+    "named": true,
+    "fields": {}
+  },
+  {
+    "type": "device_spec",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "device",
+          "named": true
+        },
+        {
+          "type": "network_index",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "instruction",
+    "named": true,
+    "fields": {
+      "operand": {
+        "multiple": true,
+        "required": false,
+        "types": [
+          {
+            "type": "operand",
+            "named": true
+          }
+        ]
+      },
+      "operation": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "invalid_instruction",
+            "named": true
+          },
+          {
+            "type": "operation",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "label",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "identifier",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "line",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "comment",
+          "named": true
+        },
+        {
+          "type": "instruction",
+          "named": true
+        },
+        {
+          "type": "label",
+          "named": true
+        },
+        {
+          "type": "newline",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "newline",
+    "named": true,
+    "fields": {}
+  },
+  {
+    "type": "number",
+    "named": true,
+    "fields": {}
+  },
+  {
+    "type": "operand",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "device_spec",
+          "named": true
+        },
+        {
+          "type": "hash_preproc",
+          "named": true
+        },
+        {
+          "type": "identifier",
+          "named": true
+        },
+        {
+          "type": "logictype",
+          "named": true
+        },
+        {
+          "type": "number",
+          "named": true
+        },
+        {
+          "type": "register",
+          "named": true
+        },
+        {
+          "type": "str_preproc",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "operation",
+    "named": true,
+    "fields": {}
+  },
+  {
+    "type": "program",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "line",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "source_file",
+    "named": true,
+    "root": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": false,
+      "types": [
+        {
+          "type": "program",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "\n",
+    "named": false
+  },
+  {
+    "type": "\r",
+    "named": false
+  },
+  {
+    "type": "\r\n",
+    "named": false
+  },
+  {
+    "type": ":",
+    "named": false
+  },
+  {
+    "type": "abs",
+    "named": false
+  },
+  {
+    "type": "acos",
+    "named": false
+  },
+  {
+    "type": "add",
+    "named": false
+  },
+  {
+    "type": "alias",
+    "named": false
+  },
+  {
+    "type": "and",
+    "named": false
+  },
+  {
+    "type": "asin",
+    "named": false
+  },
+  {
+    "type": "atan",
+    "named": false
+  },
+  {
+    "type": "bap",
+    "named": false
+  },
+  {
+    "type": "bapal",
+    "named": false
+  },
+  {
+    "type": "bapz",
+    "named": false
+  },
+  {
+    "type": "bapzal",
+    "named": false
+  },
+  {
+    "type": "bdns",
+    "named": false
+  },
+  {
+    "type": "bdnsal",
+    "named": false
+  },
+  {
+    "type": "bdse",
+    "named": false
+  },
+  {
+    "type": "bdseal",
+    "named": false
+  },
+  {
+    "type": "beq",
+    "named": false
+  },
+  {
+    "type": "beqal",
+    "named": false
+  },
+  {
+    "type": "beqz",
+    "named": false
+  },
+  {
+    "type": "beqzal",
+    "named": false
+  },
+  {
+    "type": "bge",
+    "named": false
+  },
+  {
+    "type": "bgeal",
+    "named": false
+  },
+  {
+    "type": "bgez",
+    "named": false
+  },
+  {
+    "type": "bgezal",
+    "named": false
+  },
+  {
+    "type": "bgt",
+    "named": false
+  },
+  {
+    "type": "bgtal",
+    "named": false
+  },
+  {
+    "type": "bgtz",
+    "named": false
+  },
+  {
+    "type": "bgtzal",
+    "named": false
+  },
+  {
+    "type": "ble",
+    "named": false
+  },
+  {
+    "type": "bleal",
+    "named": false
+  },
+  {
+    "type": "blez",
+    "named": false
+  },
+  {
+    "type": "blezal",
+    "named": false
+  },
+  {
+    "type": "blt",
+    "named": false
+  },
+  {
+    "type": "bltal",
+    "named": false
+  },
+  {
+    "type": "bltz",
+    "named": false
+  },
+  {
+    "type": "bltzal",
+    "named": false
+  },
+  {
+    "type": "bna",
+    "named": false
+  },
+  {
+    "type": "bnaal",
+    "named": false
+  },
+  {
+    "type": "bnan",
+    "named": false
+  },
+  {
+    "type": "bnaz",
+    "named": false
+  },
+  {
+    "type": "bnazal",
+    "named": false
+  },
+  {
+    "type": "bne",
+    "named": false
+  },
+  {
+    "type": "bneal",
+    "named": false
+  },
+  {
+    "type": "bnez",
+    "named": false
+  },
+  {
+    "type": "bnezal",
+    "named": false
+  },
+  {
+    "type": "brap",
+    "named": false
+  },
+  {
+    "type": "brapz",
+    "named": false
+  },
+  {
+    "type": "brdns",
+    "named": false
+  },
+  {
+    "type": "brdse",
+    "named": false
+  },
+  {
+    "type": "breq",
+    "named": false
+  },
+  {
+    "type": "breqz",
+    "named": false
+  },
+  {
+    "type": "brge",
+    "named": false
+  },
+  {
+    "type": "brgez",
+    "named": false
+  },
+  {
+    "type": "brgt",
+    "named": false
+  },
+  {
+    "type": "brgtz",
+    "named": false
+  },
+  {
+    "type": "brle",
+    "named": false
+  },
+  {
+    "type": "brlez",
+    "named": false
+  },
+  {
+    "type": "brlt",
+    "named": false
+  },
+  {
+    "type": "brltz",
+    "named": false
+  },
+  {
+    "type": "brna",
+    "named": false
+  },
+  {
+    "type": "brnan",
+    "named": false
+  },
+  {
+    "type": "brnaz",
+    "named": false
+  },
+  {
+    "type": "brne",
+    "named": false
+  },
+  {
+    "type": "brnez",
+    "named": false
+  },
+  {
+    "type": "ceil",
+    "named": false
+  },
+  {
+    "type": "cos",
+    "named": false
+  },
+  {
+    "type": "define",
+    "named": false
+  },
+  {
+    "type": "deg2rad",
+    "named": false
+  },
+  {
+    "type": "device",
+    "named": true
+  },
+  {
+    "type": "div",
+    "named": false
+  },
+  {
+    "type": "epsilon",
+    "named": false
+  },
+  {
+    "type": "exp",
+    "named": false
+  },
+  {
+    "type": "floor",
+    "named": false
+  },
+  {
+    "type": "hash_preproc",
+    "named": true
+  },
+  {
+    "type": "hcf",
+    "named": false
+  },
+  {
+    "type": "identifier",
+    "named": true
+  },
+  {
+    "type": "invalid_instruction",
+    "named": true
+  },
+  {
+    "type": "j",
+    "named": false
+  },
+  {
+    "type": "jal",
+    "named": false
+  },
+  {
+    "type": "jr",
+    "named": false
+  },
+  {
+    "type": "l",
+    "named": false
+  },
+  {
+    "type": "label",
+    "named": false
+  },
+  {
+    "type": "lb",
+    "named": false
+  },
+  {
+    "type": "lbn",
+    "named": false
+  },
+  {
+    "type": "lbns",
+    "named": false
+  },
+  {
+    "type": "lbs",
+    "named": false
+  },
+  {
+    "type": "log",
+    "named": false
+  },
+  {
+    "type": "logictype",
+    "named": true
+  },
+  {
+    "type": "lr",
+    "named": false
+  },
+  {
+    "type": "ls",
+    "named": false
+  },
+  {
+    "type": "max",
+    "named": false
+  },
+  {
+    "type": "min",
+    "named": false
+  },
+  {
+    "type": "mod",
+    "named": false
+  },
+  {
+    "type": "move",
+    "named": false
+  },
+  {
+    "type": "mul",
+    "named": false
+  },
+  {
+    "type": "nan",
+    "named": false
+  },
+  {
+    "type": "network_index",
+    "named": true
+  },
+  {
+    "type": "ninf",
+    "named": false
+  },
+  {
+    "type": "nor",
+    "named": false
+  },
+  {
+    "type": "not",
+    "named": false
+  },
+  {
+    "type": "or",
+    "named": false
+  },
+  {
+    "type": "peek",
+    "named": false
+  },
+  {
+    "type": "pi",
+    "named": false
+  },
+  {
+    "type": "pinf",
+    "named": false
+  },
+  {
+    "type": "pop",
+    "named": false
+  },
+  {
+    "type": "push",
+    "named": false
+  },
+  {
+    "type": "rad2deg",
+    "named": false
+  },
+  {
+    "type": "rand",
+    "named": false
+  },
+  {
+    "type": "register",
+    "named": true
+  },
+  {
+    "type": "round",
+    "named": false
+  },
+  {
+    "type": "s",
+    "named": false
+  },
+  {
+    "type": "sap",
+    "named": false
+  },
+  {
+    "type": "sapz",
+    "named": false
+  },
+  {
+    "type": "sb",
+    "named": false
+  },
+  {
+    "type": "sbn",
+    "named": false
+  },
+  {
+    "type": "sbs",
+    "named": false
+  },
+  {
+    "type": "sdns",
+    "named": false
+  },
+  {
+    "type": "sdse",
+    "named": false
+  },
+  {
+    "type": "select",
+    "named": false
+  },
+  {
+    "type": "seq",
+    "named": false
+  },
+  {
+    "type": "seqz",
+    "named": false
+  },
+  {
+    "type": "sge",
+    "named": false
+  },
+  {
+    "type": "sgez",
+    "named": false
+  },
+  {
+    "type": "sgt",
+    "named": false
+  },
+  {
+    "type": "sgtz",
+    "named": false
+  },
+  {
+    "type": "sin",
+    "named": false
+  },
+  {
+    "type": "sla",
+    "named": false
+  },
+  {
+    "type": "sle",
+    "named": false
+  },
+  {
+    "type": "sleep",
+    "named": false
+  },
+  {
+    "type": "slez",
+    "named": false
+  },
+  {
+    "type": "sll",
+    "named": false
+  },
+  {
+    "type": "slt",
+    "named": false
+  },
+  {
+    "type": "sltz",
+    "named": false
+  },
+  {
+    "type": "sna",
+    "named": false
+  },
+  {
+    "type": "snan",
+    "named": false
+  },
+  {
+    "type": "snanz",
+    "named": false
+  },
+  {
+    "type": "snaz",
+    "named": false
+  },
+  {
+    "type": "sne",
+    "named": false
+  },
+  {
+    "type": "snez",
+    "named": false
+  },
+  {
+    "type": "sqrt",
+    "named": false
+  },
+  {
+    "type": "sra",
+    "named": false
+  },
+  {
+    "type": "srl",
+    "named": false
+  },
+  {
+    "type": "ss",
+    "named": false
+  },
+  {
+    "type": "str_preproc",
+    "named": true
+  },
+  {
+    "type": "sub",
+    "named": false
+  },
+  {
+    "type": "tan",
+    "named": false
+  },
+  {
+    "type": "trunc",
+    "named": false
+  },
+  {
+    "type": "xor",
+    "named": false
+  },
+  {
+    "type": "yield",
+    "named": false
+  }
+]

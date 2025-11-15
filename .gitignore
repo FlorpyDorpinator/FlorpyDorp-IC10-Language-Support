@@ -31,3 +31,7 @@ Thumbs.db
 
 # Editor directories
 .idea/
+
+.CONVERSATION_SUMMARY.md
+.CHAT_SUMMARY.md
+.github/
