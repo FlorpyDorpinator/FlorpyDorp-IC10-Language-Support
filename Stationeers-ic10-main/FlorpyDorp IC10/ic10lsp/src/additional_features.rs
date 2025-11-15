@@ -634,9 +634,11 @@ impl RegisterAnalyzer {
                 }
                 // Explicit numeric generating ops
                 // move already handled earlier; no case needed here to avoid unreachable pattern warning
-                // Stack gets - unknown but considered assigned elsewhere
+                // get/getd read device slots into registers as numbers
                 "get" | "getd" => {
-                    // leave Unknown
+                    if !target_reg.is_empty() {
+                        self.set_kind(&target_reg, ValueKind::Number);
+                    }
                 }
                 _ => {
                     // Arithmetic and others -> Number

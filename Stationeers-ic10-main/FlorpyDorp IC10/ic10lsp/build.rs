@@ -128,9 +128,9 @@ fn main() {
         out
     }
 
-    let enums_file = Path::new("../../Enums.json");
+    let enums_file = Path::new("../../../data/Enums.json");
     let enums_json =
-        fs::read_to_string(enums_file).expect("Failed to read Enums.json (expected at repo root)");
+        fs::read_to_string(enums_file).expect("Failed to read Enums.json (expected at data folder)");
     let v: Value = serde_json::from_str(&enums_json).expect("Failed to parse Enums.json");
 
     // Builders
@@ -238,5 +238,5 @@ fn main() {
     .unwrap();
     // (No direct value->name PHF map emitted; use runtime scan helper.)
 
-    println!("cargo:rerun-if-changed=../../Enums.json");
+    println!("cargo:rerun-if-changed=../../../data/Enums.json");
 }
