@@ -1,3 +1,7 @@
-yield
-get r12 db 12
-beqz r12 InitWaitLoop
+Start: 
+
+j Start
+
+beq 12 r3 Start
+
+

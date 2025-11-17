@@ -163,7 +163,7 @@
     },
     {
       "scope": ["variable.other.ic10"],
-      "settings": { "foreground": "#e0e0e0" }
+      "settings": { "foreground": "#ffffff" }
     },
     {
       "scope": ["comment", "punctuation.definition.comment"],
@@ -191,7 +191,7 @@
     },
     {
       "scope": ["variable", "support.variable"],
-      "settings": { "foreground": "#0080FF" }
+      "settings": { "foreground": "#ffffff" }
     },
     {
       "scope": ["constant.language"],

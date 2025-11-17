@@ -1,5 +1,12 @@
 ### Changelog Beginning 11-01-2025
 
+## [1.2.7] - 2025-11-15
+
+### 🐛 Bug Fixes
+- **Auto-fix Execute Permissions**: Extension now automatically sets execute permissions for LSP binaries on Linux/macOS
+- Eliminates "permission denied" errors on Unix-like systems
+- No manual `chmod +x` required after installation
+
 ## [1.2.6] - 2025-11-15
 
 ### 🌍 Multi-Platform Support
