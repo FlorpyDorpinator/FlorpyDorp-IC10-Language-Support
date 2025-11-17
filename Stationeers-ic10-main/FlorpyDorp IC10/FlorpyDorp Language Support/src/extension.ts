@@ -167,8 +167,18 @@ export function activate(context: vscode.ExtensionContext) {
     // Log the resolved server path for debugging
     console.log(`IC10 LSP: Server path resolved to: ${serverModule}`);
     
-    // Verify server binary exists
+    // Ensure executable permissions on Unix-like systems
     const fs = require('fs');
+    if (process.platform !== "win32" && fs.existsSync(serverModule)) {
+        try {
+            fs.chmodSync(serverModule, 0o755);
+            console.log(`IC10 LSP: Set executable permissions for ${serverModule}`);
+        } catch (err) {
+            console.warn(`IC10 LSP: Could not set executable permissions: ${err}`);
+        }
+    }
+    
+    // Verify server binary exists
     if (!fs.existsSync(serverModule)) {
         const errorMsg = `IC10 Language Server binary not found at: ${serverModule}\n\n` +
             `If using a custom serverPath, ensure the path is correct and uses forward slashes or escaped backslashes.\n` +
