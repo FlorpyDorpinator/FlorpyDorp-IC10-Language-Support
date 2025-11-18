@@ -139,8 +139,13 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       
       - name: Publish to VS Code Marketplace
-        if: startsWith(github.ref, 'refs/tags/') && secrets.VSCE_PAT != ''
+        if: startsWith(github.ref, 'refs/tags/')
         working-directory: Stationeers-ic10-main/FlorpyDorp IC10/FlorpyDorp Language Support
-        run: vsce publish -p ${{ secrets.VSCE_PAT }}
+        run: |
+          if [ -n "${{ secrets.VSCE_PAT }}" ]; then
+            vsce publish -p ${{ secrets.VSCE_PAT }}
+          else
+            echo "VSCE_PAT not set - skipping marketplace publish"
+          fi
         env:
           VSCE_PAT: ${{ secrets.VSCE_PAT }}
