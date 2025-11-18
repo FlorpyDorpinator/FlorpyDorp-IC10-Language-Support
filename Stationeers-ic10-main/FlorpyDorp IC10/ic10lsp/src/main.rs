@@ -301,6 +301,7 @@ struct Configuration {
     max_bytes: usize,
     warn_overline_comment: bool,
     warn_overcolumn_comment: bool,
+    suppress_hash_diagnostics: bool,
 }
 
 impl Default for Configuration {
@@ -311,6 +312,7 @@ impl Default for Configuration {
             max_bytes: 4096,
             warn_overline_comment: true,
             warn_overcolumn_comment: true,
+            suppress_hash_diagnostics: false,
         }
     }
 }
@@ -326,6 +328,52 @@ struct Backend {
 #[async_trait]
 impl LanguageServer for Backend {
     async fn initialize(&self, params: InitializeParams) -> Result<InitializeResult> {
+        // Debug: log what we receive
+        self.client.log_message(MessageType::INFO, format!("Initialize called, has init_options: {}", params.initialization_options.is_some())).await;
+        
+        // Read initial configuration from initializationOptions if provided
+        if let Some(init_options) = params.initialization_options {
+            self.client.log_message(MessageType::INFO, format!("Init options: {}", serde_json::to_string_pretty(&init_options).unwrap_or_else(|_| "serialize failed".to_string()))).await;
+            
+            let mut config = self.config.write().await;
+            
+            if let Some(warnings) = init_options.get("warnings").and_then(Value::as_object) {
+                config.warn_overline_comment = warnings
+                    .get("overline_comment")
+                    .and_then(Value::as_bool)
+                    .unwrap_or(config.warn_overline_comment);
+                config.warn_overcolumn_comment = warnings
+                    .get("overcolumn_comment")
+                    .and_then(Value::as_bool)
+                    .unwrap_or(config.warn_overcolumn_comment);
+            }
+            
+            config.max_lines = init_options
+                .get("max_lines")
+                .and_then(Value::as_u64)
+                .map(|x| x as usize)
+                .unwrap_or(config.max_lines);
+            
+            config.max_columns = init_options
+                .get("max_columns")
+                .and_then(Value::as_u64)
+                .map(|x| x as usize)
+                .unwrap_or(config.max_columns);
+            
+            config.max_bytes = init_options
+                .get("max_bytes")
+                .and_then(Value::as_u64)
+                .map(|x| x as usize)
+                .unwrap_or(config.max_bytes);
+            
+            config.suppress_hash_diagnostics = init_options
+                .get("suppressHashDiagnostics")
+                .and_then(Value::as_bool)
+                .unwrap_or(config.suppress_hash_diagnostics);
+            
+            self.client.log_message(MessageType::INFO, format!("Initial config - suppress_hash_diagnostics: {}", config.suppress_hash_diagnostics)).await;
+        }
+        
         let mut utf8_supported = false;
         if let Some(encodings) = params
             .capabilities
@@ -337,14 +385,9 @@ impl LanguageServer for Backend {
                     utf8_supported = true;
                 }
             }
-            if !utf8_supported {
-                self.client
-                    .show_message(
-                        MessageType::WARNING,
-                        "Client does not support UTF-8. Non-ASCII characters will cause problems.",
-                    )
-                    .await;
-            }
+            // Note: Modern LSP clients handle UTF-16 by default, which is sufficient for IC10.
+            // The warning is suppressed to avoid confusion since the vscode-languageclient
+            // handles encoding negotiation automatically.
         }
         // Log current counts of static maps/sets so we can verify the running binary contains
         // the latest logic types. This message appears once on server init in the Output panel.
@@ -366,8 +409,8 @@ impl LanguageServer for Backend {
                 )),
                 execute_command_provider: Some(ExecuteCommandOptions {
                     commands: vec![
-                        "version".to_string(),
                         "setDiagnostics".to_string(),
+                        "ic10.setHashDiagnostics".to_string(),
                     ],
                     work_done_progress_options: WorkDoneProgressOptions {
                         work_done_progress: None,
@@ -407,6 +450,10 @@ impl LanguageServer for Backend {
                         },
                     ),
                 ),
+                workspace: Some(WorkspaceServerCapabilities {
+                    workspace_folders: None,
+                    file_operations: None,
+                }),
                 ..Default::default()
             },
             server_info: Some(ServerInfo {
@@ -447,6 +494,20 @@ impl LanguageServer for Backend {
                                 .publish_diagnostics(uri.clone(), vec![], None)
                                 .await;
                         }
+                    }
+                }
+            }
+            "ic10.setHashDiagnostics" => {
+                if let Some(suppress) = params.arguments.get(0).and_then(Value::as_bool) {
+                    self.config.write().await.suppress_hash_diagnostics = suppress;
+
+                    // Re-run diagnostics for all open files
+                    let uris = {
+                        let files = self.files.read().await;
+                        files.keys().cloned().collect::<Vec<_>>()
+                    };
+                    for uri in uris {
+                        self.run_diagnostics(&uri).await;
                     }
                 }
             }
@@ -577,6 +638,10 @@ impl LanguageServer for Backend {
             let mut config = self.config.write().await;
             let value = params.settings;
 
+            // Debug logging
+            self.client.log_message(MessageType::INFO, "=== Configuration received ===").await;
+            self.client.log_message(MessageType::INFO, format!("Config JSON: {}", serde_json::to_string_pretty(&value).unwrap_or_else(|_| "Failed to serialize".to_string()))).await;
+
             if let Some(warnings) = value.get("warnings").and_then(Value::as_object) {
                 config.warn_overline_comment = warnings
                     .get("overline_comment")
@@ -606,6 +671,13 @@ impl LanguageServer for Backend {
                 .and_then(Value::as_u64)
                 .map(|x| x as usize)
                 .unwrap_or(config.max_bytes);
+
+            config.suppress_hash_diagnostics = value
+                .get("suppressHashDiagnostics")
+                .and_then(Value::as_bool)
+                .unwrap_or(config.suppress_hash_diagnostics);
+
+            self.client.log_message(MessageType::INFO, format!("suppress_hash_diagnostics set to: {}", config.suppress_hash_diagnostics)).await;
         }
 
         let uris = {
@@ -2398,6 +2470,10 @@ impl Backend {
             return;
         };
 
+        // Read config before the loop to avoid await across non-Send types
+        let suppress_hash_diagnostics = self.config.read().await.suppress_hash_diagnostics;
+        self.client.log_message(MessageType::INFO, format!("Running diagnostics with suppress_hash_diagnostics: {}", suppress_hash_diagnostics)).await;
+
         let mut cursor = QueryCursor::new();
         let query = Query::new(tree_sitter_ic10::language(), "(instruction)@a").unwrap();
 
@@ -2633,16 +2709,18 @@ impl Backend {
                                     if let Some(_) = get_device_hash(name.as_str()) {
                                         // Known device name; optionally could inlay the numeric value
                                     } else {
-                                        // Unknown device string; still treat as number but nudge
-                                        diagnostics.push(Diagnostic::new(
-                                            Range::from(operand.range()).into(),
-                                            Some(DiagnosticSeverity::INFORMATION),
-                                            None,
-                                            None,
-                                            format!("Unrecognized device name '{}' in HASH(...). Will be treated as number.", name),
-                                            None,
-                                            None,
-                                        ));
+                                        // Unknown device string; still treat as number but nudge (unless suppressed)
+                                        if !suppress_hash_diagnostics {
+                                            diagnostics.push(Diagnostic::new(
+                                                Range::from(operand.range()).into(),
+                                                Some(DiagnosticSeverity::INFORMATION),
+                                                None,
+                                                None,
+                                                format!("Unrecognized device name '{}' in HASH(...). Will be treated as number.", name),
+                                                None,
+                                                None,
+                                            ));
+                                        }
                                     }
                                 }
                                 instructions::Union(&[DataType::Number])

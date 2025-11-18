@@ -79,6 +79,11 @@ When static analysis produces false positives for registers (common with complex
 - **Code Action**: Click the lightbulb on a register diagnostic → "Ignore diagnostics for rX"  
 - **Hotkey**: Press **Ctrl+Alt+I** to suppress all register diagnostics at once
 
+**Suppress hash diagnostics:**  
+If you prefer not to see warnings about HASH() calls or device hash values:  
+- **Hotkey**: Press **Ctrl+Alt+H** to toggle hash diagnostics on/off  
+- Setting persists across VS Code sessions
+
 ## 🎩 Code in STYLE!
 **Theme Toggle:**  
 Press **Ctrl+Alt+T** to switch between the immersive Stationeers Editor Theme and your previous theme.
@@ -113,7 +118,9 @@ Press **Ctrl+Alt+T** to switch between the immersive Stationeers Editor Theme an
 Ctrl+Shift+P → "IC10: Restart Server"
 
 **Toggle diagnostics:**  
-Ctrl+Alt+D
+Ctrl+Alt+D (all diagnostics)  
+Ctrl+Alt+H (hash diagnostics only)  
+Ctrl+Alt+I (register diagnostics)
 
 ---
 

@@ -91,8 +91,18 @@ function getInstructionExamples(instruction: string): string[] {
  * 
  * @returns Configuration object with IC10 LSP settings
  */
-function getLSPIC10Configurations(): vscode.WorkspaceConfiguration {
-    return vscode.workspace.getConfiguration('ic10.lsp');
+function getLSPIC10Configurations(): any {
+    const config = vscode.workspace.getConfiguration('ic10.lsp');
+    return {
+        max_lines: config.get('max_lines'),
+        max_columns: config.get('max_columns'),
+        max_bytes: config.get('max_bytes'),
+        warnings: {
+            overline_comment: config.get('warnings.overline_comment'),
+            overcolumn_comment: config.get('warnings.overcolumn_comment')
+        },
+        suppressHashDiagnostics: config.get('suppressHashDiagnostics')
+    };
 }
 
 // ============================================================================
@@ -223,9 +233,9 @@ export function activate(context: vscode.ExtensionContext) {
     const forcePalette = vscode.workspace.getConfiguration().get('ic10.colors.forceGamePalette') as boolean;
     if (forcePalette) {
         const currentTheme = vscode.workspace.getConfiguration('workbench').get('colorTheme') as string | undefined;
-        const targetTheme = 'IC10 In-Game Colors';
+        const targetTheme = 'Stationeers IC10 Syntax Only';
         if (currentTheme !== targetTheme) {
-            vscode.window.showInformationMessage('Switch to IC10 In-Game Colors theme for authentic colors?', 'Switch', 'Later')
+            vscode.window.showInformationMessage('Switch to Stationeers IC10 Syntax Only theme for authentic colors?', 'Switch', 'Later')
                 .then((choice: string | undefined) => {
                     if (choice === 'Switch') {
                         vscode.workspace.getConfiguration('workbench').update('colorTheme', targetTheme, vscode.ConfigurationTarget.Global);
@@ -243,6 +253,7 @@ export function activate(context: vscode.ExtensionContext) {
         ],
         // Use UTF-8 encoding for proper handling of special characters
         outputChannelName: 'IC10 Language Server',
+        initializationOptions: getLSPIC10Configurations(),
         middleware: {
             provideHover: async (document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken, next: any) => {
                 const useGameStyle = vscode.workspace.getConfiguration().get('ic10.hover.useGameStyle') as boolean;
@@ -898,11 +909,51 @@ export function activate(context: vscode.ExtensionContext) {
         }
     }));
 
+    // Toggle hash-related diagnostics
+    context.subscriptions.push(vscode.commands.registerCommand('ic10.suppressHashDiagnostics', async () => {
+        console.log('[IC10] suppressHashDiagnostics command invoked');
+        const config = vscode.workspace.getConfiguration('ic10.lsp');
+        const currentValue = config.get<boolean>('suppressHashDiagnostics', false);
+        const newValue = !currentValue;
+        
+        console.log('[IC10] Current value:', currentValue, '-> New value:', newValue);
+        console.log('[IC10] Client running:', clientRunning);
+        
+        // Update the config setting
+        await config.update('suppressHashDiagnostics', newValue, vscode.ConfigurationTarget.Global);
+        console.log('[IC10] Config updated');
+        
+        // Send custom command to LSP to update the setting and refresh diagnostics
+        if (clientRunning && lc) {
+            try {
+                console.log('[IC10] Sending command to LSP server...');
+                const options: ExecuteCommandParams = {
+                    command: 'ic10.setHashDiagnostics',
+                    arguments: [newValue]
+                };
+                const result = await lc.sendRequest('workspace/executeCommand', options);
+                console.log('[IC10] LSP server response:', result);
+                
+                vscode.window.showInformationMessage(
+                    `HASH() warnings ${newValue ? 'suppressed' : 'enabled'}`
+                );
+            } catch (error) {
+                console.error('[IC10] Error sending command to server:', error);
+                vscode.window.showErrorMessage(`Failed to update hash diagnostics: ${error}`);
+            }
+        } else {
+            console.log('[IC10] Client not running (clientRunning=' + clientRunning + ')');
+            vscode.window.showInformationMessage(
+                `HASH() warnings ${newValue ? 'suppressed' : 'enabled'} (restart required)`
+            );
+        }
+    }));
+
     // Toggle between Stationeers theme and user's previous theme
     context.subscriptions.push(vscode.commands.registerCommand('ic10.toggleStationeersTheme', async () => {
         const config = vscode.workspace.getConfiguration();
         const currentTheme = config.get<string>('workbench.colorTheme');
-        const stationeersTheme = 'Stationeers Dark';
+        const stationeersTheme = 'Stationeers Full Color Theme';
         
         // Get or set the stored previous theme
         const previousTheme = context.globalState.get<string>('ic10.previousTheme');
@@ -916,7 +967,7 @@ export function activate(context: vscode.ExtensionContext) {
             // Store current theme and switch to Stationeers
             await context.globalState.update('ic10.previousTheme', currentTheme);
             await config.update('workbench.colorTheme', stationeersTheme, vscode.ConfigurationTarget.Global);
-            vscode.window.showInformationMessage('Switched to Stationeers Dark theme');
+            vscode.window.showInformationMessage('Switched to Stationeers Full Color Theme');
         }
     }));
 

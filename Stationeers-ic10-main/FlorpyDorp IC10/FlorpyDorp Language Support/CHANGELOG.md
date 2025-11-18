@@ -1,5 +1,27 @@
 ### Changelog Beginning 11-01-2025
 
+## [1.2.10] - 2025-11-17
+
+### ✨ New Features
+- **Hash Diagnostics Toggle**: Added Ctrl+Alt+H to suppress/restore HASH() and device hash diagnostics
+- New command: "IC10: Suppress Hash Diagnostics" for toggling hash-related warnings
+- Added `ic10.lsp.suppressHashDiagnostics` setting to persist preference across sessions
+
+### 🐛 Bug Fixes
+- Fixed "Client does not support UTF-8" warning appearing on startup
+- Removed debug messages that showed "Server received command" notifications
+- Cleaned up verbose logging for better user experience
+- Extension now properly handles UTF-16 encoding (default for LSP clients)
+
+## [1.2.8] - 2025-11-17
+
+### 🎨 Theme Improvements
+- **Renamed Themes for Clarity**:
+  - "Stationeers Dark" → "Stationeers Full Color Theme" (complete UI + syntax)
+  - "IC10 In-Game Colors" → "Stationeers IC10 Syntax Only" (syntax highlighting only)
+- Updated theme toggle command (Ctrl+Alt+T) to use new names
+- Improved theme descriptions for better discoverability
+
 ## [1.2.7] - 2025-11-15
 
 ### 🐛 Bug Fixes
