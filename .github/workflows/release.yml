@@ -99,7 +99,7 @@ jobs:
       
       - name: Install dependencies
         working-directory: Stationeers-ic10-main/FlorpyDorp IC10/FlorpyDorp Language Support
-        run: npm ci
+        run: npm install
       
       - name: Build extension
         working-directory: Stationeers-ic10-main/FlorpyDorp IC10/FlorpyDorp Language Support
