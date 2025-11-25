@@ -229,18 +229,42 @@ export function activate(context: vscode.ExtensionContext) {
         };
     }
 
-    // Optionally prompt to switch to in-game color theme
-    const forcePalette = vscode.workspace.getConfiguration().get('ic10.colors.forceGamePalette') as boolean;
-    if (forcePalette) {
+    // Optionally prompt to switch to IC10 theme on first install (only once)
+    const hasAskedAboutTheme = context.globalState.get<boolean>('ic10.hasAskedAboutTheme', false);
+    
+    console.log('[IC10] Theme prompt - hasAsked:', hasAskedAboutTheme);
+    
+    if (!hasAskedAboutTheme) {
         const currentTheme = vscode.workspace.getConfiguration('workbench').get('colorTheme') as string | undefined;
-        const targetTheme = 'Stationeers IC10 Syntax Only';
-        if (currentTheme !== targetTheme) {
-            vscode.window.showInformationMessage('Switch to Stationeers IC10 Syntax Only theme for authentic colors?', 'Switch', 'Later')
-                .then((choice: string | undefined) => {
-                    if (choice === 'Switch') {
-                        vscode.workspace.getConfiguration('workbench').update('colorTheme', targetTheme, vscode.ConfigurationTarget.Global);
-                    }
-                });
+        const themeOptions = [
+            'Stationeers IC10 Syntax Only',
+            'Stationeers Full Color Theme'
+        ];
+        
+        console.log('[IC10] Current theme:', currentTheme);
+        
+        // Only prompt if not already using one of our themes
+        if (!themeOptions.includes(currentTheme || '')) {
+            console.log('[IC10] Showing theme selection prompt');
+            vscode.window.showInformationMessage(
+                'Apply IC10 syntax colors? (Dark+ UI + Stationeers in-game colors, or full custom theme)', 
+                'Syntax Colors Only', 
+                'Full Custom Theme', 
+                'No Thanks'
+            ).then((choice: string | undefined) => {
+                console.log('[IC10] User selected:', choice);
+                if (choice === 'Syntax Colors Only') {
+                    vscode.workspace.getConfiguration('workbench').update('colorTheme', 'Stationeers IC10 Syntax Only', vscode.ConfigurationTarget.Global);
+                } else if (choice === 'Full Custom Theme') {
+                    vscode.workspace.getConfiguration('workbench').update('colorTheme', 'Stationeers Full Color Theme', vscode.ConfigurationTarget.Global);
+                }
+                // Mark that we've asked, regardless of choice
+                context.globalState.update('ic10.hasAskedAboutTheme', true);
+            });
+        } else {
+            // Already using one of our themes, mark as asked so we don't prompt in the future
+            console.log('[IC10] Already using IC10 theme, skipping prompt');
+            context.globalState.update('ic10.hasAskedAboutTheme', true);
         }
     }
 
@@ -969,6 +993,12 @@ export function activate(context: vscode.ExtensionContext) {
             await config.update('workbench.colorTheme', stationeersTheme, vscode.ConfigurationTarget.Global);
             vscode.window.showInformationMessage('Switched to Stationeers Full Color Theme');
         }
+    }));
+
+    // Command to reset theme prompt state (for testing)
+    context.subscriptions.push(vscode.commands.registerCommand('ic10.resetThemePrompt', async () => {
+        await context.globalState.update('ic10.hasAskedAboutTheme', undefined);
+        vscode.window.showInformationMessage('Theme prompt state reset. Reload window to see the prompt again.');
     }));
 
 }
