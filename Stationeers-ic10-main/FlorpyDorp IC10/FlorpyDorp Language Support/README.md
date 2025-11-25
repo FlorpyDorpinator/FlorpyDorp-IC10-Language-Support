@@ -84,6 +84,41 @@ If you prefer not to see warnings about HASH() calls or device hash values:
 - **Hotkey**: Press **Ctrl+Alt+H** to toggle hash diagnostics on/off  
 - Setting persists across VS Code sessions
 
+---
+
+## 🎨 Color Themes
+
+Choose from two custom themes designed for IC10 development:
+
+### Stationeers IC10 Syntax Only
+Perfect for users who want authentic Stationeers in-game syntax colors while keeping their familiar Dark+ UI. This theme only changes code colors, leaving the rest of VS Code untouched.
+
+![IC10 Syntax Only Theme](images/theme-syntax-only.png)
+
+**Features:**
+- Dark+ base UI (familiar and clean)
+- Authentic Stationeers in-game syntax colors
+- Optimized for IC10 instruction visibility
+- Works seamlessly with existing VS Code setup
+
+### Stationeers Full Color Theme
+A complete immersive theme that transforms your entire VS Code interface with Stationeers-inspired colors throughout - code like you're in the game!
+
+![Stationeers Full Color Theme](images/theme-full.png)
+
+**Features:**
+- Full custom UI colors inspired by Stationeers
+- Cohesive color palette across editor and interface
+- Deep integration with game aesthetics
+- Complete visual overhaul
+
+**Apply themes:**
+- First install: Choose when prompted on activation
+- Anytime: Press Ctrl+K Ctrl+T and select your preferred theme
+- Toggle: Press **Ctrl+Alt+T** to switch between the full color Stationeers theme and your previous theme
+
+---
+
 ## 🎩 Code in STYLE!
 **Theme Toggle:**  
 Press **Ctrl+Alt+T** to switch between the immersive Stationeers Editor Theme and your previous theme.

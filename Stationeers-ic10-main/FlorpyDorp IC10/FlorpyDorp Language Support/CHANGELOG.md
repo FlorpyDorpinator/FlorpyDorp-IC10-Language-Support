@@ -1,5 +1,24 @@
 ### Changelog Beginning 11-01-2025
 
+## [1.2.11] - 2025-11-24
+
+### ✨ New Features
+- **One-Time Theme Prompt**: Extension now prompts once on first install to choose between IC10 themes
+  - "Syntax Colors Only" - Dark+ UI with Stationeers in-game syntax colors
+  - "Full Custom Theme" - Complete custom theme with Stationeers aesthetics
+  - "No Thanks" - Keep current theme
+- Prompt only appears once and respects user's choice
+
+### 📚 Documentation
+- Added theme showcase section to README with screenshots
+- Clarified differences between "Syntax Only" and "Full Theme" options
+- Added theme selection guide for new users
+
+### 🔧 Improvements
+- Removed dependency on `ic10.colors.forceGamePalette` setting for cleaner configuration
+- Added "IC10: Reset Theme Prompt" command for testing (developer feature)
+- Improved theme prompt messaging to clearly explain options
+
 ## [1.2.10] - 2025-11-17
 
 ### ✨ New Features
