@@ -1,5 +1,17 @@
 ### Changelog Beginning 11-01-2025
 
+## [1.2.12] - 2025-11-25
+
+### ✨ New Features
+- **#IgnoreLimits Directive**: Add `#IgnoreLimits` comment to scripts to suppress line and byte limit diagnostics
+  - Suppresses "Instruction past line 128" errors for long scripts
+  - Suppresses byte limit warnings for scripts exceeding 52KB
+  - Case-insensitive (works with `#ignorelimits`, `#IgnoreLimits`, etc.)
+  - Useful for development/testing of large scripts before optimization
+
+### 🔧 Improvements
+- Enhanced diagnostic control for better workflow flexibility
+
 ## [1.2.11] - 2025-11-24
 
 ### ✨ New Features
