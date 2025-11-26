@@ -84,6 +84,13 @@ If you prefer not to see warnings about HASH() calls or device hash values:
 - **Hotkey**: Press **Ctrl+Alt+H** to toggle hash diagnostics on/off  
 - Setting persists across VS Code sessions
 
+**Suppress line/byte limit diagnostics:**  
+For development or testing of large scripts that exceed the 128-line or 52KB limits:  
+- Add `#IgnoreLimits` anywhere in your script (case-insensitive)  
+- Suppresses "Instruction past line 128" errors  
+- Suppresses byte limit warnings  
+- Useful for prototyping before optimization
+
 ---
 
 ## 🎨 Color Themes

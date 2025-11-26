@@ -2278,6 +2278,20 @@ impl Backend {
         node
     }
 
+    fn should_ignore_limits(content: &str) -> bool {
+        // Check for #IgnoreLimits directive in comments (case-insensitive)
+        for line in content.lines() {
+            let trimmed = line.trim();
+            if let Some(comment_start) = trimmed.find('#') {
+                let comment = trimmed[comment_start + 1..].trim().to_lowercase();
+                if comment.starts_with("ignorelimits") {
+                    return true;
+                }
+            }
+        }
+        false
+    }
+
     async fn update_content(&self, uri: Url, mut text: String) {
         let mut files = self.files.write().await;
 
@@ -2953,81 +2967,87 @@ impl Backend {
                 }
             }
 
-            cursor.set_point_range(
-                tree_sitter::Point::new(config.max_lines, 0)
-                    ..tree_sitter::Point::new(usize::MAX, usize::MAX),
-            );
-            let query = Query::new(tree_sitter_ic10::language(), "(instruction)@x").unwrap();
+            // Check for #IgnoreLimits directive
+            if !Self::should_ignore_limits(&document.content) {
+                cursor.set_point_range(
+                    tree_sitter::Point::new(config.max_lines, 0)
+                        ..tree_sitter::Point::new(usize::MAX, usize::MAX),
+                );
+                let query = Query::new(tree_sitter_ic10::language(), "(instruction)@x").unwrap();
 
-            for (capture, _) in
-                cursor.captures(&query, tree.root_node(), document.content.as_bytes())
-            {
-                let node = capture.captures[0].node;
-                diagnostics.push(Diagnostic {
-                    range: Range::from(node.range()).into(),
-                    severity: Some(DiagnosticSeverity::ERROR),
-                    message: format!("Instruction past line {}", config.max_lines),
-                    ..Default::default()
-                });
-            }
-
-            if config.warn_overline_comment {
-                let query = Query::new(tree_sitter_ic10::language(), "(comment)@x").unwrap();
                 for (capture, _) in
                     cursor.captures(&query, tree.root_node(), document.content.as_bytes())
                 {
                     let node = capture.captures[0].node;
                     diagnostics.push(Diagnostic {
                         range: Range::from(node.range()).into(),
-                        severity: Some(DiagnosticSeverity::WARNING),
-                        message: format!("Comment past line {}", config.max_lines),
+                        severity: Some(DiagnosticSeverity::ERROR),
+                        message: format!("Instruction past line {}", config.max_lines),
                         ..Default::default()
                     });
+                }
+
+                if config.warn_overline_comment {
+                    let query = Query::new(tree_sitter_ic10::language(), "(comment)@x").unwrap();
+                    for (capture, _) in
+                        cursor.captures(&query, tree.root_node(), document.content.as_bytes())
+                    {
+                        let node = capture.captures[0].node;
+                        diagnostics.push(Diagnostic {
+                            range: Range::from(node.range()).into(),
+                            severity: Some(DiagnosticSeverity::WARNING),
+                            message: format!("Comment past line {}", config.max_lines),
+                            ..Default::default()
+                        });
+                    }
                 }
             }
         }
 
         // Byte size check
         {
-            let mut byte_count = 0;
-            let mut start_pos: Option<LspPosition> = None;
-            let mut current_line = 0;
-            let mut current_col = 0;
+            // Check for #IgnoreLimits directive
+            if !Self::should_ignore_limits(&document.content) {
+                let mut byte_count = 0;
+                let mut start_pos: Option<LspPosition> = None;
+                let mut current_line = 0;
+                let mut current_col = 0;
 
-            for char in document.content.chars() {
-                let char_len = if char == '\n' { 2 } else { 1 };
+                for char in document.content.chars() {
+                    let char_len = if char == '\n' { 2 } else { 1 };
 
-                if byte_count <= config.max_bytes && byte_count + char_len > config.max_bytes {
-                    if start_pos.is_none() {
-                        start_pos = Some(LspPosition::new(current_line, current_col));
+                    if byte_count <= config.max_bytes && byte_count + char_len > config.max_bytes {
+                        if start_pos.is_none() {
+                            start_pos = Some(LspPosition::new(current_line, current_col));
+                        }
+                    }
+                    byte_count += char_len;
+
+                    if char == '\n' {
+                        current_line += 1;
+                        current_col = 0;
+                    } else {
+                        current_col += 1;
                     }
                 }
-                byte_count += char_len;
 
-                if char == '\n' {
-                    current_line += 1;
-                    current_col = 0;
-                } else {
-                    current_col += 1;
+                if byte_count > config.max_bytes {
+                    let end_line = document.content.lines().count().saturating_sub(1) as u32;
+                    let end_col = document.content.lines().last().map_or(0, |l| l.len()) as u32;
+
+                    diagnostics.push(Diagnostic {
+                        range: LspRange::new(
+                            start_pos.unwrap_or_else(|| LspPosition::new(end_line, 0)),
+                            LspPosition::new(end_line, end_col),
+                        ),
+                        severity: Some(DiagnosticSeverity::ERROR),
+                        message: format!(
+                            "Script size ({} bytes) exceeds the maximum limit of {} bytes.",
+                            byte_count, config.max_bytes
+                        ),
+                        ..Default::default()
+                    });
                 }
-            }
-
-            if byte_count > config.max_bytes {
-                let end_line = document.content.lines().count().saturating_sub(1) as u32;
-                let end_col = document.content.lines().last().map_or(0, |l| l.len()) as u32;
-
-                diagnostics.push(Diagnostic {
-                    range: LspRange::new(
-                        start_pos.unwrap_or_else(|| LspPosition::new(end_line, 0)),
-                        LspPosition::new(end_line, end_col),
-                    ),
-                    severity: Some(DiagnosticSeverity::ERROR),
-                    message: format!(
-                        "Script size ({} bytes) exceeds the maximum limit of {} bytes.",
-                        byte_count, config.max_bytes
-                    ),
-                    ..Default::default()
-                });
             }
         }
 
