@@ -1,5 +1,26 @@
 ### Changelog Beginning 11-01-2025
 
+## [1.2.16] - 2025-11-26
+
+### 🚀 Performance Improvements (LSP)
+- **Large Workspace Optimization**: Significantly improved performance when working with many IC10 files
+  - Added diagnostic debouncing (500ms delay) to prevent spam on rapid file changes
+  - Smart batching: config changes only refresh 50 most recently-edited files instead of all files
+  - File count warning when >50 files open with suggestion to use Ctrl+Alt+D to disable diagnostics
+  - Timestamp tracking for intelligent diagnostic prioritization
+  - Prevents LSP timeout errors in workspaces with 100+ IC10 files
+
+### 🐛 Bug Fixes
+- **Inlay Hints**: Fixed shadow text appearing on completed instructions
+  - Properly recognizes `beqzal` and other `*zal` branch variants as 2-operand instructions
+  - Fixed parameter counting logic to hide hints when all parameters are provided
+- **Code Actions**: Fixed panic in code action handler (replaced unsafe unwrap() calls)
+
+### 🔧 Technical Changes
+- Added dashmap dependency for better concurrent performance
+- Optimized `did_change_configuration` to avoid diagnostic cascades
+- Improved memory efficiency with selective diagnostic runs
+
 ## [1.2.15] - 2025-11-26
 
 ### 🐛 Bug Fixes
