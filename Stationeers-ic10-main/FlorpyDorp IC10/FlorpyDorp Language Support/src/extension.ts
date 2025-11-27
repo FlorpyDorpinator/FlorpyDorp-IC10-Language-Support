@@ -581,7 +581,8 @@ export function activate(context: vscode.ExtensionContext) {
         try {
             await lc.start();
             clientRunning = true;
-            flushPendingServerState();
+            // Give server a moment to fully initialize before sending commands
+            setTimeout(() => flushPendingServerState(), 100);
         } catch (err) {
             vscode.window.showErrorMessage(`IC10 Language Server failed to start: ${err instanceof Error ? err.message : String(err)}`);
         }
@@ -618,15 +619,17 @@ export function activate(context: vscode.ExtensionContext) {
     void startClient();
 
     // Register configuration changes to keep the server in sync.
-    vscode.workspace.onDidChangeConfiguration((e: vscode.ConfigurationChangeEvent) => {
-        if (e.affectsConfiguration('ic10.lsp')) {
-            scheduleConfigSync();
-        }
-        if (e.affectsConfiguration('ic10.diagnostics.enabled')) {
-            const diag = (vscode.workspace.getConfiguration().get('ic10.diagnostics.enabled') as boolean | undefined) ?? true;
-            scheduleDiagnosticsSync(diag);
-        }
-    });
+    context.subscriptions.push(
+        vscode.workspace.onDidChangeConfiguration((e: vscode.ConfigurationChangeEvent) => {
+            if (e.affectsConfiguration('ic10.lsp')) {
+                scheduleConfigSync();
+            }
+            if (e.affectsConfiguration('ic10.diagnostics.enabled')) {
+                const diag = (vscode.workspace.getConfiguration().get('ic10.diagnostics.enabled') as boolean | undefined) ?? true;
+                scheduleDiagnosticsSync(diag);
+            }
+        })
+    );
 
     // Dynamic example extraction removed; using static examples only.
 
@@ -752,6 +755,10 @@ export function activate(context: vscode.ExtensionContext) {
                         const text = document.lineAt(line).text;
                         const m = text.match(/^\s*([a-zA-Z][a-zA-Z0-9]*)\b(.*)$/);
                         if (!m) continue;
+                        
+                        // Skip labels (word followed by colon)
+                        if (m[2].trimStart().startsWith(':')) continue;
+                        
                         const opcode = m[1].toLowerCase();
                         const sig = signatureMap[opcode] ?? computeSignature(opcode);
                         if (!sig) continue;
