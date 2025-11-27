@@ -100,7 +100,7 @@ Choose from two custom themes designed for IC10 development:
 ### Stationeers IC10 Syntax Only
 Perfect for users who want authentic Stationeers in-game syntax colors while keeping their familiar Dark+ UI. This theme only changes code colors, leaving the rest of VS Code untouched.
 
-![IC10 Syntax Only Theme](images/theme-syntax-only.png)
+![IC10 Syntax Only Theme](https://raw.githubusercontent.com/FlorpyDorp/Stationeers-ic10/main/FlorpyDorp%20IC10/FlorpyDorp%20Language%20Support/images/theme-syntax-only.png)
 
 **Features:**
 - Dark+ base UI (familiar and clean)
@@ -111,7 +111,7 @@ Perfect for users who want authentic Stationeers in-game syntax colors while kee
 ### Stationeers Full Color Theme
 A complete immersive theme that transforms your entire VS Code interface with Stationeers-inspired colors throughout - code like you're in the game!
 
-![Stationeers Full Color Theme](images/theme-full.png)
+![Stationeers Full Color Theme](https://raw.githubusercontent.com/FlorpyDorp/Stationeers-ic10/main/FlorpyDorp%20IC10/FlorpyDorp%20Language%20Support/images/theme-full.png)
 
 **Features:**
 - Full custom UI colors inspired by Stationeers
