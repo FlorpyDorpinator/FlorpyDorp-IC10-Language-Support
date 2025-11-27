@@ -1,5 +1,19 @@
 ### Changelog Beginning 11-01-2025
 
+## [1.2.18] - 2025-11-27
+
+### 🐛 Bug Fixes (Extension)
+- **LSP Startup**: Fixed server initialization race condition
+  - Added 100ms delay before sending initial configuration to allow server to fully initialize
+  - Configuration change listener now properly disposed on extension deactivation
+  - Prevents "Connection to server got closed" errors and unexpected restarts
+  - Resolves startup issues in VS Code Insiders
+
+### 🎨 Inlay Hints
+- **Label Detection**: Fixed shadow text appearing after labels
+  - Labels ending with `:` no longer trigger parameter hints
+  - Improves code readability by not showing hints on non-instruction lines
+
 ## [1.2.17] - 2025-11-26
 
 ### 🎨 Theme Fixes
