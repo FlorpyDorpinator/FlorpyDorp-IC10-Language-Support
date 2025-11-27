@@ -1711,7 +1711,12 @@ impl LanguageServer for Backend {
             };
             match code.as_str() {
                 LINT_NUMBER_BATCH_MODE => {
-                    let replacement = diagnostic.data.as_ref().unwrap().as_str().unwrap();
+                    let Some(data) = diagnostic.data.as_ref() else {
+                        continue;
+                    };
+                    let Some(replacement) = data.as_str() else {
+                        continue;
+                    };
 
                     let edit = TextEdit::new(diagnostic.range, replacement.to_string());
 
