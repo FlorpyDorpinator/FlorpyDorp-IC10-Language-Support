@@ -1105,10 +1105,29 @@ impl LanguageServer for Backend {
                 }
             };
 
+            // Calculate token length and clamp to line bounds to prevent "end character > line length" errors
+            let calculated_length = node.range().end_point.column as u32 - start.column as u32;
+            
+            // Get the actual line length from the document to ensure we don't exceed it
+            let line_length = document.content.lines().nth(start.row).map(|line| line.len() as u32).unwrap_or(0);
+            let max_allowed_length = if line_length > start.column as u32 {
+                line_length - start.column as u32
+            } else {
+                0
+            };
+            
+            // Use the minimum of calculated length and max allowed length
+            let safe_length = calculated_length.min(max_allowed_length);
+            
+            // Skip tokens with zero length (defensive)
+            if safe_length == 0 {
+                continue;
+            }
+
             ret.push(SemanticToken {
                 delta_line,
                 delta_start,
-                length: node.range().end_point.column as u32 - start.column as u32,
+                length: safe_length,
                 token_type: SEMANTIC_SYMBOL_LEGEND
                     .iter()
                     .position(|x| *x == tokentype)

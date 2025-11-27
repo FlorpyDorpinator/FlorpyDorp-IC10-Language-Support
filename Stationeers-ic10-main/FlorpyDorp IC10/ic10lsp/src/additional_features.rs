@@ -1148,4 +1148,29 @@ mod tests {
             }
         }
     }
+    
+    #[test]
+    fn pop_assigns_register() {
+        let aliases = HashMap::new();
+        let src = "pop r11\nbeqz r11 Loop\n";
+        let ra = analyze(src, &aliases);
+        let info = ra.get_register_info("r11").unwrap();
+        
+        // pop should create an assignment
+        assert!(!info.assignments.is_empty(), "pop should assign to r11");
+        assert!(!info.reads.is_empty(), "beqz should read r11");
+        assert_eq!(info.get_state(), RegisterState::Used, "r11 should be Used, not ReadBeforeAssign");
+    }
+    
+    #[test]
+    fn peek_assigns_register() {
+        let aliases = HashMap::new();
+        let src = "peek r10\nadd r9 r10 5\n";
+        let ra = analyze(src, &aliases);
+        let info = ra.get_register_info("r10").unwrap();
+        
+        assert!(!info.assignments.is_empty(), "peek should assign to r10");
+        assert!(!info.reads.is_empty(), "add should read r10");
+        assert_eq!(info.get_state(), RegisterState::Used);
+    }
 }
