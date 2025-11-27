@@ -1,5 +1,13 @@
 ### Changelog Beginning 11-01-2025
 
+## [1.2.14] - 2025-11-26
+
+### 🐛 Bug Fixes
+- **Critical Fix**: Fixed LSP crash in code action handler
+  - Replaced unsafe `unwrap()` calls with proper Option handling
+  - Prevents panic when diagnostic data is None
+  - Fixes "called `Option::unwrap()` on a `None` value" crash at line 1714
+
 ## [1.2.13] - 2025-11-26
 
 ### 🚀 Performance Improvements
