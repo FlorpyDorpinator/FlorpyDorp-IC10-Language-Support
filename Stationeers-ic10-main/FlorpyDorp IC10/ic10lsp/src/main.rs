@@ -25,6 +25,7 @@
 use ic10lsp::instructions::{self, DataType}; // access library module with instruction metadata
 use std::fs;
 use std::path::Path;
+use std::time::{Duration, Instant};
 use std::{
     borrow::Cow,
     collections::{HashMap, HashSet},
@@ -292,6 +293,7 @@ impl TypeData {
 struct FileData {
     document_data: DocumentData,
     type_data: TypeData,
+    last_diagnostic_run: Option<Instant>,
 }
 
 #[derive(Clone, Debug)]
@@ -323,7 +325,13 @@ struct Backend {
     config: Arc<RwLock<Configuration>>,
     // Runtime flag to allow diagnostics suppression without restart
     diagnostics_enabled: Arc<RwLock<bool>>,
+    // Track when we've warned about too many files
+    warned_about_file_count: Arc<tokio::sync::Mutex<bool>>,
 }
+
+// Constants for performance tuning
+const MAX_RECOMMENDED_FILES: usize = 50;
+const DIAGNOSTIC_DEBOUNCE_MS: u64 = 500;
 
 #[async_trait]
 impl LanguageServer for Backend {
@@ -621,6 +629,27 @@ impl LanguageServer for Backend {
     async fn did_open(&self, params: DidOpenTextDocumentParams) {
         self.update_content(params.text_document.uri.clone(), params.text_document.text)
             .await;
+        
+        // Check if we have too many files open and warn once
+        {
+            let files = self.files.read().await;
+            let file_count = files.len();
+            if file_count > MAX_RECOMMENDED_FILES {
+                let mut warned = self.warned_about_file_count.lock().await;
+                if !*warned {
+                    *warned = true;
+                    self.client.show_message(
+                        MessageType::WARNING,
+                        format!(
+                            "IC10 LSP: {} files open (recommended max: {}). Consider closing unused files or using workspace folders to improve performance. Use Ctrl+Alt+D to disable diagnostics if needed.",
+                            file_count, MAX_RECOMMENDED_FILES
+                        )
+                    ).await;
+                }
+            }
+        }
+        
+        // Run diagnostics for newly opened files
         self.run_diagnostics(&params.text_document.uri).await;
     }
 
@@ -630,7 +659,24 @@ impl LanguageServer for Backend {
             self.update_content(params.text_document.uri.clone(), change.text)
                 .await;
         }
-        self.run_diagnostics(&params.text_document.uri).await;
+        
+        // Debounce diagnostics on change - only run if enough time has passed
+        let should_run = {
+            let files = self.files.read().await;
+            if let Some(file_data) = files.get(&params.text_document.uri) {
+                if let Some(last_run) = file_data.last_diagnostic_run {
+                    last_run.elapsed() > Duration::from_millis(DIAGNOSTIC_DEBOUNCE_MS)
+                } else {
+                    true
+                }
+            } else {
+                true
+            }
+        };
+        
+        if should_run {
+            self.run_diagnostics(&params.text_document.uri).await;
+        }
     }
 
     async fn did_change_configuration(&self, params: DidChangeConfigurationParams) {
@@ -680,10 +726,30 @@ impl LanguageServer for Backend {
             self.client.log_message(MessageType::INFO, format!("suppress_hash_diagnostics set to: {}", config.suppress_hash_diagnostics)).await;
         }
 
+        // Only re-run diagnostics on a limited set of files to avoid overwhelming the server
+        // In large workspaces, we'll only refresh diagnostics for recently-edited files
         let uris = {
             let files = self.files.read().await;
-            files.keys().map(Clone::clone).collect::<Vec<_>>()
+            let mut file_list: Vec<(Url, Option<Instant>)> = files
+                .iter()
+                .map(|(url, data)| (url.clone(), data.last_diagnostic_run))
+                .collect();
+            
+            // If we have many files, only refresh the most recently diagnosed ones
+            if file_list.len() > MAX_RECOMMENDED_FILES {
+                file_list.sort_by_key(|(_, last_run)| std::cmp::Reverse(*last_run));
+                file_list.truncate(MAX_RECOMMENDED_FILES);
+                
+                self.client.log_message(
+                    MessageType::INFO, 
+                    format!("Config changed: refreshing diagnostics for {} of {} files", 
+                            MAX_RECOMMENDED_FILES, files.len())
+                ).await;
+            }
+            
+            file_list.into_iter().map(|(url, _)| url).collect::<Vec<_>>()
         };
+        
         for uri in uris {
             self.run_diagnostics(&uri).await;
         }
@@ -2313,12 +2379,14 @@ impl Backend {
                         parser,
                     },
                     type_data: TypeData::default(),
+                    last_diagnostic_run: None,
                 });
             }
             std::collections::hash_map::Entry::Occupied(mut entry) => {
-                let mut entry = entry.get_mut();
+                let entry = entry.get_mut();
                 entry.document_data.tree = entry.document_data.parser.parse(&text, None); // TODO
                 entry.document_data.content = text;
+                // Don't reset last_diagnostic_run here - it will be updated when diagnostics actually run
             }
         }
     }
@@ -2856,6 +2924,15 @@ impl Backend {
                 .await;
             return;
         }
+        
+        // Update the last diagnostic run time
+        {
+            let mut files = self.files.write().await;
+            if let Some(file_data) = files.get_mut(uri) {
+                file_data.last_diagnostic_run = Some(Instant::now());
+            }
+        }
+        
         let mut diagnostics = Vec::new();
 
         // Collect definitions
@@ -3801,6 +3878,7 @@ async fn main() {
         files: Arc::new(RwLock::new(HashMap::new())),
         config: Arc::new(RwLock::new(Configuration::default())),
         diagnostics_enabled: Arc::new(RwLock::new(true)),
+        warned_about_file_count: Arc::new(tokio::sync::Mutex::new(false)),
     });
 
     if !cli.listen && cli.host.is_none() {
