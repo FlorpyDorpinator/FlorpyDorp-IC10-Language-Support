@@ -738,7 +738,8 @@ export function activate(context: vscode.ExtensionContext) {
             if (opcodeLower === 'j' || opcodeLower === 'jal') return 'label(r?|num)';
             // Branch family: default is three operands (a, b, label); *z variants use implicit zero (a, label)
             if (opcodeLower.startsWith('b')) {
-                const twoOp = opcodeLower.endsWith('z');
+                // Check for *zal variants first (beqzal, bnezal, etc.) - they're 2 operands like *z
+                const twoOp = opcodeLower.endsWith('zal') || opcodeLower.endsWith('z');
                 return twoOp ? 'a(r?|num) label(r?|num)' : 'a(r?|num) b(r?|num) label(r?|num)';
             }
             return undefined;
@@ -768,7 +769,7 @@ export function activate(context: vscode.ExtensionContext) {
                         }
 
                         // Remove the slot currently being edited and show only the remaining ones to the right
-                        const remaining = parts.slice(Math.min(typedTokens.length, parts.length));
+                        const remaining = parts.slice(typedTokens.length);
                         if (remaining.length === 0) continue;
 
                         // Anchor the hint immediately after what the user has typed (before any comment)

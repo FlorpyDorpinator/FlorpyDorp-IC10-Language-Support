@@ -1,5 +1,13 @@
 ### Changelog Beginning 11-01-2025
 
+## [1.2.15] - 2025-11-26
+
+### 🐛 Bug Fixes
+- **Inlay Hints**: Fixed shadow text appearing on completed instructions
+  - Properly recognizes `beqzal` and other `*zal` branch variants as 2-operand instructions
+  - Fixed parameter counting logic to hide hints when all parameters are provided
+  - Shadow text now correctly disappears for fully-formed instructions
+
 ## [1.2.14] - 2025-11-26
 
 ### 🐛 Bug Fixes
