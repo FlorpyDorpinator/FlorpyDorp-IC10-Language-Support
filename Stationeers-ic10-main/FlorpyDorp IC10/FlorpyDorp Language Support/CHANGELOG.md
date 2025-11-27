@@ -1,5 +1,21 @@
 ### Changelog Beginning 11-01-2025
 
+## [1.2.17] - 2025-11-26
+
+### 🎨 Theme Fixes
+- **Register Colors**: Fixed registers (r0-r15, sp, ra) displaying as teal instead of blue
+  - Registers now correctly display in blue (#0080FF) in both themes
+- **Device Colors**: Fixed devices (d0-d5, db) displaying as teal instead of green
+  - Devices now correctly display in bright green (#00FF00) in both themes
+- Added proper semantic token color mappings for `macro` (registers) and `function` (devices)
+
+### 🐛 Bug Fixes (LSP)
+- **Semantic Token Validation**: Fixed "Invalid Semantic Tokens Data" errors that caused syntax highlighting to not update until Enter was pressed
+  - Added bounds checking to ensure token lengths don't exceed line lengths
+  - Prevents "end character > model.getLineLength" errors in VS Code
+  - Syntax highlighting now updates immediately as you type
+  - Fixes issue where colors wouldn't refresh until creating a new line
+
 ## [1.2.16] - 2025-11-26
 
 ### 🚀 Performance Improvements (LSP)

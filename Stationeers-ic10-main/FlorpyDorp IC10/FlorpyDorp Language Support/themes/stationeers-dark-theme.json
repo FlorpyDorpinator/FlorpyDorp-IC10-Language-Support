@@ -130,7 +130,9 @@
     "type": "#800080",
     "enum": "#FFA500",
     "string": "#FFA500",
-    "number": "#20B2AA"
+    "number": "#20B2AA",
+    "macro": "#0080FF",
+    "function": "#00FF00"
   },
   "tokenColors": [
     {
