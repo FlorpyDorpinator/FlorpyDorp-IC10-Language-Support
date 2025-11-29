@@ -7,6 +7,7 @@
 
 # Device aliases
 define SmallLED HASH("StructureConsoleLED5")
+define StartButton HASH("StructureLogicButton")
 
 # Register aliases
 alias MessageID r15         # Current message ID from db (1-15)
@@ -21,35 +22,108 @@ alias ResetSP r7            # Reset position for loop detection
 alias LetterCounter r6      # Counts characters processed (0-5)
 alias TwoSpaces r5          # Constant 8224 (two space characters)
 alias BootingCounter r4
+alias TempStore r3
 
 # ============================================================================
 # INITIAL SETUP
 # ============================================================================
-sbn SmallLED HASH("TrinityOS") Mode 10  # Set LED to string display mode
-move PrevMessageID 0        # No previous message
-move RBuffer 0              # Empty read buffer
-move PartCount 0            # No parts loaded yet
-move SavedSP 0              # No saved stack position
-move MessageID 0            # No message selected
-move LetterCounter 0        # No characters processed
-move TwoSpaces 8224         # ASCII for two spaces (0x2020)
 # ============================================================================
 # Booting Sequence Of Messages
 # ============================================================================
 Booting: 
     put db 511 1
     add BootingCounter 1 BootingCounter
-    beq BootingCounter 4 Main
+    bne BootingCounter 16 Main
+    move BootingCounter 0
+    put db 511 2
+Booting2:
+    add BootingCounter 1 BootingCounter
+    bne BootingCounter 9 Main
+    move BootingCounter 0
+    put db 511 5
+    move BootingCounter 0
+    move r2 77
+    get r1 db r2 
+CheckChipHousing:
+    lbn r0 2037291645 r1 ReferenceId 1
+    bdns r0 ChipError
+    sub r2 r2 1 
+    get r1 db r2 
+    beq r2 69 OSNominal
+    j CheckChipHousing
+ChipError:
+    put db 511 3
+    add BootingCounter 1 BootingCounter
+    bne BootingCounter 18 Main
+    move BootingCounter 0
+    j CheckChipHousing
+OSNominal:
+    put db 511 4
+    add BootingCounter 1 BootingCounter
+    bne BootingCounter 12 Main
+    put db 511 5
+    j Main
+
+# ============================================================================
+# Interrogation Sequence
+# ============================================================================
+InterrogateAsk:
+lbn TempStore StartButton HASH("No") Activate Maximum
+beq TempStore 1 ResetSystem
+lbn TempStore StartButton HASH("Yes") Activate Maximum
+beq TempStore 0 ra
+InterrogateLoop:
+put db 511 12
+lb TempStore HASH("StructureSatelliteDish") MinimumWattsToContact Maximum
+bgt TempStore 7500 UseLargeDish
+sb HASH("StructureSatelliteDish") Activate 1
+lb TempStore HASH("StructureSatelliteDish") InterrogationProgress Maximum
+jal Main
+brne TempStore 1 -2
+j CallDownAsk
+    UseLargeDish:
+        sb HASH("StructureLargeSatelliteDish") On 1
+        sb HASH("StructureLargeSatelliteDish") Setting 50000
+        WaitForResolve:
+            jal Main
+            lb TempStore HASH("StructureLargeSatelliteDish") SignalID Maximum 
+            bltz TempStore WaitForResolve #could change to br and get rid of labels
+        sb HASH("StructureLargeSatelliteDish") Activate 1
+        jal Main
+        lb TempStore HASH("StructureSatelliteDish") InterrogationProgress Maximum
+        yield
+        brne TempStore 1 -3
+        
+CallDownAsk:
+put db 511 13
+jal Main
+lbn TempStore StartButton HASH("No") Activate Maximum
+beq TempStore 1 ResetSystem
+lbn TempStore StartButton HASH("Yes") Activate Maximum
+beq TempStore 0 CallDownAsk
+Approaching:
+put db 511 14
+jal Main
+sb HASH("StructureSatelliteDish") Activate 1
+add BootingCounter 1 BootingCounter
+bneal BootingCounter 40 Main
+move BootingCounter 0
+ResetSystem:
+put db 511 5
+lb TempStore HASH("StructureSatelliteDish") ReferenceId Maximum
+put TempStore 12 1 
+
+
 # ============================================================================
 # MAIN LOOP
 # Continuously scrolls the selected message across the display
 # ============================================================================
 Main:
+    move r0 ra #Store ra for the calldown sequence 
     # Read message selection from IC housing db register
     get MessageID db 511                # Get requested message (1-15) #ignore MessageID 
-    beq MessageID 0 Main                # Wait if no message selected
-    beq MessageID 1 Booting
-    beq MessageID 3 Main
+    beq MessageID 0 Main 
+    beqal MessageID 11 InterrogateAsk 
     # Load new message if selection changed
     bneal MessageID PrevMessageID LoadNewMessage
 
@@ -80,7 +154,13 @@ Main:
 UpdateDisplay:
     # Write scrolling text to LED display
     sbn SmallLED HASH("TrinityOS") Setting SDisplay
-    yield                               # Let other scripts run
+    yield    
+    beq MessageID 1 Booting
+    beq MessageID 2 Booting2
+    beq MessageID 4 OSNominal   
+    beq MessageID 12 r0  
+    beq MessageID 13 r0
+    beq MessageID 14 r0
     j Main                              # Loop forever
 #Called when message selection changes
 # Resets state and sets stack pointer to selected message

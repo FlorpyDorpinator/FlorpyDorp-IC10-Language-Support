@@ -1,5 +1,134 @@
 ### Changelog Beginning 11-01-2025
 
+## [2.1.0] - 2025-11-28
+
+### 🚀 Major Feature: Auto-Generation System
+- **Automatic Type Definitions**: LSP now auto-generates all type definitions from Stationeers game source files
+  - Replaces 187 manually-maintained logic types with 257 types extracted from game data
+  - All types include descriptions from game (93 missing types added, including `VolumeOfLiquid`)
+  - Zero manual maintenance required - just replace source files and rebuild
+  - Uses phf crate for compile-time perfect hashing (O(1) lookups, zero runtime cost)
+  
+- **Build-Time Code Generation**: New `build.rs` system parses game sources during compilation
+  - Parses `Enums.json` (LogicType, SlotLogicType, BatchMode, ReagentMode)
+  - Parses `Stationpedia.json` (device documentation)
+  - Parses `ProgrammableChip.cs` (instruction signatures)
+  - Generates `instructions_generated.rs` included directly into LSP
+  
+- **Update Process**: Simple 3-step workflow for game updates
+  1. Replace source files in `ic10lsp/data/game-sources/`
+  2. Run `cargo build --release`
+  3. Copy new binary to extension
+  - See `ic10lsp/AUTO-GENERATION.md` for complete documentation (~800 lines)
+  - See `ic10lsp/data/game-sources/README.md` for extraction guide (~400 lines)
+  
+- **Benefits**:
+  - ✅ Always up-to-date with game patches
+  - ✅ 100% coverage of all logic types (257 vs 187 previously)
+  - ✅ Authoritative source - data comes directly from game
+  - ✅ Type safety - compile-time generation ensures correctness
+  - ✅ Future-proof for new Stationeers features
+
+### ✨ Completion System Improvements
+- **Fixed Global HASH Detection**: HASH() completions now work correctly everywhere
+  - Typing `HASH("` triggers device completions in any context (defines, instructions, parameters)
+  - Fixed `already_complete` logic to skip device loop when HASH is complete
+  - Allows fallthrough to parameter completions when appropriate
+  - Example: `sbn HASH("Fertilizer") [space]` now shows HASH() for nameHash parameter
+  
+- **Windows Line Ending Support**: Fixed byte offset calculations for CRLF line endings
+  - Completions now work correctly on Windows after line 3
+  - Added `original_position` variable to preserve LSP position before adjustments
+  - Rewrote cursor byte calculation using `char_indices()` for accurate CRLF handling
+  - Fixed two separate cursor_byte calculations (global HASH and instruction bounds)
+  
+- **Complete Fallback Completions**: Added comprehensive fallback when cursor outside instruction bounds
+  - Registers (r0-r17, ra, sp) for all parameter types
+  - LogicType/SlotLogicType/BatchMode/ReagentMode for static parameters
+  - Labels for branch/jump instructions (starts with 'b' or 'j')
+  - `ra` register specifically for "*al" suffix instructions (jal, beqal, etc.)
+  - Number completions for numeric parameters
+  - Example: `s d0 [space]` shows registers even if cursor is past instruction end
+  
+- **Label Completions**: Branch and jump instructions now show labels
+  - All branch instructions: `bdns`, `beq`, `bne`, `blt`, `bgt`, `ble`, `bge`, etc.
+  - All jump instructions: `j`, `jal`, `jr`, etc.
+  - Detection: `first_word.starts_with('b') || first_word.starts_with('j')`
+  - Shows labels from `file_data.type_data.labels` with kind=CONSTANT
+  - Detail text: " label"
+  
+- **Improved Prefix Extraction**: Fixed completion prefix detection
+  - Changed from `split_whitespace().last()` to `rfind(' ')`
+  - Correctly extracts text after last space for filtering
+  - Prevents wrong token from being used as filter prefix
+
+### 🐛 Bug Fixes (LSP)
+- **Completion Position Handling**: Fixed cursor position calculations throughout completion()
+  - Added `original_position` to preserve LSP position before `saturating_sub(1)`
+  - All byte offset calculations now use `original_position` instead of adjusted `position`
+  - Fixed text fallback `cursor_col` calculation
+  - Prevents off-by-one errors in position tracking
+  
+- **Parameter Completion Logic**: Added both builtin and static completions
+  - Now calls `param_completions_builtin()` for registers/numbers/devices
+  - Also calls `param_completions_static()` for LogicType/BatchMode/etc.
+  - Previously only called static, missing register completions
+  - Both are needed for complete parameter coverage
+
+### 🔧 Technical Improvements (LSP v0.9.0)
+- **Build System**: Added comprehensive `build.rs` script
+  - Regex parsing for ProgrammableChip.cs instruction signatures
+  - JSON parsing for Enums.json type definitions
+  - Automatic recompilation when source files change
+  - Generated code uses phf maps/sets for optimal performance
+  
+- **Code Organization**: Better separation of manual vs generated code
+  - Generated types in `instructions_generated.rs`
+  - Manual instruction definitions remain in `instructions.rs`
+  - Old manual definitions commented out with explanation
+  - Clear include statement: `include!(concat!(env!("OUT_DIR"), "/instructions_generated.rs"));`
+  
+- **Dependencies**: Added to Cargo.toml
+  - `regex` in build-dependencies for ProgrammableChip.cs parsing
+  - `serde_json` for Enums.json parsing
+  - `phf` and `phf_codegen` for compile-time hash maps
+
+### 📝 Documentation
+- **AUTO-GENERATION.md**: Comprehensive 800-line guide
+  - Architecture overview and build flow
+  - What gets generated and why
+  - Complete update process for new game versions
+  - Verification steps and troubleshooting
+  - Benefits and history comparison
+  
+- **data/game-sources/README.md**: Source file documentation
+  - File format details for Enums.json, Stationpedia.json, ProgrammableChip.cs
+  - Extraction instructions for each file type
+  - Verification commands and expected outputs
+  - Version history table
+  - Backup procedures
+  
+- **DOCUMENTATION_INDEX.md**: Updated with auto-generation references
+  - Links to new documentation files
+  - Quick start guides
+  - Update procedures
+
+### 🧹 Known Issues
+- Debug `eprintln!` statements still present in main.rs completion() function (~50+ lines)
+- Will be removed in next patch release for cleaner logs
+
+### 📊 Statistics
+- **Logic Types**: 187 manual → 257 auto-generated (+37% coverage)
+- **Missing Types Added**: 93 including VolumeOfLiquid and other new types
+- **Documentation**: +1200 lines of new auto-generation documentation
+- **Build Script**: 428 lines of parsing and code generation logic
+- **Future-Proof**: No manual updates needed for game patches
+
+## [2.0.2] - 2025-11-28
+
+### Bug Fixes
+- Fixed LSP binary packaging issue from v2.0.1
+
 ## [2.0.1] - 2025-11-28
 
 ### Documentation

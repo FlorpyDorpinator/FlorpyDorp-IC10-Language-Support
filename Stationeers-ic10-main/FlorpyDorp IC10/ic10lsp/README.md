@@ -10,10 +10,13 @@ A comprehensive language server for the IC10 MIPS-like assembly language used in
   - IC10 instructions with parameter hints
   - Device hash names with fuzzy search
   - Register and device references
+  - **257 Logic Types** (auto-generated from game data)
+  - **8 Slot Logic Types** (auto-generated from game data)
 - **Hover Information**: Detailed tooltips showing:
   - Instruction documentation and signatures
   - Device hash values with display names
   - Register and device information
+  - Logic type descriptions from game
 - **Go-to-Definition**: Navigate to labels and definitions
 - **Diagnostics**: Real-time error detection for:
   - Syntax errors and invalid instructions
@@ -25,6 +28,16 @@ A comprehensive language server for the IC10 MIPS-like assembly language used in
 - **Fuzzy Search**: Type partial names like "Battery" to find all battery devices
 - **Inlay Hints**: Shows device display names with arrow notation (→)
 - **Hash Tooltips**: Display hash values in both decimal and hexadecimal formats
+
+### Auto-Generated Game Data
+The LSP automatically generates type definitions from Stationeers game source files:
+- **Logic Types**: All 257 logic types including latest additions (VolumeOfLiquid, etc.)
+- **Slot Logic Types**: All 8 slot-specific types
+- **Batch Modes**: Average, Sum, Minimum, Maximum
+- **Reagent Modes**: Contents, Required, Recipe
+- **Instruction Signatures**: Parameter types parsed from game code
+
+See [AUTO-GENERATION.md](AUTO-GENERATION.md) for details on updating game data.
 
 ### Advanced Features
 - **Code Actions**: Quick fixes for common issues

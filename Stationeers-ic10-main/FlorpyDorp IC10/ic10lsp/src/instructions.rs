@@ -2,6 +2,11 @@ use std::fmt::Display;
 
 use phf::{phf_map, phf_set};
 
+// Auto-generated types from build.rs (game-sources/)
+// This include happens BEFORE manual definitions, but manual pub const takes precedence
+// So we comment out the manual ones below
+include!(concat!(env!("OUT_DIR"), "/instructions_generated.rs"));
+
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum DataType {
     Number,
@@ -180,6 +185,9 @@ pub const INSTRUCTIONS: phf::Map<&'static str, InstructionSignature> = phf_map! 
     "ins" => InstructionSignature(&[REGISTER, VALUE, VALUE, VALUE]),
     "lerp" => InstructionSignature(&[REGISTER, VALUE, VALUE, VALUE]),
 };
+
+/* MANUAL DEFINITIONS DISABLED - NOW AUTO-GENERATED FROM game-sources/Enums.json
+   See module 'generated' at top of file for auto-generated LOGIC_TYPES, etc.
 
 #[allow(dead_code)]
 pub const LOGIC_TYPES: phf::Set<&'static str> = phf_set! {
@@ -423,6 +431,8 @@ pub const REAGENT_MODE_LOOKUP: phf::Map<u8, &'static str> = phf_map! {
     1u8 => "Required",
     2u8 => "Recipe",
 };
+
+END OF MANUAL SET DEFINITIONS */
 
 impl Display for DataType {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -681,6 +691,8 @@ pub const INSTRUCTION_DOCS: phf::Map<&'static str, &'static str> = phf_map! {
     "lerp" => "Linearly interpolates between a and b by the ratio c, and places the result in the register provided. The ratio c will be clamped between 0 and 1.",
 };
 
+/* MANUAL DOCS DEFINITIONS DISABLED - NOW AUTO-GENERATED
+
 #[allow(dead_code)]
 pub const LOGIC_TYPE_DOCS: phf::Map<&'static str, &'static str> = phf_map! {
     "Power" => "Can be read to return if the device is correctly powered or not, set via the power system, return 1 if powered and 0 if not",
@@ -917,6 +929,8 @@ pub const BATCH_MODE_DOCS: phf::Map<&'static str, &'static str> = phf_map! {
     "Minimum" => "Lowest of all read values",
     "Maximum" => "Highest of all read values",
 };
+
+END OF MANUAL DEFINITIONS - NOW AUTO-GENERATED */
 
 // Wrap generated Stationpedia constants to silence dead_code warnings, then re-export
 #[allow(dead_code)]

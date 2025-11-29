@@ -1,3 +1,4 @@
+use regex::Regex;
 use serde_json::Value;
 use std::collections::HashSet;
 use std::{
@@ -7,6 +8,24 @@ use std::{
     io::Write,
     path::Path,
 };
+
+// BUILD SCRIPT - Auto-generates code from game source files
+//
+// This build.rs script runs during compilation and generates Rust code from
+// Stationeers game source files. This ensures the LSP stays up-to-date with
+// game updates without manual maintenance.
+//
+// GENERATED FILES:
+// 1. stationpedia.rs - Device names and hashes from stationpedia.txt
+// 2. enums_generated.rs - Game enums from Enums.json
+// 3. instructions_generated.rs - Logic types, instruction signatures from game sources
+//
+// SOURCE FILES (data/game-sources/):
+// - Enums.json - All game enum definitions (LogicType, SlotLogicType, etc.)
+// - Stationpedia.json - Game documentation and descriptions
+// - ProgrammableChip.cs - Decompiled game code with instruction signatures
+//
+// For details on updating game sources, see: AUTO-GENERATION.md
 
 fn main() {
     let out_dir = env::var_os("OUT_DIR").unwrap();
@@ -128,9 +147,9 @@ fn main() {
         out
     }
 
-    let enums_file = Path::new("../../../data/Enums.json");
+    let enums_file = Path::new("../../../data/game-sources/Enums.json");
     let enums_json =
-        fs::read_to_string(enums_file).expect("Failed to read Enums.json (expected at data folder)");
+        fs::read_to_string(enums_file).expect("Failed to read game-sources/Enums.json");
     let v: Value = serde_json::from_str(&enums_json).expect("Failed to parse Enums.json");
 
     // Builders
@@ -238,5 +257,317 @@ fn main() {
     .unwrap();
     // (No direct value->name PHF map emitted; use runtime scan helper.)
 
-    println!("cargo:rerun-if-changed=../../../data/Enums.json");
+    println!("cargo:rerun-if-changed=../../../data/game-sources/Enums.json");
+
+    // =========================
+    // Generate instruction signatures and logic types from game sources
+    // =========================
+    let instructions_out_path = Path::new(&out_dir).join("instructions_generated.rs");
+    
+    // Read Enums.json for logic types
+    let enums_game_file = Path::new("../../../data/game-sources/Enums.json");
+    let enums_game_json = fs::read_to_string(enums_game_file)
+        .expect("Failed to read game-sources/Enums.json");
+    let enums_game: Value = serde_json::from_str(&enums_game_json)
+        .expect("Failed to parse game-sources/Enums.json");
+    
+    // Read ProgrammableChip.cs for instruction signatures
+    let chip_file = Path::new("../../../data/game-sources/ProgrammableChip.cs");
+    let chip_cs = fs::read_to_string(chip_file)
+        .expect("Failed to read game-sources/ProgrammableChip.cs");
+    
+    // Parse instruction signatures from GetCommandExample method
+    let instruction_sigs = parse_instruction_signatures(&chip_cs);
+    
+    // Build logic types from Enums.json
+    let mut logic_types_builder = ::phf_codegen::Set::new();
+    let mut logic_type_docs_builder = ::phf_codegen::Map::new();
+    let mut slot_logic_types_builder = ::phf_codegen::Set::new();
+    let mut slot_type_docs_builder = ::phf_codegen::Map::new();
+    let mut batch_modes_builder = ::phf_codegen::Set::new();
+    let mut batch_mode_docs_builder = ::phf_codegen::Map::new();
+    let mut reagent_modes_builder = ::phf_codegen::Set::new();
+    let mut reagent_mode_docs_builder = ::phf_codegen::Map::new();
+    
+    // Extract LogicType
+    if let Some(script_enums) = enums_game.get("scriptEnums").and_then(|x| x.as_object()) {
+        if let Some(logic_type) = script_enums.get("LogicType") {
+            if let Some(values) = logic_type.get("values").and_then(|x| x.as_object()) {
+                for (name, data) in values.iter() {
+                    let deprecated = data.get("deprecated").and_then(|x| x.as_bool()).unwrap_or(false);
+                    if !deprecated {
+                        logic_types_builder.entry(name);
+                        let desc = data.get("description").and_then(|x| x.as_str()).unwrap_or("");
+                        logic_type_docs_builder.entry(name, &format!("\"{}\"", escape_str(desc)));
+                    }
+                }
+            }
+        }
+        
+        // Extract SlotLogicType
+        if let Some(slot_logic_type) = script_enums.get("SlotLogicType") {
+            if let Some(values) = slot_logic_type.get("values").and_then(|x| x.as_object()) {
+                for (name, data) in values.iter() {
+                    let deprecated = data.get("deprecated").and_then(|x| x.as_bool()).unwrap_or(false);
+                    if !deprecated {
+                        slot_logic_types_builder.entry(name);
+                        let desc = data.get("description").and_then(|x| x.as_str()).unwrap_or("");
+                        slot_type_docs_builder.entry(name, &format!("\"{}\"", escape_str(desc)));
+                    }
+                }
+            }
+        }
+        
+        // Extract BatchMode
+        if let Some(batch_mode) = script_enums.get("BatchMode") {
+            if let Some(values) = batch_mode.get("values").and_then(|x| x.as_object()) {
+                for (name, data) in values.iter() {
+                    let deprecated = data.get("deprecated").and_then(|x| x.as_bool()).unwrap_or(false);
+                    if !deprecated {
+                        batch_modes_builder.entry(name);
+                        let desc = data.get("description").and_then(|x| x.as_str()).unwrap_or("");
+                        batch_mode_docs_builder.entry(name, &format!("\"{}\"", escape_str(desc)));
+                    }
+                }
+            }
+        }
+        
+        // Extract ReagentMode
+        if let Some(reagent_mode) = script_enums.get("ReagentMode") {
+            if let Some(values) = reagent_mode.get("values").and_then(|x| x.as_object()) {
+                for (name, data) in values.iter() {
+                    let deprecated = data.get("deprecated").and_then(|x| x.as_bool()).unwrap_or(false);
+                    if !deprecated {
+                        reagent_modes_builder.entry(name);
+                        let desc = data.get("description").and_then(|x| x.as_str()).unwrap_or("");
+                        reagent_mode_docs_builder.entry(name, &format!("\"{}\"", escape_str(desc)));
+                    }
+                }
+            }
+        }
+    }
+    
+    // Write instructions_generated.rs
+    let mut inst_writer = BufWriter::new(
+        File::create(instructions_out_path).expect("Failed to create instructions_generated.rs")
+    );
+    
+    writeln!(&mut inst_writer, "// Auto-generated from game sources - DO NOT EDIT").unwrap();
+    writeln!(&mut inst_writer, "// This file is included directly into instructions.rs").unwrap();
+    writeln!(&mut inst_writer, "// Do not add 'use' statements here - they belong in instructions.rs").unwrap();
+    writeln!(&mut inst_writer, "").unwrap();
+    
+    // Write LOGIC_TYPES
+    writeln!(
+        &mut inst_writer,
+        "pub const LOGIC_TYPES: phf::Set<&'static str> = {};",
+        logic_types_builder.build()
+    ).unwrap();
+    writeln!(&mut inst_writer, "").unwrap();
+    
+    // Write LOGIC_TYPE_DOCS
+    writeln!(
+        &mut inst_writer,
+        "pub const LOGIC_TYPE_DOCS: phf::Map<&'static str, &'static str> = {};",
+        logic_type_docs_builder.build()
+    ).unwrap();
+    writeln!(&mut inst_writer, "").unwrap();
+    
+    // Write SLOT_LOGIC_TYPES
+    writeln!(
+        &mut inst_writer,
+        "pub const SLOT_LOGIC_TYPES: phf::Set<&'static str> = {};",
+        slot_logic_types_builder.build()
+    ).unwrap();
+    writeln!(&mut inst_writer, "").unwrap();
+    
+    // Write SLOT_TYPE_DOCS
+    writeln!(
+        &mut inst_writer,
+        "pub const SLOT_TYPE_DOCS: phf::Map<&'static str, &'static str> = {};",
+        slot_type_docs_builder.build()
+    ).unwrap();
+    writeln!(&mut inst_writer, "").unwrap();
+    
+    // Write BATCH_MODES
+    writeln!(
+        &mut inst_writer,
+        "pub const BATCH_MODES: phf::Set<&'static str> = {};",
+        batch_modes_builder.build()
+    ).unwrap();
+    writeln!(&mut inst_writer, "").unwrap();
+    
+    // Write BATCH_MODE_DOCS
+    writeln!(
+        &mut inst_writer,
+        "pub const BATCH_MODE_DOCS: phf::Map<&'static str, &'static str> = {};",
+        batch_mode_docs_builder.build()
+    ).unwrap();
+    writeln!(&mut inst_writer, "").unwrap();
+    
+    // Write REAGENT_MODES
+    writeln!(
+        &mut inst_writer,
+        "pub const REAGENT_MODES: phf::Set<&'static str> = {};",
+        reagent_modes_builder.build()
+    ).unwrap();
+    writeln!(&mut inst_writer, "").unwrap();
+    
+    // Write REAGENT_MODE_DOCS
+    writeln!(
+        &mut inst_writer,
+        "pub const REAGENT_MODE_DOCS: phf::Map<&'static str, &'static str> = {};",
+        reagent_mode_docs_builder.build()
+    ).unwrap();
+    writeln!(&mut inst_writer, "").unwrap();
+    
+    // Write instruction signatures
+    writeln!(&mut inst_writer, "// Instruction signatures").unwrap();
+    writeln!(&mut inst_writer, "pub(crate) const INSTRUCTION_SIGNATURES: &[(&str, &[&[&str]])] = &[").unwrap();
+    for (cmd, params) in instruction_sigs.iter() {
+        write!(&mut inst_writer, "    (\"{}\", &[", cmd).unwrap();
+        for (i, param_types) in params.iter().enumerate() {
+            if i > 0 {
+                write!(&mut inst_writer, ", ").unwrap();
+            }
+            write!(&mut inst_writer, "&[").unwrap();
+            for (j, ptype) in param_types.iter().enumerate() {
+                if j > 0 {
+                    write!(&mut inst_writer, ", ").unwrap();
+                }
+                write!(&mut inst_writer, "\"{}\"", ptype).unwrap();
+            }
+            write!(&mut inst_writer, "]").unwrap();
+        }
+        writeln!(&mut inst_writer, "]),").unwrap();
+    }
+    writeln!(&mut inst_writer, "];").unwrap();
+    
+    println!("cargo:rerun-if-changed=../../../data/game-sources/ProgrammableChip.cs");
+    println!("cargo:rerun-if-changed=../../../data/game-sources/Stationpedia.json");
+}
+
+// Parse instruction signatures from ProgrammableChip.cs GetCommandExample method
+fn parse_instruction_signatures(cs_code: &str) -> Vec<(String, Vec<Vec<String>>)> {
+    let mut instructions = Vec::new();
+    
+    // Find the GetCommandExample method
+    let method_start = match cs_code.find("public static string GetCommandExample") {
+        Some(pos) => pos,
+        None => return instructions,
+    };
+    let method_code = &cs_code[method_start..];
+    
+    // Find the switch statement
+    let switch_start = match method_code.find("switch (command)") {
+        Some(pos) => pos,
+        None => return instructions,
+    };
+    
+    // Find the end of the method more carefully
+    let switch_end = method_code[switch_start..].find("default:").unwrap_or(method_code.len() - switch_start);
+    let switch_end = switch_end + method_code[switch_start + switch_end..].find('}').unwrap_or(0) + 1;
+    
+    let switch_body = &method_code[switch_start..std::cmp::min(switch_start + switch_end, method_code.len())];
+    
+    // Parse each case
+    let case_regex = Regex::new(r"case ScriptCommand\.([a-z0-9]+):").unwrap();
+    let helpstring_regex = Regex::new(
+        r"ProgrammableChip\.(REGISTER|DEVICE_INDEX|LOGIC_TYPE|LOGIC_SLOT_TYPE|BATCH_MODE|REAGENT_MODE|NUMBER|INTEGER|STRING|DEVICE_HASH|NAME_HASH|SLOT_INDEX|REF_ID)"
+    ).unwrap();
+    
+    let lines: Vec<&str> = switch_body.lines().collect();
+    let mut i = 0;
+    
+    while i < lines.len() {
+        let line = lines[i].trim();
+        
+        if let Some(caps) = case_regex.captures(line) {
+            let cmd = caps.get(1).unwrap().as_str().to_string();
+            
+            // Look ahead to find the HelpString array
+            let mut params: Vec<Vec<String>> = Vec::new();
+            let mut j = i + 1;
+            let mut in_array = false;
+            
+            while j < lines.len() && j < i + 30 {
+                let array_line = lines[j];
+                
+                if array_line.contains("ProgrammableChip.HelpString[]") {
+                    in_array = true;
+                }
+                
+                if in_array {
+                    // Extract parameter types from this line
+                    for cap in helpstring_regex.captures_iter(array_line) {
+                        let ptype = cap.get(1).unwrap().as_str();
+                        let mapped_type = map_helpstring_to_datatype(ptype);
+                        
+                        // Check if this is part of a union (+ operator on same line)
+                        if array_line.contains(" + ") {
+                            // This is a union type - collect all types on this logical line
+                            let mut union_types = vec![mapped_type.to_string()];
+                            
+                            // Scan for all types in this union expression
+                            for cap2 in helpstring_regex.captures_iter(array_line) {
+                                let ptype2 = cap2.get(1).unwrap().as_str();
+                                let mapped2 = map_helpstring_to_datatype(ptype2);
+                                if !union_types.contains(&mapped2.to_string()) {
+                                    union_types.push(mapped2.to_string());
+                                }
+                            }
+                            params.push(union_types);
+                            break; // Move to next parameter
+                        } else {
+                            params.push(vec![mapped_type.to_string()]);
+                        }
+                    }
+                    
+                    if array_line.contains("});") {
+                        break;
+                    }
+                }
+                
+                j += 1;
+            }
+            
+            // Handle multiple case labels for same signature (fallthrough)
+            let mut commands = vec![cmd];
+            let mut k = i + 1;
+            while k < lines.len() && lines[k].trim().starts_with("case ScriptCommand.") {
+                if let Some(caps2) = case_regex.captures(lines[k]) {
+                    commands.push(caps2.get(1).unwrap().as_str().to_string());
+                }
+                k += 1;
+            }
+            
+            // Add all commands with this signature
+            for command in commands {
+                instructions.push((command, params.clone()));
+            }
+        }
+        
+        i += 1;
+    }
+    
+    instructions
+}
+
+fn map_helpstring_to_datatype(helpstring: &str) -> &str {
+    match helpstring {
+        "REGISTER" => "Register",
+        "DEVICE_INDEX" => "Device",
+        "LOGIC_TYPE" => "LogicType",
+        "LOGIC_SLOT_TYPE" => "SlotLogicType",
+        "BATCH_MODE" => "BatchMode",
+        "REAGENT_MODE" => "ReagentMode",
+        "NUMBER" => "Number",
+        "INTEGER" => "Number",
+        "STRING" => "Name",
+        "DEVICE_HASH" => "Number",
+        "NAME_HASH" => "Number",
+        "SLOT_INDEX" => "Number",
+        "REF_ID" => "Number",
+        _ => "Number",
+    }
 }
