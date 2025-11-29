@@ -31,6 +31,7 @@ const VALUE: Union = Union(&[DataType::Register, DataType::Number]);
 const LOGIC_TYPE: Union = Union(&[DataType::LogicType]);
 const SLOT_LOGIC_TYPE: Union = Union(&[DataType::SlotLogicType]);
 const BATCH_MODE: Union = Union(&[DataType::BatchMode, DataType::Number, DataType::Register]);
+const BATCH_MODE_ONLY: Union = Union(&[DataType::BatchMode]);
 const REAGENT_MODE: Union = Union(&[DataType::ReagentMode, DataType::Number, DataType::Register]);
 
 pub const INSTRUCTIONS: phf::Map<&'static str, InstructionSignature> = phf_map! {
@@ -44,7 +45,7 @@ pub const INSTRUCTIONS: phf::Map<&'static str, InstructionSignature> = phf_map! 
     "brdns" => InstructionSignature(&[DEVICE,VALUE]),
     "brdse" => InstructionSignature(&[DEVICE,VALUE]),
     "l" => InstructionSignature(&[REGISTER,DEVICE,LOGIC_TYPE]),
-    "lb" => InstructionSignature(&[REGISTER,VALUE,LOGIC_TYPE,BATCH_MODE]),
+    "lb" => InstructionSignature(&[REGISTER,VALUE,LOGIC_TYPE,BATCH_MODE_ONLY]),
     "lr" => InstructionSignature(&[REGISTER,DEVICE,REAGENT_MODE,VALUE]),
     "ls" => InstructionSignature(&[REGISTER,DEVICE,VALUE,SLOT_LOGIC_TYPE]),
     "s" => InstructionSignature(&[DEVICE,LOGIC_TYPE,VALUE]),
@@ -155,9 +156,9 @@ pub const INSTRUCTIONS: phf::Map<&'static str, InstructionSignature> = phf_map! 
     "yield" => InstructionSignature(&[]),
     "bnan" => InstructionSignature(&[VALUE, VALUE]),
     "brnan" => InstructionSignature(&[VALUE, VALUE]),
-    "lbn" => InstructionSignature(&[REGISTER, VALUE, VALUE, LOGIC_TYPE, BATCH_MODE]),
-    "lbns" => InstructionSignature(&[REGISTER, VALUE, VALUE, VALUE, SLOT_LOGIC_TYPE, BATCH_MODE]),
-    "lbs" => InstructionSignature(&[REGISTER, VALUE, VALUE, SLOT_LOGIC_TYPE, BATCH_MODE]),
+    "lbn" => InstructionSignature(&[REGISTER, VALUE, VALUE, LOGIC_TYPE, BATCH_MODE_ONLY]),
+    "lbns" => InstructionSignature(&[REGISTER, VALUE, VALUE, VALUE, SLOT_LOGIC_TYPE, BATCH_MODE_ONLY]),
+    "lbs" => InstructionSignature(&[REGISTER, VALUE, VALUE, SLOT_LOGIC_TYPE, BATCH_MODE_ONLY]),
     "not" => InstructionSignature(&[REGISTER, VALUE]),
     "sbn" => InstructionSignature(&[VALUE, VALUE, LOGIC_TYPE, VALUE]),
     "sbs" => InstructionSignature(&[VALUE, VALUE, SLOT_LOGIC_TYPE, REGISTER]),
@@ -898,36 +899,6 @@ It is an unwavering universal law that anything higher than 11 will be purple. T
     "Channel5" => "Channel on a cable network which should be considered volatile (index 5).",
     "Channel6" => "Channel on a cable network which should be considered volatile (index 6).",
     "Channel7" => "Channel on a cable network which should be considered volatile (index 7).",
-};
-
-#[allow(dead_code)]
-pub const SLOT_TYPE_DOCS: phf::Map<&'static str, &'static str> = phf_map! {
-    "Occupied" => "Returns 0 when slot is not occupied, 1 when it is",
-    "OccupantHash" => "Returns the has of the current occupant, the unique identifier of the thing",
-    "Quantity" => "Returns the current quantity, such as stack size, of the item in the slot",
-    "Damage" => "Returns the damage state of the item in the slot",
-    "Efficiency" => "Returns the growth efficiency of the plant in the slot",
-    "Mature" => "Returns 1 if the plant in this slot is mature, 0 when it isn't",
-    "Seeding" => "Whether a plant is seeding (ready to harvest seeds from). Returns 1 if seeding or 0 if not.",
-    "Health" => "Returns the health of the plant in the slot",
-    "Growth" => "Returns the current growth state of the plant in the slot",
-    "Pressure" => "Returns pressure of the slot occupants internal atmosphere",
-    "Temperature" => "Returns temperature of the slot occupants internal atmosphere",
-    "Charge" => "Returns current energy charge the slot occupant is holding",
-    "ChargeRatio" => "Returns current energy charge the slot occupant is holding as a ratio between 0 and 1 of its maximum",
-    "Class" => "Returns integer representing the class of object",
-    "PressureWaste" => "Returns pressure in the waste tank of the jetpack in this slot",
-    "PressureAir" => "Returns pressure in the air tank of the jetpack in this slot",
-    "MaxQuantity" => "Returns the max stack size of the item in the slot",
-    "PrefabHash" => "Returns the hash of the structure in the slot",
-};
-
-#[allow(dead_code)]
-pub const BATCH_MODE_DOCS: phf::Map<&'static str, &'static str> = phf_map! {
-    "Average" => "Average of all read values",
-    "Sum" => "All read values added together",
-    "Minimum" => "Lowest of all read values",
-    "Maximum" => "Highest of all read values",
 };
 
 END OF MANUAL DEFINITIONS - NOW AUTO-GENERATED */

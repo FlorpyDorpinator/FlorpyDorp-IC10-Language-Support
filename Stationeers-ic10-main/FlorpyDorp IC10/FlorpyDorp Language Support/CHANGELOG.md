@@ -50,10 +50,11 @@
   - Number completions for numeric parameters
   - Example: `s d0 [space]` shows registers even if cursor is past instruction end
   
-- **Label Completions**: Branch and jump instructions now show labels
-  - All branch instructions: `bdns`, `beq`, `bne`, `blt`, `bgt`, `ble`, `bge`, etc.
-  - All jump instructions: `j`, `jal`, `jr`, etc.
-  - Detection: `first_word.starts_with('b') || first_word.starts_with('j')`
+- **Label Completions**: Branch and jump instructions now show labels on jump target parameter only
+  - Jump instructions (`j`, `jal`, `jr`): Labels show for parameter 0 (the jump target)
+  - Branch instructions (`beq`, `bne`, `blt`, `bgt`, etc.): Labels show for last parameter (the jump target)
+  - Example: `beq r0 r1 [here]` - labels only appear for 3rd parameter, not for r0/r1 comparison values
+  - Prevents labels from incorrectly appearing on comparison operands
   - Shows labels from `file_data.type_data.labels` with kind=CONSTANT
   - Detail text: " label"
   

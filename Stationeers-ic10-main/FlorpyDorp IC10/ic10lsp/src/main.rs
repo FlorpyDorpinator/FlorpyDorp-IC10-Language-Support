@@ -1380,14 +1380,30 @@ impl LanguageServer for Backend {
             let prefix_trimmed = prefix.trim_start();
             let prefix_lower = prefix_trimmed.to_ascii_lowercase();
 
+            eprintln!("DEBUG param_completions_static: Union has {} types", param_type.0.len());
+            
             for typ in param_type.0 {
+                eprintln!("DEBUG param_completions_static: Processing type: {:?}", typ);
                 let map = match typ {
-                    DataType::LogicType => instructions::LOGIC_TYPE_DOCS,
-                    DataType::SlotLogicType => instructions::SLOT_TYPE_DOCS,
-                    DataType::BatchMode => instructions::BATCH_MODE_DOCS,
-                    _ => continue,
+                    DataType::LogicType => {
+                        eprintln!("DEBUG: Matched LogicType, map has {} entries", instructions::LOGIC_TYPE_DOCS.len());
+                        instructions::LOGIC_TYPE_DOCS
+                    }
+                    DataType::SlotLogicType => {
+                        eprintln!("DEBUG: Matched SlotLogicType, map has {} entries", instructions::SLOT_TYPE_DOCS.len());
+                        instructions::SLOT_TYPE_DOCS
+                    }
+                    DataType::BatchMode => {
+                        eprintln!("DEBUG: Matched BatchMode, map has {} entries", instructions::BATCH_MODE_DOCS.len());
+                        instructions::BATCH_MODE_DOCS
+                    }
+                    _ => {
+                        eprintln!("DEBUG: Type did not match any case, continuing");
+                        continue;
+                    }
                 };
 
+                eprintln!("DEBUG: About to iterate map.entries(), map has {} entries", map.len());
                 for entry in map.entries() {
                     let name = *entry.0;
                     let docs = *entry.1;
@@ -2013,9 +2029,15 @@ impl LanguageServer for Backend {
                         eprintln!("DEBUG: Fallback - param_count: {}", param_count);
                         
                         // Check if we should suggest HASH(" for this position
+                        // Match the same logic as the main path (lines ~2226-2234)
                         let suggest_hash = (first_word == "define" && param_count == 1) 
                             || (first_word == "lbn" && (param_count == 1 || param_count == 2))
-                            || (first_word == "sbn" && (param_count == 0 || param_count == 1));
+                            || (first_word == "lbns" && (param_count == 1 || param_count == 2))
+                            || (first_word == "sbn" && (param_count == 0 || param_count == 1))
+                            || (first_word == "lb" && param_count == 1)
+                            || (first_word == "lbs" && param_count == 1)
+                            || (first_word == "sb" && param_count == 0)
+                            || (first_word == "sbs" && param_count == 0);
                         
                         eprintln!("DEBUG: Fallback - suggest_hash: {}", suggest_hash);
                         
@@ -2028,9 +2050,9 @@ impl LanguageServer for Backend {
                                     "Type device name inside quotes to get its hash value".to_string()
                                 )),
                                 insert_text: Some("HASH(\"".to_string()),
-                                filter_text: Some("H".to_string()),
+                                filter_text: Some("HASH".to_string()),
                                 insert_text_format: Some(InsertTextFormat::PLAIN_TEXT),
-                                sort_text: Some("!".to_string()),
+                                sort_text: Some("!0000".to_string()),
                                 preselect: Some(true),
                                 ..Default::default()
                             });
@@ -2104,9 +2126,22 @@ impl LanguageServer for Backend {
                                     
                                     eprintln!("DEBUG: Fallback - prefix for completion: {:?}", prefix);
                                     
-                                    // For branch/jump instructions, provide label completions
-                                    let is_branch_or_jump = first_word.starts_with('b') || first_word.starts_with('j');
-                                    if is_branch_or_jump {
+                                    // For branch/jump instructions, provide label completions on the jump target parameter
+                                    let is_branch = first_word.starts_with('b');
+                                    let is_jump = first_word.starts_with('j');
+                                    
+                                    // Labels only show for:
+                                    // - Jump instructions (j, jal, jr): parameter 0 (the jump target)
+                                    // - Branch instructions (beq, bne, etc.): LAST parameter (the jump target)
+                                    let should_show_labels = if is_jump {
+                                        param_count == 0  // j/jal/jr first parameter
+                                    } else if is_branch {
+                                        param_count == signature.0.len() - 1  // Last parameter of branch
+                                    } else {
+                                        false
+                                    };
+                                    
+                                    if should_show_labels {
                                         // Add label completions
                                         for (label_name, _) in &file_data.type_data.labels {
                                             if prefix.is_empty() || label_name.starts_with(prefix) {
@@ -2208,11 +2243,18 @@ impl LanguageServer for Backend {
 
                 // Special case: suggest HASH(" for instructions that commonly use device hashes
                 // - define: second parameter (index 1) is usually a device hash
-                // - lbn: third parameter (index 2) is the nameHash for targeting specific device by name  
-                // - sbn: BOTH first parameter (deviceHash, index 0) AND second parameter (nameHash, index 1) can use HASH
+                // - lbn/lbns: parameter 1 is deviceHash, parameter 2 is nameHash
+                // - sbn: parameter 0 is deviceHash, parameter 1 is nameHash
+                // - lb/lbs: parameter 1 is deviceHash
+                // - sb/sbs: parameter 0 is deviceHash
                 let suggest_hash = (text == "define" && current_param == 1) 
                     || (text == "lbn" && (current_param == 1 || current_param == 2))
-                    || (text == "sbn" && (current_param == 0 || current_param == 1));
+                    || (text == "lbns" && (current_param == 1 || current_param == 2))
+                    || (text == "sbn" && (current_param == 0 || current_param == 1))
+                    || (text == "lb" && current_param == 1)
+                    || (text == "lbs" && current_param == 1)
+                    || (text == "sb" && current_param == 0)
+                    || (text == "sbs" && current_param == 0);
                 
                 eprintln!("DEBUG: Main path - suggest_hash: {}", suggest_hash);
                 
@@ -2238,9 +2280,9 @@ impl LanguageServer for Backend {
                             "Type device name inside quotes to get its hash value".to_string()
                         )),
                         insert_text: Some("HASH(\"".to_string()),
-                        filter_text: Some("H".to_string()), // Match on single 'H' to be very permissive
+                        filter_text: Some("HASH".to_string()),
                         insert_text_format: Some(InsertTextFormat::PLAIN_TEXT),
-                        sort_text: Some("!".to_string()),
+                        sort_text: Some("!0000".to_string()), // Multiple ! to ensure absolute top priority
                         preselect: Some(true),
                         ..Default::default()
                     });
@@ -2458,8 +2500,18 @@ impl LanguageServer for Backend {
                         &mut ret,
                         Some(&used_items),
                     );
-                    // Skip other completions for hash parameters
+                    // ONLY skip other completions if this is specifically the device/name hash parameter
+                    // For other parameters (like SlotLogicType on sbs param 2), fall through to normal completions
                     return Ok(Some(CompletionResponse::Array(ret)));
+                }
+                
+                // For batch instructions, check if we're on a NON-hash parameter that needs static completions
+                // For example: sbs param 2 is SLOT_LOGIC_TYPE and should show Occupant, OccupantHash, etc.
+                // We only want to skip normal completions for the hash parameters themselves
+                if (is_load_batch || is_store_batch) && !is_device_hash_param && !is_name_hash_param {
+                    // Not a hash parameter - fall through to normal parameter completions below
+                    // This allows SlotLogicType, LogicType, BatchMode, etc. to show properly
+                    eprintln!("DEBUG: Batch instruction but not a hash param - falling through to normal completions");
                 }
 
                 // Legacy preproc_string support (for backwards compatibility)
@@ -2693,9 +2745,13 @@ impl LanguageServer for Backend {
             lowered.as_str()
         };
 
+        // Convert position (line, column) to document byte offset
+        let line_start_byte = line_node.start_byte();
+        let cursor_byte = line_start_byte + position.0.character as usize;
+
         let (current_param, _) = get_current_parameter(
             instruction_node,
-            position.0.character.saturating_sub(1) as usize,
+            cursor_byte,
             document.content.as_bytes(),
         );
 
@@ -2703,26 +2759,70 @@ impl LanguageServer for Backend {
             return Ok(None);
         };
 
-        // Use the enriched syntax with labeled parameters for better guidance
+        // Use enriched syntax for the display label
         let label = crate::tooltip_documentation::get_instruction_syntax(text);
+        
+        eprintln!("====== SIGNATURE HOVER DEBUG ======");
+        eprintln!("Instruction: {}", text);
+        eprintln!("Label string: '{}'", label);
+        eprintln!("Current param index: {}", current_param);
+
         let mut parameters: Vec<[u32; 2]> = Vec::new();
-        // Derive parameter spans by locating tokens after the opcode
-        let tokens: Vec<&str> = label.split(' ').collect();
-        if tokens.len() > 1 {
-            // Search progressively to get stable ranges
-            let mut search_start: usize = 0;
-            for tok in tokens.iter().skip(1) {
-                if tok.is_empty() {
-                    continue;
-                }
-                if let Some(rel_idx) = label[search_start..].find(tok) {
-                    let start = search_start + rel_idx;
-                    let end = start + tok.len();
-                    parameters.push([start as u32, end as u32]);
-                    search_start = end;
-                }
+
+        // The label is PLAIN TEXT like: "lbn dest(r?) deviceHash(r?|num) nameHash(r?|num) logicType batchMode"
+        // We need to find each parameter token after the instruction name
+        // Split by whitespace and skip the first token (instruction name)
+        
+        let tokens: Vec<&str> = label.split_whitespace().collect();
+        eprintln!("Label tokens: {:?}", tokens);
+        
+        if tokens.is_empty() {
+            eprintln!("No tokens found in label!");
+            eprintln!("====== END SIGNATURE DEBUG ======");
+            return Ok(None);
+        }
+        
+        // Skip first token (instruction name), rest are parameters
+        let param_tokens = &tokens[1..];
+        eprintln!("Parameter tokens: {:?}", param_tokens);
+        
+        // Now find byte positions of each parameter in the label string
+        let mut search_start = 0;
+        
+        // Skip past the instruction name first
+        if let Some(first_space) = label[search_start..].find(char::is_whitespace) {
+            search_start += first_space;
+            // Skip whitespace
+            while search_start < label.len() && label.as_bytes()[search_start].is_ascii_whitespace() {
+                search_start += 1;
             }
         }
+        
+        for (idx, param_token) in param_tokens.iter().enumerate() {
+            // Find this parameter token in the label starting from search_start
+            if let Some(token_pos) = label[search_start..].find(param_token) {
+                let abs_start = search_start + token_pos;
+                let abs_end = abs_start + param_token.len();
+                
+                eprintln!("Parameter {}: '{}' at label bytes [{}, {}]", 
+                         idx, param_token, abs_start, abs_end);
+                
+                parameters.push([abs_start as u32, abs_end as u32]);
+                
+                // Move search start past this token
+                search_start = abs_end;
+                // Skip whitespace for next search
+                while search_start < label.len() && label.as_bytes()[search_start].is_ascii_whitespace() {
+                    search_start += 1;
+                }
+            } else {
+                eprintln!("WARNING: Could not find parameter token '{}' in label starting at {}", 
+                         param_token, search_start);
+            }
+        }
+        
+        eprintln!("Total parameters found: {}", parameters.len());
+        eprintln!("====== END SIGNATURE DEBUG ======");
 
         Ok(Some(SignatureHelp {
             signatures: vec![SignatureInformation {
@@ -2739,10 +2839,10 @@ impl LanguageServer for Backend {
                         })
                         .collect(),
                 ),
-                active_parameter: Some(current_param as u32),
+                active_parameter: None,
             }],
-            active_signature: None,
-            active_parameter: None,
+            active_signature: Some(0),
+            active_parameter: Some(current_param as u32),
         }))
     }
 
