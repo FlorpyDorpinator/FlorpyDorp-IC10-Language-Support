@@ -1,0 +1,124 @@
+# Test file for  byte count
+# This script intentionally exceeds the line limit (128 lines)
+# and byte limit (52KB) to test that bytes are counted properly 
+#anusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkey
+#anusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkey
+#anusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkey
+#anusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkey
+#anusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkey
+#anusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkey
+#anusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkey
+#anusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkey
+#anusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkey
+#anusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkey
+#anusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkey
+#anusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkey
+#anusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkey
+#anusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkey
+#anusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkey
+#anusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkey
+#anusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkey
+#anusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkey
+#anusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkey
+#anusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkey
+#anusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkey
+#anusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkey
+#anusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkey
+#anusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkey
+#anusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkey
+#anusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkey
+#anusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkey
+#anusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkey
+#anusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkey
+move r0 0
+move r1 1
+move r2 2
+move r3 3
+move r4 4
+move r5 5
+move r6 6
+move r7 7
+move r8 8
+move r9 9
+move r10 10
+move r11 11
+move r12 12
+move r13 13
+move r14 14
+move r15 15
+# Line 20
+move r0 0
+move r1 1
+move r2 2
+move r3 3
+move r4 4
+move r5 5
+move r6 6
+move r7 7
+move r8 8
+move r9 9
+move r10 10
+move r11 11
+move r12 12
+move r13 13
+move r14 14
+move r15 15
+# Line 40
+move r0 0
+move r1 1
+move r2 2
+move r3 3
+move r4 4
+move r5 5
+move r6 6
+move r7 7
+move r8 8
+move r9 9
+move r10 10
+move r11 11
+move r12 12
+move r13 13
+move r14 14
+move r15 15
+# Line 60
+move r0 0
+move r1 1
+move r2 2
+move r3 3
+move r4 4
+move r5 5
+move r6 6
+move r7 7
+move r8 8
+move r9 9
+move r10 10
+move r11 11
+move r12 12
+move r13 13
+move r14 14
+move r15 15
+# Line 80
+move r0 0
+move r1 1
+move r2 2
+move r3 3
+move r4 4
+move r5 5
+move r6 6
+move r7 7
+#anusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkey
+#anusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkey
+#anusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkey
+#anusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkey
+#anusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkey
+#anusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkey
+#anusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkey
+move r8
+#anusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkey
+#anusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkey
+#anusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkey
+move r8
+#anusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkey
+#anusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkey
+#anusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkeynusMonkey
+move r8

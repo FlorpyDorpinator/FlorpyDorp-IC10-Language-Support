@@ -1,0 +1,11 @@
+define Cat STR("Annoying")
+
+move r0 Cat 
+
+define Dog HASH("Cute")
+
+move r1 Dog
+
+
+
+bdns

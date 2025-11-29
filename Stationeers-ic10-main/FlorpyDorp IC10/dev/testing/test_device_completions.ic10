@@ -1,0 +1,36 @@
+# Test Device Completions in HASH()
+# Tests that device names appear when typing inside HASH() strings
+
+# Test 1: Empty HASH - should show all 1709 devices
+define sensor HASH("")
+
+# Test 2: Partial match - "Struct" should show Structure* devices
+define pump HASH("Struct")
+
+# Test 3: Fuzzy match - "Gas" should show GasSensor, etc.
+define gas HASH("Gas")
+
+# Test 4: Case insensitive - "struct" should work
+define wall HASH("struct")
+
+# Test 5: Multiple devices matching pattern
+define item HASH("Item")
+
+# Test 6: Exact device name
+define battery HASH("StructureBattery")
+
+# Test 7: Device with spaces in display name
+define sensor2 HASH("Volume")
+
+# Test 8: Common device types
+define ichouse HASH("IC")
+define cable HASH("Cable")
+define sensor3 HASH("Sensor")
+
+# Test 9: HASH() with number should show error diagnostic
+define bad1 HASH("123")
+define bad2 HASH("-456")
+define bad3 HASH("0")
+
+# Test 10: Valid HASH usage with device hash value
+define validHash -404336834

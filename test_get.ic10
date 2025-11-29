@@ -4,7 +4,7 @@
 # Receives message selection via db register (1-15)
 # Uses stack-based message storage with looping playback
 # ============================================================================
-#ignorelimits
+
 # Device aliases
 define SmallLED HASH("StructureConsoleLED5")
 
@@ -49,6 +49,7 @@ Main:
     get MessageID db 511                # Get requested message (1-15) #ignore MessageID 
     beq MessageID 0 Main                # Wait if no message selected
     beq MessageID 1 Booting
+    beq MessageID 3 Main
     # Load new message if selection changed
     bneal MessageID PrevMessageID LoadNewMessage
 

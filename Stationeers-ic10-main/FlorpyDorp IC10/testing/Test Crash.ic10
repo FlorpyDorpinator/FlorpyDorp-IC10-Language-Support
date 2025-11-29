@@ -3,8 +3,7 @@
 # Displays scrolling status messages on a single console LED
 # Receives message selection via db Setting (register 512)
 # Message IDs 1-15 correspond to different Trinity system states
-# ============================================================================
-#ignorelimits
+
 # Device aliases
 alias ConDisplay d0     # Console LED panel for scrolling text display
 

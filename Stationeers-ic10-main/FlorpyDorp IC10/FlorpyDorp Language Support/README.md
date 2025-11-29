@@ -1,7 +1,8 @@
 # FlorpyDorp IC10 Language Support  
 ================================
 
-## Advanced IC10 editing, documentation, device hashing, and completion tools for Stationeers. Code in STYLE!
+## Advanced IC10 editing, documentation, device hashing, and completion tools for Stationeers. 
+                                     ###Code in STYLE!
 
  ### FlorpyDorp IC10 L.S. is a complete and actively maintained IC10 extension for VS Code. It provides deep IC10 language intelligence, rich hover documentation, expanded tokens, code diagnostics, device hashing tools, and quality-of-life enhancements built on years of community work.
 
@@ -11,21 +12,139 @@
 
 - Full IC10 syntax highlighting (`.ic10`)
 - **Two immersive color themes**: IC10 In-Game Colors (syntax) and Stationeers Dark (full UI) with a hotkey to swap
-- Intelligent autocompletion for all IC10 instructions
-- Operand suggestions for LogicType, SlotLogicType, BatchMode, DeviceIO, and more
+- **Latest game support**: Updated for Stationeers Respawn Update Beta (v0.2.6054.26551)
+- **Modular Console Mod**: Full support for all 101 modular console devices
+- **13 new instructions**: atan2, pow, lerp, ext, ins, ld, sd, bdnvl, bdnvs, clr, clrd, poke, rmap
+- **242 logic types**: Complete coverage including orbital mechanics and celestial navigation
+- **1709+ device hashes**: Comprehensive device name resolution with HASH() tooltips
+- **Intelligent context-aware completions**: Dropdowns filter by parameter type
+- **Device completions in HASH()**: All 1709 devices with fuzzy search
+- **Usage-based sorting**: Frequently-used registers/devices prioritized
 - Multi-example hover documentation for 80+ instructions
 - Expanded instruction descriptions and category grouping
 - Instant diagnostics toggle (Ctrl+Alt+D)
 - Theme toggle between Stationeers and your preferred theme (Ctrl+Alt+T)
 - Inline device names from both `HASH()` and numeric hash values
-- Inlay hints that avoid covering typed code
-- Hundreds of missing variables, enums, tokens, and structure hashes
+- Inlay hints that avoid covering typed code (shadow text)
 - Code length warnings approaching the 4096-byte IC10 limit
-- Consistent handling of labels, defines, and parameter patterns
+- Smart error detection (HASH() validation, relative branch warnings)
+
+---
+
+## 🚀 Intelligent Completions
+
+![Auto-completion Demo](images/completion-demo.gif)
+
+The extension provides context-aware completions that understand what you're typing:
+
+**Smart Filtering:**
+- LogicType/BatchMode parameters show ONLY their predefined constants
+- Register parameters show registers and your aliases
+- Device parameters show device references
+- Branch instructions show ONLY labels
+- Batch instructions (lb, lbn, lbs) suggest HASH() for device parameters
+
+**Device Completions in HASH():**
+Type `HASH("")` and see all 1709 device names with fuzzy filtering:
+- Example: `HASH("Struct")` shows StructureVolumePump, StructureBatterySmall, etc.
+- Display format: `DeviceName → DisplayName (HashValue)`
+- Case-insensitive search
+- Only triggers inside HASH(""), not for completed calls
+
+**Usage-Based Sorting:**
+Completions prioritize items you've already used:
+- Registers (r0-r17) that appear earlier float to top
+- Devices (d0-d5) used in your code come first
+- Your aliases and defines appear before unused items
+
+**Automatic Triggers:**
+- Space after instruction: Parameter completions appear
+- Quote in HASH(): Device names appear instantly
+- Empty LogicType/BatchMode: Dropdown shows automatically
+
+---
+
+## 💡 Inlay Hints (Shadow Text)
+
+![Inlay Hints Demo](images/inlay-hints-demo.gif)
+
+See helpful context as you code without obscuring your text:
+
+**Parameter Type Hints:**
+- Shows expected parameter types as you type an instruction
+- Example: Type `add` → see ` dest a b` in gray shadow text
+- Disappears immediately when you start typing parameters
+- Never interferes with cursor position or typing flow
+
+**Device Name Hints:**
+
+![Device Hash Hints](images/device-hash-hints.png)
+
+- HASH() calls show device display name and hash value at end of line
+- Example: `HASH("StructureVolumePump")` → shows ` → Volume Pump (-1258351925)`
+- Numeric device hashes show friendly names
+- Example: `-1258351925` → shows ` → Volume Pump`
+- Only appears for complete, valid device hashes
+- Helps identify devices at a glance
+
+**Smart Behavior:**
+- Appears ahead of cursor, never covers what you're typing
+- Updates in real-time as you write
+- Helps learn instruction signatures and device names naturally
+
+---
+
+## 🩺 Error Detection & Diagnostics
+
+![Error Detection Demo](images/diagnostics-demo.gif)
+
+The extension catches common mistakes:
+
+**HASH() Validation:**
+- `HASH("123")` shows error: "Cannot be a number. Use hash value directly: 123"
+- Prevents putting numeric hash values inside HASH()
+
+**Relative Branch to Label Warning:**
+- `breq r0 0 labelName` shows warning: "Do you REALLY want to use relative branch here?"
+- Quick-fix converts to absolute: `beq r0 0 labelName`
+- Critical: Relative branches use the numeric value at the label, NOT the label's line number
+- Prevents script-breaking bugs
+
+**Code Limits:**
+- Line, column, and byte-limit validation
+- 4096-byte warning as you approach the IC10 limit
+- Add `#IgnoreLimits` to suppress during development
+
+---
+
+## ⚡ Quick Actions & Refactoring
+
+![Code Actions Demo](images/code-actions-demo.gif)
+
+The extension provides intelligent code actions to improve your workflow:
+
+**HASH Conversion Refactoring:**
+- **String to Number**: Right-click on `HASH("StructureVolumePump")` → Refactor → "Convert to hash number: -1258351925"
+- **Number to String**: Right-click on `-1258351925` → Refactor → "Convert to HASH(\"StructureVolumePump\")"
+- Bidirectional conversion for all 1709 recognized devices
+- Appears in "Refactor..." submenu (not quick-fix)
+
+**Branch Conversion Quick-Fixes:**
+- **Relative to Absolute**: `breq r0 0 label` → lightbulb → "Change to absolute branch (beq)"
+- **Absolute to Relative**: `beq r0 0 123` → lightbulb → "Change to relative branch (breq)"
+- Prevents common mistake of using relative branches with labels
+
+**Register Diagnostic Suppression:**
+- Click lightbulb on register diagnostic → "Ignore diagnostics for r0"
+- Adds `# ignore r0` comment to suppress false positives
+- Useful for complex control flow that static analysis can't follow
+- Hotkey: **Ctrl+Alt+I** to suppress all register diagnostics at once
 
 ---
 
 ## 📚 Hover Documentation
+
+![Hover Documentation Demo](images/hover-demo.gif)
 
 Hover over any instruction to see:
 
@@ -42,16 +161,14 @@ This turns the editor into a live IC10 reference.
 
 ## 🔢 Device Hash Support
 
-The extension understands both string-based and numeric hash values:
+![Device Hash Support](images/device-hash-demo.png)
 
-```ic10
-define Pump   HASH("StructureVolumePump")   ; → Volume Pump
-define Sensor -1252983604                   ; → Gas Sensor
-```
+The extension understands both string-based and numeric hash values for **1709+ devices** including the complete Modular Console Mod.
 
 Features:
 
-- 1200+ devices from complete Stationpedia database
+- **1709+ devices** from complete Stationpedia database (Respawn Update Beta)
+- **Modular Console Mod**: All 101 devices including buttons, switches, dials, LEDs, gauges, and displays
 - Hover tooltips for device names  
 - Smart typo handling for common Stationeers prefab misspellings  
 - `HASH()` in defines behaves exactly like a numeric constant  
@@ -100,7 +217,7 @@ Choose from two custom themes designed for IC10 development:
 ### Stationeers IC10 Syntax Only
 Perfect for users who want authentic Stationeers in-game syntax colors while keeping their familiar Dark+ UI. This theme only changes code colors, leaving the rest of VS Code untouched.
 
-![IC10 Syntax Only Theme](https://raw.githubusercontent.com/FlorpyDorp/Stationeers-ic10/main/FlorpyDorp%20IC10/FlorpyDorp%20Language%20Support/images/theme-syntax-only.png)
+![IC10 Syntax Only Theme](images/theme-syntax-only.png)
 
 **Features:**
 - Dark+ base UI (familiar and clean)
@@ -111,7 +228,7 @@ Perfect for users who want authentic Stationeers in-game syntax colors while kee
 ### Stationeers Full Color Theme
 A complete immersive theme that transforms your entire VS Code interface with Stationeers-inspired colors throughout - code like you're in the game!
 
-![Stationeers Full Color Theme](https://raw.githubusercontent.com/FlorpyDorp/Stationeers-ic10/main/FlorpyDorp%20IC10/FlorpyDorp%20Language%20Support/images/theme-full.png)
+![Stationeers Full Color Theme](images/theme-full.png)
 
 **Features:**
 - Full custom UI colors inspired by Stationeers
@@ -126,7 +243,7 @@ A complete immersive theme that transforms your entire VS Code interface with St
 
 ---
 
-## 🎩 Code in STYLE!
+## 🎩 Swap Themes with ease!
 **Theme Toggle:**  
 Press **Ctrl+Alt+T** to switch between the immersive Stationeers Editor Theme and your previous theme.
 
@@ -144,11 +261,12 @@ Press **Ctrl+Alt+T** to switch between the immersive Stationeers Editor Theme an
 
 ---
 
-## 📝 Usage
+## 📝 Usage & Hotkeys
 
 1. Install the extension.  
 2. Open or create a file ending in `.ic10`.  
 3. Start typing — language features load automatically.
+4. Profit
 
 **Platform Support:**  
 - ✅ Windows (x64)
@@ -156,13 +274,19 @@ Press **Ctrl+Alt+T** to switch between the immersive Stationeers Editor Theme an
 - ✅ macOS Intel (x64)
 - ✅ macOS Apple Silicon (ARM64)
 
-**Restart the server:**  
-Ctrl+Shift+P → "IC10: Restart Server"
+**Available Commands:**  
+- Ctrl+Shift+P → "IC10: Restart Server" (restart language server)
+- Ctrl+Shift+P → "IC10: Show Version" (display LSP version)
+- Ctrl+Shift+P → "IC10: Show Related Instructions"
+- Ctrl+Shift+P → "IC10: Search Instruction Category"
+- Ctrl+Shift+P → "IC10: Show Instruction Examples"
 
-**Toggle diagnostics:**  
-Ctrl+Alt+D (all diagnostics)  
-Ctrl+Alt+H (hash diagnostics only)  
-Ctrl+Alt+I (register diagnostics)
+**Hotkeys:**  
+- **Ctrl+Alt+D** - Toggle all diagnostics (errors/warnings)
+- **Ctrl+Alt+H** - Toggle hash diagnostics (HASH() and device hash warnings)
+- **Ctrl+Alt+I** - Suppress all register diagnostics (adds ignore comments)
+- **Ctrl+Alt+W** - Add #IgnoreRegisterWarnings directive
+- **Ctrl+Alt+T** - Toggle Stationeers theme on/off
 
 ---
 

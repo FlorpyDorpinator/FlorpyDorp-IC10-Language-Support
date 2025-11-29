@@ -24,6 +24,32 @@
     }
   },
   {
+    "type": "hash_function",
+    "named": true,
+    "fields": {
+      "argument": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "hash_string",
+            "named": true
+          }
+        ]
+      },
+      "function": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "hash_keyword",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
     "type": "instruction",
     "named": true,
     "fields": {
@@ -118,7 +144,7 @@
           "named": true
         },
         {
-          "type": "hash_preproc",
+          "type": "hash_function",
           "named": true
         },
         {
@@ -138,7 +164,7 @@
           "named": true
         },
         {
-          "type": "str_preproc",
+          "type": "str_function",
           "named": true
         }
       ]
@@ -181,6 +207,32 @@
     }
   },
   {
+    "type": "str_function",
+    "named": true,
+    "fields": {
+      "argument": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "str_string",
+            "named": true
+          }
+        ]
+      },
+      "function": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "str_keyword",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
     "type": "\n",
     "named": false
   },
@@ -190,6 +242,14 @@
   },
   {
     "type": "\r\n",
+    "named": false
+  },
+  {
+    "type": "(",
+    "named": false
+  },
+  {
+    "type": ")",
     "named": false
   },
   {
@@ -225,6 +285,10 @@
     "named": false
   },
   {
+    "type": "atan2",
+    "named": false
+  },
+  {
     "type": "bap",
     "named": false
   },
@@ -246,6 +310,14 @@
   },
   {
     "type": "bdnsal",
+    "named": false
+  },
+  {
+    "type": "bdnvl",
+    "named": false
+  },
+  {
+    "type": "bdnvs",
     "named": false
   },
   {
@@ -453,6 +525,14 @@
     "named": false
   },
   {
+    "type": "clr",
+    "named": false
+  },
+  {
+    "type": "clrd",
+    "named": false
+  },
+  {
     "type": "cos",
     "named": false
   },
@@ -481,6 +561,10 @@
     "named": false
   },
   {
+    "type": "ext",
+    "named": false
+  },
+  {
     "type": "floor",
     "named": false
   },
@@ -493,7 +577,11 @@
     "named": false
   },
   {
-    "type": "hash_preproc",
+    "type": "hash_keyword",
+    "named": true
+  },
+  {
+    "type": "hash_string",
     "named": true
   },
   {
@@ -503,6 +591,10 @@
   {
     "type": "identifier",
     "named": true
+  },
+  {
+    "type": "ins",
+    "named": false
   },
   {
     "type": "invalid_instruction",
@@ -542,6 +634,14 @@
   },
   {
     "type": "lbs",
+    "named": false
+  },
+  {
+    "type": "ld",
+    "named": false
+  },
+  {
+    "type": "lerp",
     "named": false
   },
   {
@@ -617,7 +717,15 @@
     "named": false
   },
   {
+    "type": "poke",
+    "named": false
+  },
+  {
     "type": "pop",
+    "named": false
+  },
+  {
+    "type": "pow",
     "named": false
   },
   {
@@ -645,6 +753,10 @@
     "named": true
   },
   {
+    "type": "rmap",
+    "named": false
+  },
+  {
     "type": "round",
     "named": false
   },
@@ -670,6 +782,10 @@
   },
   {
     "type": "sbs",
+    "named": false
+  },
+  {
+    "type": "sd",
     "named": false
   },
   {
@@ -781,7 +897,11 @@
     "named": false
   },
   {
-    "type": "str_preproc",
+    "type": "str_keyword",
+    "named": true
+  },
+  {
+    "type": "str_string",
     "named": true
   },
   {

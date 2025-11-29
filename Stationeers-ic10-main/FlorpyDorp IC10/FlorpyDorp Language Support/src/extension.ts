@@ -101,7 +101,9 @@ function getLSPIC10Configurations(): any {
             overline_comment: config.get('warnings.overline_comment'),
             overcolumn_comment: config.get('warnings.overcolumn_comment')
         },
-        suppressHashDiagnostics: config.get('suppressHashDiagnostics')
+        suppressHashDiagnostics: config.get('suppressHashDiagnostics'),
+        enableControlFlowAnalysis: config.get('enableControlFlowAnalysis'),
+        suppressRegisterWarnings: config.get('suppressRegisterWarnings')
     };
 }
 
@@ -278,6 +280,10 @@ export function activate(context: vscode.ExtensionContext) {
         // Use UTF-8 encoding for proper handling of special characters
         outputChannelName: 'IC10 Language Server',
         initializationOptions: getLSPIC10Configurations(),
+        // Add completion trigger characters - space bar triggers parameter completions
+        synchronize: {
+            configurationSection: 'ic10'
+        },
         middleware: {
             provideHover: async (document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken, next: any) => {
                 const useGameStyle = vscode.workspace.getConfiguration().get('ic10.hover.useGameStyle') as boolean;
@@ -739,6 +745,12 @@ export function activate(context: vscode.ExtensionContext) {
             if (signatureMap[opcodeLower]) return signatureMap[opcodeLower];
             // Jumps
             if (opcodeLower === 'j' || opcodeLower === 'jal') return 'label(r?|num)';
+            // Device status branches (bdse, bdns, brdse, brdns, bdseal, bdnsal)
+            if (opcodeLower === 'bdse' || opcodeLower === 'bdns' || 
+                opcodeLower === 'brdse' || opcodeLower === 'brdns' ||
+                opcodeLower === 'bdseal' || opcodeLower === 'bdnsal') {
+                return 'device(d?|r?|id) label(r?|num)';
+            }
             // Branch family: default is three operands (a, b, label); *z variants use implicit zero (a, label)
             if (opcodeLower.startsWith('b')) {
                 // Check for *zal variants first (beqzal, bnezal, etc.) - they're 2 operands like *z
@@ -979,6 +991,48 @@ export function activate(context: vscode.ExtensionContext) {
                 `HASH() warnings ${newValue ? 'suppressed' : 'enabled'} (restart required)`
             );
         }
+    }));
+
+    // Add #IgnoreRegisterWarnings directive to suppress register warnings
+    context.subscriptions.push(vscode.commands.registerCommand('ic10.ignoreRegisterWarnings', async () => {
+        const editor = vscode.window.activeTextEditor;
+        if (!editor || editor.document.languageId !== 'ic10') {
+            vscode.window.showInformationMessage('No active IC10 file');
+            return;
+        }
+
+        const document = editor.document;
+        const text = document.getText();
+        
+        // Check if directive already exists
+        const directiveRegex = /#IgnoreRegisterWarnings/i;
+        if (directiveRegex.test(text)) {
+            vscode.window.showInformationMessage('#IgnoreRegisterWarnings already present');
+            return;
+        }
+
+        // Find the best position to insert the directive (after other directives at the top)
+        const lines = text.split('\n');
+        let insertLine = 0;
+        
+        // Skip shebang and find last directive/comment at the top
+        for (let i = 0; i < lines.length; i++) {
+            const trimmed = lines[i].trim();
+            if (trimmed.startsWith('#') || trimmed === '') {
+                insertLine = i + 1;
+            } else {
+                break; // Stop at first non-comment/non-empty line
+            }
+        }
+
+        const position = new vscode.Position(insertLine, 0);
+        const directive = '#IgnoreRegisterWarnings\n';
+        
+        await editor.edit(editBuilder => {
+            editBuilder.insert(position, directive);
+        });
+
+        vscode.window.showInformationMessage('Added #IgnoreRegisterWarnings directive');
     }));
 
     // Toggle between Stationeers theme and user's previous theme
