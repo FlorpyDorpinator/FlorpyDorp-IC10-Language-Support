@@ -1,0 +1,12 @@
+# Test VolumeOfLiquid completion
+# Type "s d0 " (with space after d0) and check if VolumeOfLiquid appears in dropdown
+
+alias sensor d0
+
+# Test 1: Store VolumeOfLiquid
+s d0 
+
+# Test 2: Load VolumeOfLiquid  
+l r0 d0 
+
+# Expected: VolumeOfLiquid should appear in both completion lists above

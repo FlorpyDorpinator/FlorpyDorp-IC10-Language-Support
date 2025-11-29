@@ -1,0 +1,228 @@
+# ============================================================================
+# TRINITY OS DISPLAY SYSTEM
+# Displays scrolling status messages on a single console LED
+# Receives message selection via db register (1-15)
+# Uses stack-based message storage with looping playback
+# ============================================================================
+
+# Device aliases
+define SmallLED HASH("StructureConsoleLED5")
+define StartButton HASH("StructureLogicButton")
+
+# Register aliases
+alias MessageID r15         # Current message ID from db (1-15)
+alias PrevMessageID r14     # Previous message ID (detects changes)
+alias SDisplay r13          # Display buffer (5 characters visible)
+alias SBuffer r12           # Temp buffer for character extraction
+alias RBuffer r11           # Read buffer (current 6-char string chunk)
+alias PartCount r10         # Number of string parts in message
+alias SavedSP r9            # Saved stack position for looping
+alias StackPointer r8       # Stack pointer for message selection
+alias ResetSP r7            # Reset position for loop detection
+alias LetterCounter r6      # Counts characters processed (0-5)
+alias TwoSpaces r5          # Constant 8224 (two space characters)
+alias BootingCounter r4
+alias TempStore r3
+
+# ============================================================================
+# INITIAL SETUP
+# ============================================================================
+# ============================================================================
+# Booting Sequence Of Messages
+# ============================================================================
+Booting: 
+    put db 511 1
+    add BootingCounter 1 BootingCounter
+    bne BootingCounter 16 Main
+    move BootingCounter 0
+    put db 511 2
+Booting2:
+    add BootingCounter 1 BootingCounter
+    bne BootingCounter 9 Main
+    move BootingCounter 0
+    put db 511 5
+    move BootingCounter 0
+    move r2 77
+    get r1 db r2 
+CheckChipHousing:
+    lbn r0 2037291645 r1 ReferenceId 1
+    bdns r0 ChipError
+    sub r2 r2 1 
+    get r1 db r2 
+    beq r2 69 OSNominal
+    j CheckChipHousing
+ChipError:
+    put db 511 3
+    add BootingCounter 1 BootingCounter
+    bne BootingCounter 18 Main
+    move BootingCounter 0
+    j CheckChipHousing
+OSNominal:
+    put db 511 4
+    add BootingCounter 1 BootingCounter
+    bne BootingCounter 12 Main
+    put db 511 5
+    j Main
+
+# ============================================================================
+# Interrogation Sequence
+# ============================================================================
+InterrogateAsk:
+lbn TempStore StartButton HASH("No") Activate Maximum
+beq TempStore 1 ResetSystem
+lbn TempStore StartButton HASH("Yes") Activate Maximum
+beq TempStore 0 ra
+InterrogateLoop:
+put db 511 12
+lb TempStore HASH("StructureSatelliteDish") MinimumWattsToContact Maximum
+bgt TempStore 7500 UseLargeDish
+sb HASH("StructureSatelliteDish") Activate 1
+lb TempStore HASH("StructureSatelliteDish") InterrogationProgress Maximum
+jal Main
+brne TempStore 1 -2
+j CallDownAsk
+    UseLargeDish:
+        sb HASH("StructureLargeSatelliteDish") On 1
+        sb HASH("StructureLargeSatelliteDish") Setting 50000
+        WaitForResolve:
+            jal Main
+            lb TempStore HASH("StructureLargeSatelliteDish") SignalID Maximum 
+            bltz TempStore WaitForResolve #could change to br and get rid of labels
+        sb HASH("StructureLargeSatelliteDish") Activate 1
+        jal Main
+        lb TempStore HASH("StructureSatelliteDish") InterrogationProgress Maximum
+        yield
+        brne TempStore 1 -3
+        
+CallDownAsk:
+put db 511 13
+jal Main
+lbn TempStore StartButton HASH("No") Activate Maximum
+beq TempStore 1 ResetSystem
+lbn TempStore StartButton HASH("Yes") Activate Maximum
+beq TempStore 0 CallDownAsk
+Approaching:
+put db 511 14
+jal Main
+sb HASH("StructureSatelliteDish") Activate 1
+add BootingCounter 1 BootingCounter
+bneal BootingCounter 40 Main
+move BootingCounter 0
+ResetSystem:
+put db 511 5
+lb TempStore HASH("StructureSatelliteDish") ReferenceId Maximum
+put TempStore 12 1 
+
+
+# ============================================================================
+# MAIN LOOP
+# Continuously scrolls the selected message across the display
+# ============================================================================
+Main:
+    move r0 ra #Store ra for the calldown sequence 
+    # Read message selection from IC housing db register
+    get MessageID db 511                # Get requested message (1-15) #ignore MessageID 
+    beq MessageID 0 Main 
+    beqal MessageID 11 InterrogateAsk 
+    # Load new message if selection changed
+    bneal MessageID PrevMessageID LoadNewMessage
+
+    # ========================================================================
+    # STRING SCROLLER
+    # Extracts characters from 6-char string chunks and scrolls left
+    # ========================================================================
+    
+    # Pop next string chunk if buffer empty
+    beqzal RBuffer StringGet           
+    
+    # Extract leftmost character from current string
+    srl SBuffer RBuffer 40              # Shift right 40 bits (extract bits 47-40)
+    brnez SBuffer 3                     # Jump if character exists
+    move SBuffer STR(" ")               # Use space if empty
+    beq TwoSpaces SBuffer StringGet     # Skip double spaces, get next string
+    
+    # Insert character into display buffer
+    sll SDisplay SDisplay 8             # Shift display left 8 bits
+    ins SDisplay 0 8 SBuffer            # Insert char at rightmost position (bits 7-0)
+    
+    # Consume character from read buffer
+    sll RBuffer RBuffer 8               # Shift left, removing leftmost char
+    add LetterCounter LetterCounter 1   # Increment character counter
+    beq LetterCounter 6 StringGet       # All 6 chars consumed, get next string
+    beq TwoSpaces SBuffer StringGet     # Skip double spaces
+    
+UpdateDisplay:
+    # Write scrolling text to LED display
+    sbn SmallLED HASH("TrinityOS") Setting SDisplay
+    yield    
+    beq MessageID 1 Booting
+    beq MessageID 2 Booting2
+    beq MessageID 4 OSNominal   
+    beq MessageID 12 r0  
+    beq MessageID 13 r0
+    beq MessageID 14 r0
+    j Main                              # Loop forever
+#Called when message selection changes
+# Resets state and sets stack pointer to selected message
+# ============================================================================
+LoadNewMessage:
+ move SavedSP 0                         # Clear saved stack position
+ move PartCount 0                       # Clear part count
+ move ResetSP 0                         # Clear reset position
+ get StackPointer db MessageID          # Get stack position for message ID #ignore StackPointer
+ move sp StackPointer                   # Set stack pointer to message start
+ move PrevMessageID MessageID           # Update previous message tracker
+j ra                                    # Return to main loop StackPointer db MessageID #ignore StackPointer
+
+# ============================================================================
+# STRING GET SUBROUTINE(either part count or string chunk)
+# Implements message looping by detecting when all parts consumed
+# ============================================================================
+StringGet:
+    move LetterCounter 0                # Reset character counter
+    pop RBuffer                         # Pop next value from stack #ignore RBuffer 
+    
+    # First pop gets the part count
+    beqz PartCount LoadPartCount        # If PartCount is 0, this is first pop
+    
+    # Check if we've looped back to start (sp equals reset position)
+    brne ResetSP sp 2                   # If not at reset position, continue
+    j LoopMessage                       # Otherwise loop message
+    j ra                                # Return with string in RBuffer
+
+LoadPartCount:
+    move PartCount RBuffer              # Store part count (2-4 depending on message)
+    move SavedSP sp                     # Save current stack position
+    move RBuffer 0                      # Clear buffer (not a string yet)
+    sub ResetSP SavedSP PartCount       # Calculate reset position
+    sub ResetSP ResetSP 1               # Adjust for stack indexing
+    j StringGet                         # Get first string chunk
+
+LoopMessage:
+    move sp SavedSP                     # Reset stack pointer to saved position
+    move RBuffer 0                      # Clear buffer
+    j StringGet                         # Get first string chunk again
+
+# ============================================================================
+# MESSAGE FLOW:
+# 1. User sets MessageID (1-15) in db register 511
+# 2. LoadNewMessage gets stack position from db[MessageID]
+# 3. First pop gets part count (2-4), saves position for looping
+# 4. Subsequent pops get 6-character string chunks
+# 5. Each string scrolls character-by-character across display
+# 6. When sp reaches ResetSP, loop back to SavedSP
+# 7. Message repeats indefinitely until MessageID changes
+#
+# STACK STRUCTURE (per message):
+# - Part count (numeric value)
+# - String chunk 1 (6 chars)
+# - String chunk 2 (6 chars)
+# - String chunk N (6 chars, padded with spaces)
+#
+# SCROLLING MECHANISM:
+# - srl 40: Extracts leftmost char (bits 47-40) from 6-char string
+# - sll 8: Shifts string left, consuming leftmost char
+# - Display shows 5 chars, scrolls right-to-left
+# - Trailing spaces automatically handled by double-space detection
+# ============================================================================
+

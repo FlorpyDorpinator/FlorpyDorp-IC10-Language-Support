@@ -1321,6 +1321,10 @@ impl LanguageServer for Backend {
     }
 
     async fn completion(&self, params: CompletionParams) -> Result<Option<CompletionResponse>> {
+        eprintln!("\n=== COMPLETION REQUEST at line={}, char={} ===", 
+            params.text_document_position.position.line,
+            params.text_document_position.position.character);
+        
         fn instruction_completions(prefix: &str, completions: &mut Vec<CompletionItem>) {
             let start_entries = completions.len();
             for (instruction, signature) in instructions::INSTRUCTIONS.entries() {
@@ -1620,6 +1624,7 @@ impl LanguageServer for Backend {
         let mut ret = Vec::new();
 
         let uri = params.text_document_position.text_document.uri;
+        let original_position = params.text_document_position.position;
         let position = {
             let pos = params.text_document_position.position;
             Position::from(tower_lsp::lsp_types::Position::new(
@@ -1640,24 +1645,134 @@ impl LanguageServer for Backend {
         };
 
         let Some(node) = self.node_at_position(position, tree) else {
-            return Ok(None);
+            eprintln!("DEBUG: node_at_position returned None - falling back to text-based completion");
+            
+            // Tree-sitter hasn't parsed this position yet (common after typing space)
+            // Fall back to text-based completion logic
+            let actual_line = document.content.lines().nth(original_position.line as usize).unwrap_or("");
+            let cursor_col = original_position.character as usize;
+            let text_up_to_cursor = if cursor_col <= actual_line.len() {
+                &actual_line[..cursor_col]
+            } else {
+                actual_line
+            };
+            
+            let first_word = actual_line.split_whitespace().next().unwrap_or("");
+            
+            // Check if this line starts with a known instruction
+            if let Some(_signature) = instructions::INSTRUCTIONS.get(first_word) {
+                let param_count = text_up_to_cursor.split_whitespace().count().saturating_sub(1);
+                let suggest_hash = (first_word == "sbn" && (param_count == 0 || param_count == 1))
+                    || (first_word == "lbn" && (param_count == 1 || param_count == 2))
+                    || (first_word == "define" && param_count == 1);
+                
+                eprintln!("DEBUG: Text fallback - instruction: {}, param_count: {}, suggest_hash: {}", 
+                    first_word, param_count, suggest_hash);
+                
+                if suggest_hash {
+                    // Check if already typing HASH(
+                    let last_hash_open = text_up_to_cursor.rfind("HASH(\"").or_else(|| text_up_to_cursor.rfind("hash(\""));
+                    let last_hash_close = text_up_to_cursor.rfind("\")");
+                    let typing_in_hash = if let Some(open_pos) = last_hash_open {
+                        last_hash_close.map_or(true, |close_pos| close_pos < open_pos)
+                    } else {
+                        false
+                    };
+                    
+                    if typing_in_hash {
+                        // Offer device name completions
+                        let search_start = text_up_to_cursor.rfind("HASH(\"").or_else(|| text_up_to_cursor.rfind("hash(\""));
+                        if let Some(start_pos) = search_start {
+                            let search_text = &text_up_to_cursor[start_pos + 6..];
+                            let search_lower = search_text.to_lowercase();
+                            
+                            for hash_name in crate::device_hashes::DEVICE_NAME_TO_HASH.keys() {
+                                let hash_value = crate::device_hashes::DEVICE_NAME_TO_HASH[hash_name];
+                                let display_name = crate::device_hashes::HASH_TO_DISPLAY_NAME
+                                    .get(&hash_value)
+                                    .unwrap_or(hash_name);
+
+                                let matches = search_text.is_empty()
+                                    || hash_name.to_lowercase().contains(&search_lower)
+                                    || display_name.to_lowercase().contains(&search_lower);
+
+                                if matches {
+                                    ret.push(CompletionItem {
+                                        label: hash_name.to_string(),
+                                        kind: Some(CompletionItemKind::CONSTANT),
+                                        detail: Some(format!("{} → {}", display_name, hash_value)),
+                                        documentation: Some(Documentation::String(format!(
+                                            "Device: {}\nHash: {}",
+                                            display_name, hash_value
+                                        ))),
+                                        insert_text: Some(format!("{}\")", hash_name)),
+                                        insert_text_format: Some(InsertTextFormat::PLAIN_TEXT),
+                                        ..Default::default()
+                                    });
+                                }
+                            }
+                        }
+                    } else {
+                        // Offer HASH(" completion
+                        ret.insert(0, CompletionItem {
+                            label: "HASH(\"…)".to_string(),
+                            kind: Some(CompletionItemKind::SNIPPET),
+                            detail: Some("→ Device hash by name".to_string()),
+                            documentation: Some(Documentation::String(
+                                "Type device name inside quotes to get its hash value".to_string()
+                            )),
+                            insert_text: Some("HASH(\"".to_string()),
+                            filter_text: Some("H".to_string()),
+                            insert_text_format: Some(InsertTextFormat::PLAIN_TEXT),
+                            sort_text: Some("!".to_string()),
+                            preselect: Some(true),
+                            ..Default::default()
+                        });
+                    }
+                }
+            }
+            
+            return Ok(Some(CompletionResponse::Array(ret)));
         };
+
+        eprintln!("DEBUG: node kind='{}', parent kinds: operation={}, invalid={}, line={}", 
+            node.kind(),
+            node.find_parent("operation").is_some(),
+            node.find_parent("invalid_instruction").is_some(),
+            node.find_parent("line").is_some());
 
         // Global HASH(" detection - trigger device completions anywhere HASH(" is typed
         // This works in defines, instructions, anywhere a device hash might be used
         if let Some(line_node) = node.find_parent("line") {
+            eprintln!("DEBUG: Entered global HASH detection block");
             let line_text = line_node.utf8_text(document.content.as_bytes()).unwrap();
             
             // Get cursor position within the line by using byte offsets
+            // Use original_position (before saturating_sub) for accurate byte calculation
+            // Account for actual line ending bytes in the document (could be \n or \r\n)
             let line_start_byte = line_node.start_byte();
-            let cursor_byte = document.content.len().min(
-                document.content
-                    .lines()
-                    .take(position.0.line as usize)
-                    .map(|l| l.len() + 1) // +1 for newline
-                    .sum::<usize>()
-                    + position.0.character as usize
-            );
+            
+            // Calculate byte position by counting actual bytes including line endings
+            let cursor_byte = if original_position.line == 0 {
+                original_position.character as usize
+            } else {
+                // Find the actual byte offset by iterating through the content
+                let mut byte_offset = 0;
+                let mut line_count = 0;
+                for (i, ch) in document.content.char_indices() {
+                    if line_count >= original_position.line as usize {
+                        byte_offset = i + original_position.character as usize;
+                        break;
+                    }
+                    if ch == '\n' {
+                        line_count += 1;
+                    }
+                }
+                byte_offset
+            };
+            
+            eprintln!("DEBUG: Global HASH - original char={}, cursor_byte={}", 
+                original_position.character, cursor_byte);
             
             let cursor_pos_in_line = if cursor_byte >= line_start_byte {
                 cursor_byte - line_start_byte
@@ -1665,69 +1780,108 @@ impl LanguageServer for Backend {
                 0
             };
             
+            eprintln!("DEBUG: Global HASH - line_text.len()={}, cursor_pos_in_line={}, line_start_byte={}, cursor_byte={}", 
+                line_text.len(), cursor_pos_in_line, line_start_byte, cursor_byte);
+            
             let line_up_to_cursor = &line_text[..cursor_pos_in_line.min(line_text.len())];
+            
+            eprintln!("DEBUG: Global HASH - slice succeeded, line_up_to_cursor.len()={}", line_up_to_cursor.len());
             
             // Check if we're typing inside HASH("
             let last_hash_open = line_up_to_cursor.rfind("HASH(\"").or_else(|| line_up_to_cursor.rfind("hash(\""));
             let last_hash_close = line_up_to_cursor.rfind("\")");
+            
+            eprintln!("DEBUG: Global HASH - last_hash_open={:?}, last_hash_close={:?}", last_hash_open, last_hash_close);
+            
             let typing_in_hash = if let Some(open_pos) = last_hash_open {
                 last_hash_close.map_or(true, |close_pos| close_pos < open_pos)
             } else {
                 false
             };
             
+            eprintln!("DEBUG: Global HASH - typing_in_hash={}", typing_in_hash);
+            
             if typing_in_hash {
+                eprintln!("DEBUG: Global HASH - inside typing_in_hash block");
                 let search_start = line_up_to_cursor.rfind("HASH(\"").or_else(|| line_up_to_cursor.rfind("hash(\""));
+                eprintln!("DEBUG: Global HASH - search_start={:?}", search_start);
                 if let Some(start_pos) = search_start {
+                    eprintln!("DEBUG: Global HASH - found HASH( at pos {}", start_pos);
                     let search_text = &line_up_to_cursor[start_pos + 6..];
+                    eprintln!("DEBUG: Global HASH - search_text={:?}", search_text);
                     let search_lower = search_text.to_lowercase();
+                    
+                    eprintln!("DEBUG: Global HASH - about to check already_complete");
                     
                     // Check if already complete
                     let already_complete = if let Some(open_pos) = last_hash_open {
-                        line_text[open_pos..].contains("\")")
+                        eprintln!("DEBUG: Global HASH - open_pos={}, line_text.len()={}", open_pos, line_text.len());
+                        let slice_result = line_text.get(open_pos..);
+                        eprintln!("DEBUG: Global HASH - slice_result exists: {}", slice_result.is_some());
+                        if let Some(slice) = slice_result {
+                            eprintln!("DEBUG: Global HASH - checking contains in slice");
+                            slice.contains("\")")
+                        } else {
+                            false
+                        }
                     } else {
                         false
                     };
                     
-                    // Provide device name completions
-                    for hash_name in crate::device_hashes::DEVICE_NAME_TO_HASH.keys() {
-                        let hash_value = crate::device_hashes::DEVICE_NAME_TO_HASH[hash_name];
-                        let display_name = crate::device_hashes::HASH_TO_DISPLAY_NAME
-                            .get(&hash_value)
-                            .unwrap_or(hash_name);
+                    eprintln!("DEBUG: Global HASH - already_complete={}", already_complete);
+                    
+                    // If HASH is already complete (has closing "), don't offer device completions
+                    // Let it fall through to normal parameter completion logic
+                    if already_complete {
+                        eprintln!("DEBUG: Global HASH - skipping device completions, HASH already complete");
+                        // Don't return here - let it continue to normal parameter completion
+                    } else {
+                        eprintln!("DEBUG: Global HASH - starting device loop, device count={}", 
+                            crate::device_hashes::DEVICE_NAME_TO_HASH.len());
+                    
+                        // Provide device name completions
+                        let mut match_count = 0;
+                        for hash_name in crate::device_hashes::DEVICE_NAME_TO_HASH.keys() {
+                            let hash_value = crate::device_hashes::DEVICE_NAME_TO_HASH[hash_name];
+                            let display_name = crate::device_hashes::HASH_TO_DISPLAY_NAME
+                                .get(&hash_value)
+                                .unwrap_or(hash_name);
 
-                        let matches = search_text.is_empty()
-                            || hash_name.to_lowercase().contains(&search_lower)
-                            || display_name.to_lowercase().contains(&search_lower);
+                            let matches = search_text.is_empty()
+                                || hash_name.to_lowercase().contains(&search_lower)
+                                || display_name.to_lowercase().contains(&search_lower);
 
-                        if matches {
-                            let insert_text = if already_complete {
-                                hash_name.to_string()
-                            } else {
-                                format!("{}\")", hash_name)
-                            };
+                            if matches {
+                                match_count += 1;
+                                let insert_text = format!("{}\")", hash_name);
 
-                            ret.push(CompletionItem {
-                                label: hash_name.to_string(),
-                                kind: Some(CompletionItemKind::CONSTANT),
-                                detail: Some(format!("{} → {}", display_name, hash_value)),
-                                documentation: Some(Documentation::String(format!(
-                                    "Device: {}\nHash: {}",
-                                    display_name, hash_value
-                                ))),
-                                insert_text: Some(insert_text),
-                                insert_text_format: Some(InsertTextFormat::PLAIN_TEXT),
-                                ..Default::default()
-                            });
+                                ret.push(CompletionItem {
+                                    label: hash_name.to_string(),
+                                    kind: Some(CompletionItemKind::CONSTANT),
+                                    detail: Some(format!("{} → {}", display_name, hash_value)),
+                                    documentation: Some(Documentation::String(format!(
+                                        "Device: {}\nHash: {}",
+                                        display_name, hash_value
+                                    ))),
+                                    insert_text: Some(insert_text),
+                                    insert_text_format: Some(InsertTextFormat::PLAIN_TEXT),
+                                    ..Default::default()
+                                });
+                            }
                         }
+                        eprintln!("DEBUG: Global HASH - loop finished, match_count={}, ret.len()={}", match_count, ret.len());
+                        ret.sort_by(|x, y| x.label.cmp(&y.label));
+                        eprintln!("DEBUG: Global HASH - sorted, about to return");
+                        return Ok(Some(CompletionResponse::Array(ret)));
                     }
-                    ret.sort_by(|x, y| x.label.cmp(&y.label));
-                    return Ok(Some(CompletionResponse::Array(ret)));
                 }
             }
         }
 
+        eprintln!("DEBUG: After global HASH block");
+
         if let Some(node) = node.find_parent("operation") {
+            eprintln!("DEBUG: Entering operation block");
             let raw = node.utf8_text(document.content.as_bytes()).unwrap();
             let lowered;
             let text: &str = if instructions::INSTRUCTIONS.contains_key(raw) {
@@ -1741,6 +1895,7 @@ impl LanguageServer for Backend {
 
             instruction_completions(prefix, &mut ret);
         } else if let Some(node) = node.find_parent("invalid_instruction") {
+            eprintln!("DEBUG: Entering invalid_instruction block");
             let raw = node.utf8_text(document.content.as_bytes()).unwrap();
             let lowered;
             let text: &str = if instructions::INSTRUCTIONS.contains_key(raw) {
@@ -1754,22 +1909,241 @@ impl LanguageServer for Backend {
 
             instruction_completions(prefix, &mut ret);
         } else if let Some(line_node) = node.find_parent("line") {
+            eprintln!("DEBUG: Entering line_node block");
             let text = line_node.utf8_text(document.content.as_bytes()).unwrap();
             let cursor_pos = position.0.character as usize - line_node.start_position().column;
             let global_prefix = &text[..cursor_pos as usize + 1];
 
-            if global_prefix.chars().all(char::is_whitespace) {
+            eprintln!("DEBUG: In line block - text len={}, cursor_pos={}, global_prefix={:?}", 
+                text.len(), cursor_pos, global_prefix);
+
+            // Check if cursor is at start of line (all whitespace before cursor)
+            // OR if we're in a whitespace gap after an instruction (for parameter completion)
+            let at_line_start = global_prefix.chars().all(char::is_whitespace);
+            
+            eprintln!("DEBUG: at_line_start={}", at_line_start);
+            
+            if at_line_start {
+                eprintln!("DEBUG: Offering instruction completions (at line start)");
                 instruction_completions("", &mut ret);
             } else {
-                let Some(line_node) = node.find_parent("line") else {
-                    return Ok(None);
+                // Position: line={}, char={}
+                // Node kind: {}
+                
+                // Try to find instruction node that contains cursor, fallback to querying line
+                let instruction_node_opt = if let Some(inst) = node.find_parent("instruction") {
+                    eprintln!("DEBUG: Found via find_parent, line {}", position.0.line);
+                    Some(inst)
+                } else {
+                    eprintln!("DEBUG: No parent, trying query on line {}", position.0.line);
+                    eprintln!("DEBUG: line_node range: {}:{} to {}:{}", 
+                        line_node.start_position().row, line_node.start_position().column,
+                        line_node.end_position().row, line_node.end_position().column);
+                    
+                    // No instruction parent found - try querying the line for any instruction
+                    // This handles cases where tree-sitter parsing is incomplete
+                    let result = line_node.query("(instruction)@x", file_data.document_data.content.as_bytes());
+                    if let Some(ref inst) = result {
+                        eprintln!("DEBUG: Query found instruction at {}:{} to {}:{}", 
+                            inst.start_position().row, inst.start_position().column,
+                            inst.end_position().row, inst.end_position().column);
+                        
+                        // Calculate cursor byte position using original_position
+                        // Account for actual line endings in the document
+                        let cursor_byte = if original_position.line == 0 {
+                            original_position.character as usize
+                        } else {
+                            let mut byte_offset = 0;
+                            let mut line_count = 0;
+                            for (i, ch) in document.content.char_indices() {
+                                if line_count >= original_position.line as usize {
+                                    byte_offset = i + original_position.character as usize;
+                                    break;
+                                }
+                                if ch == '\n' {
+                                    line_count += 1;
+                                }
+                            }
+                            byte_offset
+                        };
+                        
+                        eprintln!("DEBUG: cursor_byte={}, inst bytes: {}-{}", 
+                            cursor_byte, inst.start_byte(), inst.end_byte());
+                        
+                        // CRITICAL: Verify the instruction actually contains the cursor!
+                        // query() returns the FIRST match, which might be from a different line
+                        if cursor_byte < inst.start_byte() || cursor_byte > inst.end_byte() {
+                            eprintln!("DEBUG: REJECTED - cursor outside instruction");
+                            None
+                        } else {
+                            eprintln!("DEBUG: ACCEPTED");
+                            result
+                        }
+                    } else {
+                        eprintln!("DEBUG: Query found nothing");
+                        None
+                    }
                 };
-
-                let Some(instruction_node) = line_node.query(
-                    "(instruction)@x",
-                    file_data.document_data.content.as_bytes(),
-                ) else {
-                    return Ok(None);
+                
+                let Some(instruction_node) = instruction_node_opt else {
+                    // No valid instruction found via tree-sitter, but we might still be able to help
+                    // Check if there's instruction text at the start of the line that we can use
+                    
+                    // IMPORTANT: Get the ACTUAL line from the document at the cursor position,
+                    // not from tree-sitter's line_node which may span multiple physical lines!
+                    let actual_line = document.content
+                        .lines()
+                        .nth(original_position.line as usize)
+                        .unwrap_or("");
+                    let cursor_col = original_position.character as usize;
+                    
+                    eprintln!("DEBUG: Fallback - actual line {}: {:?}", original_position.line, actual_line);
+                    eprintln!("DEBUG: Fallback - cursor_col: {}", cursor_col);
+                    
+                    let first_word = actual_line.split_whitespace().next().unwrap_or("");
+                    eprintln!("DEBUG: Fallback - first_word: {:?}", first_word);
+                    
+                    if let Some(_signature) = instructions::INSTRUCTIONS.get(first_word) {
+                        // We found an instruction at the start of the line!
+                        // Try to determine which parameter position we're at based on whitespace/text
+                        let text_up_to_cursor = &actual_line[..cursor_col.min(actual_line.len())];
+                        let param_count = text_up_to_cursor.split_whitespace().count().saturating_sub(1);
+                        
+                        eprintln!("DEBUG: Fallback - text_up_to_cursor: {:?}", text_up_to_cursor);
+                        eprintln!("DEBUG: Fallback - param_count: {}", param_count);
+                        
+                        // Check if we should suggest HASH(" for this position
+                        let suggest_hash = (first_word == "define" && param_count == 1) 
+                            || (first_word == "lbn" && (param_count == 1 || param_count == 2))
+                            || (first_word == "sbn" && (param_count == 0 || param_count == 1));
+                        
+                        eprintln!("DEBUG: Fallback - suggest_hash: {}", suggest_hash);
+                        
+                        if suggest_hash {
+                            ret.insert(0, CompletionItem {
+                                label: "HASH(\"…)".to_string(),
+                                kind: Some(CompletionItemKind::SNIPPET),
+                                detail: Some("→ Device hash by name".to_string()),
+                                documentation: Some(Documentation::String(
+                                    "Type device name inside quotes to get its hash value".to_string()
+                                )),
+                                insert_text: Some("HASH(\"".to_string()),
+                                filter_text: Some("H".to_string()),
+                                insert_text_format: Some(InsertTextFormat::PLAIN_TEXT),
+                                sort_text: Some("!".to_string()),
+                                preselect: Some(true),
+                                ..Default::default()
+                            });
+                        }
+                        
+                        // Check if we're typing inside HASH(" to offer device name completions
+                        let line_up_to_cursor = &actual_line[..cursor_col.min(actual_line.len())];
+                        let last_hash_open = line_up_to_cursor.rfind("HASH(\"").or_else(|| line_up_to_cursor.rfind("hash(\""));
+                        let last_hash_close = line_up_to_cursor.rfind("\")");
+                        let typing_in_hash = if let Some(open_pos) = last_hash_open {
+                            if let Some(close_pos) = last_hash_close {
+                                close_pos < open_pos || (cursor_col > open_pos + 6 && cursor_col <= close_pos)
+                            } else {
+                                true
+                            }
+                        } else {
+                            false
+                        };
+                        eprintln!("DEBUG: Fallback - typing_in_hash: {}", typing_in_hash);
+                        
+                        if typing_in_hash {
+                            eprintln!("DEBUG: Fallback - typing in HASH, offering device completions");
+                            let search_start = line_up_to_cursor.rfind("HASH(\"").or_else(|| line_up_to_cursor.rfind("hash(\""));
+                            if let Some(start_pos) = search_start {
+                                let search_text = &line_up_to_cursor[start_pos + 6..];
+                                let search_lower = search_text.to_lowercase();
+                                let already_complete = actual_line[start_pos..].contains("\")");
+                                
+                                for hash_name in crate::device_hashes::DEVICE_NAME_TO_HASH.keys() {
+                                    let hash_value = crate::device_hashes::DEVICE_NAME_TO_HASH[hash_name];
+                                    let display_name = crate::device_hashes::HASH_TO_DISPLAY_NAME
+                                        .get(&hash_value)
+                                        .unwrap_or(hash_name);
+                                    
+                                    let matches = search_text.is_empty()
+                                        || hash_name.to_lowercase().contains(&search_lower)
+                                        || display_name.to_lowercase().contains(&search_lower);
+                                    
+                                    if matches {
+                                        let insert_text = if already_complete {
+                                            hash_name.to_string()
+                                        } else {
+                                            format!("{}\")", hash_name)
+                                        };
+                                        
+                                        ret.push(CompletionItem {
+                                            label: hash_name.to_string(),
+                                            kind: Some(CompletionItemKind::CONSTANT),
+                                            detail: Some(format!("{} → {}", display_name, hash_value)),
+                                            insert_text: Some(insert_text),
+                                            insert_text_format: Some(InsertTextFormat::PLAIN_TEXT),
+                                            ..Default::default()
+                                        });
+                                    }
+                                }
+                            }
+                        } else {
+                            // Not typing in HASH - provide regular parameter completions
+                            eprintln!("DEBUG: Fallback - providing regular parameter completions");
+                            if let Some(signature) = instructions::INSTRUCTIONS.get(first_word) {
+                                if param_count < signature.0.len() {
+                                    let param_type = &signature.0[param_count];
+                                    eprintln!("DEBUG: Fallback - param {} type: {:?}", param_count, param_type);
+                                    
+                                    // Extract the text after the last space (the current parameter being typed)
+                                    let prefix = if let Some(last_space) = text_up_to_cursor.rfind(' ') {
+                                        &text_up_to_cursor[last_space + 1..]
+                                    } else {
+                                        text_up_to_cursor
+                                    };
+                                    
+                                    eprintln!("DEBUG: Fallback - prefix for completion: {:?}", prefix);
+                                    
+                                    // For branch/jump instructions, provide label completions
+                                    let is_branch_or_jump = first_word.starts_with('b') || first_word.starts_with('j');
+                                    if is_branch_or_jump {
+                                        // Add label completions
+                                        for (label_name, _) in &file_data.type_data.labels {
+                                            if prefix.is_empty() || label_name.starts_with(prefix) {
+                                                ret.push(CompletionItem {
+                                                    label: label_name.clone(),
+                                                    kind: Some(CompletionItemKind::CONSTANT),
+                                                    detail: Some(" label".to_string()),
+                                                    ..Default::default()
+                                                });
+                                            }
+                                        }
+                                        
+                                        // Add ra register for instructions that store return address
+                                        if first_word.ends_with("al") {
+                                            ret.push(CompletionItem {
+                                                label: "ra".to_string(),
+                                                kind: Some(CompletionItemKind::VARIABLE),
+                                                detail: Some(" return address register".to_string()),
+                                                ..Default::default()
+                                            });
+                                        }
+                                    }
+                                    
+                                    // Provide both builtin (registers, numbers, devices) and static (LogicType, etc.) completions
+                                    param_completions_builtin(prefix, param_type, &mut ret, None);
+                                    param_completions_static(prefix, "", param_type, &mut ret);
+                                    
+                                    eprintln!("DEBUG: Fallback - after param_completions, ret.len()={}", ret.len());
+                                }
+                            }
+                        }
+                    } else {
+                        // Not continuing an instruction - offer instruction completions
+                        instruction_completions("", &mut ret);
+                    }
+                    
+                    return Ok(Some(CompletionResponse::Array(ret)));
                 };
 
                 let Some(operation_node) = instruction_node.child_by_field_name("operation") else {
@@ -1787,48 +2161,87 @@ impl LanguageServer for Backend {
                     lowered.as_str()
                 };
 
+                // Convert LSP position to byte offset in document
+                let cursor_byte = document.content
+                    .lines()
+                    .take(position.0.line as usize)
+                    .map(|l| l.len() + 1)
+                    .sum::<usize>()
+                    + position.0.character as usize;
+                
                 let (current_param, operand_node) =
-                    get_current_parameter(instruction_node, position.0.character as usize);
+                    get_current_parameter(instruction_node, cursor_byte, document.content.as_bytes());
+
+                eprintln!("DEBUG: Main path - instruction: {}, current_param: {}", text, current_param);
 
                 let operand_text = operand_node
-                    .map(|node| node.utf8_text(document.content.as_bytes()).unwrap())
+                    .map(|node| {
+                        node.utf8_text(document.content.as_bytes()).unwrap()
+                    })
                     .unwrap_or("");
+                
+                eprintln!("DEBUG: Main path - operand_text: {:?}", operand_text);
 
                 let prefix = {
                     if let Some(operand_node) = operand_node {
                         let cursor_pos = (position.0.character as usize)
                             .saturating_sub(operand_node.start_position().column);
-                        &operand_text[..(cursor_pos + 1).min(operand_text.len())]
+                        let result = &operand_text[..(cursor_pos + 1).min(operand_text.len())];
+                        result
                     } else {
                         ""
                     }
                 };
 
                 let Some(signature) = instructions::INSTRUCTIONS.get(text) else {
+                    eprintln!("DEBUG: Main path - no signature found for instruction");
                     return Ok(None);
                 };
 
                 let Some(param_type) = signature.0.get(current_param) else {
+                    eprintln!("DEBUG: Main path - no param_type at index {}, returning early", current_param);
                     return Ok(None);
                 };
+                
+                eprintln!("DEBUG: Main path - param_type found: {:?}", param_type);
+                
 
                 // Special case: suggest HASH(" for instructions that commonly use device hashes
                 // - define: second parameter (index 1) is usually a device hash
-                // - lbn/sbn: third parameter (index 2) is the nameHash for targeting specific device by name
+                // - lbn: third parameter (index 2) is the nameHash for targeting specific device by name  
+                // - sbn: BOTH first parameter (deviceHash, index 0) AND second parameter (nameHash, index 1) can use HASH
                 let suggest_hash = (text == "define" && current_param == 1) 
-                    || ((text == "lbn" || text == "sbn") && current_param == 2);
+                    || (text == "lbn" && (current_param == 1 || current_param == 2))
+                    || (text == "sbn" && (current_param == 0 || current_param == 1));
                 
-                if suggest_hash && !prefix.contains("HASH") && !prefix.contains("hash") {
-                    ret.push(CompletionItem {
-                        label: "HASH(\"".to_string(),
+                eprintln!("DEBUG: Main path - suggest_hash: {}", suggest_hash);
+                
+                // Only suggest HASH(" if we're typing in the right parameter position
+                // Don't show it if the current parameter already starts with HASH (typed or autocompleted)
+                // Use trim() to handle spaces, and check prefix (what's typed so far) not operand_text
+                let prefix_trimmed = prefix.trim_start();
+                
+                eprintln!("DEBUG: Main path - prefix_trimmed: {:?}", prefix_trimmed);
+                eprintln!("DEBUG: Main path - about to check: suggest_hash={}, !starts_with_HASH={}", 
+                    suggest_hash, 
+                    !prefix_trimmed.starts_with("HASH") && !prefix_trimmed.starts_with("hash"));
+                
+                if suggest_hash && !prefix_trimmed.starts_with("HASH") && !prefix_trimmed.starts_with("hash") {
+                    eprintln!("DEBUG: Main path - ADDING HASH(\" completion");
+                    // Add HASH(" with multiple strategies to ensure visibility
+                    // Strategy 1: Standard completion with highest priority
+                    ret.insert(0, CompletionItem {
+                        label: "HASH(\"…)".to_string(),
                         kind: Some(CompletionItemKind::SNIPPET),
-                        detail: Some("Device hash function".to_string()),
+                        detail: Some("→ Device hash by name".to_string()),
                         documentation: Some(Documentation::String(
-                            "Insert HASH(\"\") to get device hash by name".to_string()
+                            "Type device name inside quotes to get its hash value".to_string()
                         )),
                         insert_text: Some("HASH(\"".to_string()),
+                        filter_text: Some("H".to_string()), // Match on single 'H' to be very permissive
                         insert_text_format: Some(InsertTextFormat::PLAIN_TEXT),
-                        sort_text: Some("0000".to_string()), // Sort to top
+                        sort_text: Some("!".to_string()),
+                        preselect: Some(true),
                         ..Default::default()
                     });
                 }
@@ -1836,8 +2249,14 @@ impl LanguageServer for Backend {
                 // Check if we're typing HASH(" even before it's fully parsed
                 // This handles the case where user types HASH(" and we want to show device completions immediately
                 // Only trigger if HASH(" is being typed RIGHT NOW at cursor (not earlier in line)
-                let line_text = line_node.utf8_text(document.content.as_bytes()).unwrap();
-                let line_up_to_cursor = &line_text[..cursor_pos.min(line_text.len())];
+                // IMPORTANT: Use actual document line, not tree-sitter line node which can span multiple lines
+                let actual_line = document.content
+                    .lines()
+                    .nth(position.0.line as usize)
+                    .unwrap_or("");
+                let cursor_pos_in_actual_line = position.0.character as usize;
+                let line_up_to_cursor = &actual_line[..cursor_pos_in_actual_line.min(actual_line.len())];
+                
                 // Check if cursor is immediately after HASH(" or within an unclosed HASH("
                 let just_opened_hash = line_up_to_cursor.ends_with("HASH(\"") || line_up_to_cursor.ends_with("hash(\"");
                 // Check if we're currently inside an unclosed HASH(" - find last occurrence
@@ -1846,7 +2265,14 @@ impl LanguageServer for Backend {
                 let typing_in_hash = if let Some(open_pos) = last_hash_open {
                     // We're typing in HASH if there's an open quote and either no close quote,
                     // or the close quote comes before the open quote
-                    last_hash_close.map_or(true, |close_pos| close_pos < open_pos)
+                    if let Some(close_pos) = last_hash_close {
+                        // If close comes before open, we're in an unclosed HASH
+                        // If close comes after open, check cursor is BETWEEN open and close (not after)
+                        close_pos < open_pos || (cursor_pos_in_actual_line > open_pos + 6 && cursor_pos_in_actual_line <= close_pos)
+                    } else {
+                        // No close found, we're definitely typing in HASH
+                        true
+                    }
                 } else {
                     false
                 };
@@ -1862,7 +2288,7 @@ impl LanguageServer for Backend {
                         // Check if HASH call is already complete (has closing ") somewhere on the line)
                         // Look for ") after the HASH(" opening
                         let already_complete = if let Some(open_pos) = last_hash_open {
-                            line_text[open_pos..].contains("\")")
+                            actual_line[open_pos..].contains("\")")
                         } else {
                             false
                         };
@@ -1967,6 +2393,75 @@ impl LanguageServer for Backend {
                     return Ok(Some(CompletionResponse::Array(ret)));
                 }
 
+                // Special case: batch instructions expect device hash at specific parameter positions
+                // Load batch (lb, lbn, lbs, lbns): device hash at parameter 1
+                // Store batch (sb, sbn, sbs): device hash at parameter 0
+                // For sbn/lbn: nameHash parameter (sbn param 1, lbn param 2) expects CUSTOM NAMES, not device prefabs
+                let is_load_batch = matches!(text, "lb" | "lbn" | "lbs" | "lbns");
+                let is_store_batch = matches!(text, "sb" | "sbn" | "sbs");
+                let is_device_hash_param = (is_load_batch && current_param == 1) || (is_store_batch && current_param == 0);
+                let is_name_hash_param = (text == "lbn" && current_param == 2) || (text == "sbn" && current_param == 1);
+                
+                if is_device_hash_param || is_name_hash_param {
+                    // For device hash params: show defines (which might contain device hashes)
+                    // For name hash params: show defines (which might contain custom name hashes)
+                    // The HASH(" suggestion was already added above for both cases
+                    // Do NOT show device prefab completions - those are only for deviceHash, not nameHash
+                    
+                    // Collect items that are actually used in the script for smart sorting
+                    let mut used_items = std::collections::HashSet::new();
+                    // Scan the document for used registers, devices, aliases, defines
+                    let content_lower = document.content.to_lowercase();
+                    for i in 0..=15 {
+                        let reg = format!("r{}", i);
+                        if content_lower.contains(&reg) {
+                            used_items.insert(reg);
+                        }
+                    }
+                    if content_lower.contains("ra") { used_items.insert("ra".to_string()); }
+                    if content_lower.contains("sp") { used_items.insert("sp".to_string()); }
+                    for i in 0..=5 {
+                        let dev = format!("d{}", i);
+                        if content_lower.contains(&dev) {
+                            used_items.insert(dev);
+                        }
+                    }
+                    if content_lower.contains("db") { used_items.insert("db".to_string()); }
+
+                    // Add all defined aliases and defines to used_items
+                    for alias_name in file_data.type_data.aliases.keys() {
+                        used_items.insert(alias_name.clone());
+                    }
+                    for define_name in file_data.type_data.defines.keys() {
+                        used_items.insert(define_name.clone());
+                    }
+
+                    // 1. Show built-in registers (if valid)
+                    param_completions_builtin(prefix, param_type, &mut ret, Some(&used_items));
+
+                    // 2. Show aliases (if valid)
+                    param_completions_dynamic(
+                        prefix,
+                        &file_data.type_data.aliases,
+                        " alias",
+                        param_type,
+                        &mut ret,
+                        Some(&used_items),
+                    );
+
+                    // 3. Show defines
+                    param_completions_dynamic(
+                        prefix,
+                        &file_data.type_data.defines,
+                        " define",
+                        param_type,
+                        &mut ret,
+                        Some(&used_items),
+                    );
+                    // Skip other completions for hash parameters
+                    return Ok(Some(CompletionResponse::Array(ret)));
+                }
+
                 // Legacy preproc_string support (for backwards compatibility)
                 if let Some(preproc_string_node) = instruction_node.query(
                     "(preproc_string)@x",
@@ -2059,54 +2554,7 @@ impl LanguageServer for Backend {
                         used_items.insert(define_name.clone());
                     }
                     
-                    // Special case: batch instructions expect device hash at specific parameter positions
-                    // Load batch (lb, lbn, lbs, lbns): device hash at parameter 1
-                    // Store batch (sb, sbn, sbs): device hash at parameter 0
-                    let is_load_batch = matches!(text, "lb" | "lbn" | "lbs" | "lbns");
-                    let is_store_batch = matches!(text, "sb" | "sbn" | "sbs");
-                    let is_device_hash_param = (is_load_batch && current_param == 1) || (is_store_batch && current_param == 0);
-                    
-                    if is_device_hash_param {
-                        // This is the device hash parameter for a batch instruction
-                        // Show device names for HASH() completion instead of numbers/enums
-                        
-                        // Check if we're typing HASH(" for device hash
-                        let line_text = line_node.utf8_text(document.content.as_bytes()).unwrap();
-                        let line_up_to_cursor = &line_text[..cursor_pos.min(line_text.len())];
-                        let has_hash_quote = line_up_to_cursor.contains("HASH(\"") || line_up_to_cursor.contains("hash(\"");
-                        
-                        if has_hash_quote {
-                            // Already handled above in HASH detection
-                        } else {
-                            // Not typing HASH yet - suggest starting with HASH(
-                            // Show defines that might be device hashes, and suggest HASH( pattern
-                            param_completions_dynamic(
-                                prefix,
-                                &file_data.type_data.defines,
-                                " define",
-                                param_type,
-                                &mut ret,
-                                Some(&used_items),
-                            );
-                            
-                            // Add a helpful hint to use HASH()
-                            if prefix.is_empty() || "HASH".starts_with(&prefix.to_uppercase()) {
-                                ret.push(CompletionItem {
-                                    label: "HASH(\"\")" .to_string(),
-                                    label_details: Some(CompletionItemLabelDetails {
-                                        description: None,
-                                        detail: Some(" device hash".to_string()),
-                                    }),
-                                    kind: Some(CompletionItemKind::SNIPPET),
-                                    documentation: Some(Documentation::String("Start typing device name".to_string())),
-                                    insert_text: Some("HASH(\"".to_string()),
-                                    ..Default::default()
-                                });
-                            }
-                        }
-                        // Skip other completions for device hash parameter
-                        return Ok(Some(CompletionResponse::Array(ret)));
-                    }
+
                     
                     // Check if this is a static-only parameter type (BatchMode, LogicType, SlotLogicType)
                     let is_static_only = param_type.0.iter().any(|t| matches!(t, 
@@ -2190,6 +2638,8 @@ impl LanguageServer for Backend {
             }
         }
 
+        eprintln!("DEBUG: About to return final ret with {} items", ret.len());
+
         Ok(Some(CompletionResponse::Array(ret)))
     }
 
@@ -2246,6 +2696,7 @@ impl LanguageServer for Backend {
         let (current_param, _) = get_current_parameter(
             instruction_node,
             position.0.character.saturating_sub(1) as usize,
+            document.content.as_bytes(),
         );
 
         let Some(signature) = instructions::INSTRUCTIONS.get(text) else {
@@ -2928,7 +3379,7 @@ impl LanguageServer for Backend {
                     .unwrap();
 
                 let (current_param, _) =
-                    get_current_parameter(instruction_node, position.character as usize);
+                    get_current_parameter(instruction_node, position.character as usize, document.content.as_bytes());
 
                 let candidates = instructions::logictype_candidates(name);
 
@@ -3307,7 +3758,7 @@ impl Backend {
 
         // Read config before the loop to avoid await across non-Send types
         let suppress_hash_diagnostics = self.config.read().await.suppress_hash_diagnostics;
-        self.client.log_message(MessageType::INFO, format!("Running diagnostics with suppress_hash_diagnostics: {}", suppress_hash_diagnostics)).await;
+        // Diagnostics running with suppress_hash_diagnostics: {suppress_hash_diagnostics}
 
         let mut cursor = QueryCursor::new();
         let query = Query::new(tree_sitter_ic10::language(), "(instruction)@a").unwrap();
@@ -3843,12 +4294,21 @@ impl Backend {
             if !Self::should_ignore_limits(&document.content) {
                 let mut byte_count = 0;
                 let mut start_pos: Option<LspPosition> = None;
-                let lines: Vec<&str> = document.content.lines().collect();
-
+                
                 // Stationeers byte counting (matches UpdateFileSize() method):
                 // After paste, each line is trimmed with TrimEnd()
                 // Then UpdateFileSize() counts: line.Length + 2 bytes (CRLF) for all except last line
                 // This matches the file loading behavior from InputSourceCode.cs lines 562-568
+                
+                // Split content by newlines, filtering out empty trailing lines
+                // This matches how Stationeers processes pasted content
+                let mut lines: Vec<&str> = document.content.lines().collect();
+                
+                // Remove trailing empty lines (Stationeers doesn't count these)
+                while lines.last().map_or(false, |l| l.trim().is_empty()) {
+                    lines.pop();
+                }
+                
                 for (line_idx, line) in lines.iter().enumerate() {
                     let trimmed = line.trim_end();
                     byte_count += trimmed.len();
@@ -4629,15 +5089,28 @@ fn compute_diagnostics_for_text(content: &str) -> Vec<tower_lsp::lsp_types::Diag
     diagnostics
 }
 
-fn get_current_parameter(instruction_node: Node, position: usize) -> (usize, Option<Node>) {
+fn get_current_parameter<'a>(instruction_node: Node<'a>, cursor_byte: usize, content: &'a [u8]) -> (usize, Option<Node<'a>>) {
     let mut ret: usize = 0;
     let mut cursor = instruction_node.walk();
-    for operand in instruction_node.children_by_field_name("operand", &mut cursor) {
-        if operand.end_position().column > position {
+    
+    
+    for (_idx, operand) in instruction_node.children_by_field_name("operand", &mut cursor).enumerate() {
+        // Skip empty operands (whitespace-only nodes that tree-sitter creates)
+        let operand_text = operand.utf8_text(content).unwrap_or("");
+        let is_empty = operand_text.trim().is_empty();
+        
+        // Only count non-empty operands
+        if !is_empty {
+            ret += 1;
+        }
+        
+        // Break if this operand extends past cursor position
+        // This means we're either inside it or haven't typed the next parameter yet
+        if operand.end_byte() > cursor_byte {
             break;
         }
-        ret += 1;
     }
+    
 
     let operand = instruction_node
         .children_by_field_name("operand", &mut cursor)
@@ -4713,7 +5186,6 @@ async fn main() {
             let content = match fs::read_to_string(path_ref) {
                 Ok(c) => c,
                 Err(e) => {
-                    eprintln!("Could not read {}: {}", path_ref.display(), e);
                     continue;
                 }
             };
