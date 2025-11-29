@@ -65,6 +65,9 @@ mod tooltip_documentation;
 /// Diagnostic code for absolute jump instructions (should use relative jumps)
 const LINT_ABSOLUTE_JUMP: &str = "absolute-jump";
 
+/// Diagnostic code for relative branch to label (should use absolute branch)
+const LINT_RELATIVE_BRANCH_TO_LABEL: &str = "relative-branch-to-label";
+
 /// Semantic token types supported by the LSP for syntax highlighting.
 /// These map to VSCode's semantic token system for rich colorization.
 const SEMANTIC_SYMBOL_LEGEND: &[SemanticTokenType] = &[
@@ -134,7 +137,8 @@ const LOGIC_SLOT_BATCH_REAGENT: [DataType; 4] = [
 
 use phf::phf_set;
 use crate::hash_utils::{
-    compute_crc32, extract_hash_argument, get_device_hash, is_hash_function_call,
+    compute_crc32, extract_hash_argument, extract_str_argument, get_device_hash,
+    is_hash_function_call, is_str_function_call,
 };
 use serde_json::Value;
 use tokio::{
@@ -304,6 +308,8 @@ struct Configuration {
     warn_overline_comment: bool,
     warn_overcolumn_comment: bool,
     suppress_hash_diagnostics: bool,
+    enable_control_flow_analysis: bool,
+    suppress_register_warnings: bool,
 }
 
 impl Default for Configuration {
@@ -315,6 +321,8 @@ impl Default for Configuration {
             warn_overline_comment: true,
             warn_overcolumn_comment: true,
             suppress_hash_diagnostics: false,
+            enable_control_flow_analysis: true,
+            suppress_register_warnings: false,
         }
     }
 }
@@ -331,7 +339,7 @@ struct Backend {
 
 // Constants for performance tuning
 const MAX_RECOMMENDED_FILES: usize = 50;
-const DIAGNOSTIC_DEBOUNCE_MS: u64 = 500;
+const DIAGNOSTIC_DEBOUNCE_MS: u64 = 150;
 
 #[async_trait]
 impl LanguageServer for Backend {
@@ -378,6 +386,16 @@ impl LanguageServer for Backend {
                 .get("suppressHashDiagnostics")
                 .and_then(Value::as_bool)
                 .unwrap_or(config.suppress_hash_diagnostics);
+            
+            config.enable_control_flow_analysis = init_options
+                .get("enableControlFlowAnalysis")
+                .and_then(Value::as_bool)
+                .unwrap_or(config.enable_control_flow_analysis);
+            
+            config.suppress_register_warnings = init_options
+                .get("suppressRegisterWarnings")
+                .and_then(Value::as_bool)
+                .unwrap_or(config.suppress_register_warnings);
             
             self.client.log_message(MessageType::INFO, format!("Initial config - suppress_hash_diagnostics: {}", config.suppress_hash_diagnostics)).await;
         }
@@ -437,7 +455,7 @@ impl LanguageServer for Backend {
                 document_symbol_provider: Some(OneOf::Left(true)),
                 completion_provider: Some(CompletionOptions {
                     resolve_provider: Some(false),
-                    trigger_characters: Some(vec![" ".to_string()]),
+                    trigger_characters: Some(vec![" ".to_string(), "\"".to_string()]),
                     completion_item: Some(CompletionOptionsCompletionItem {
                         label_details_support: Some(true),
                     }),
@@ -723,6 +741,16 @@ impl LanguageServer for Backend {
                 .and_then(Value::as_bool)
                 .unwrap_or(config.suppress_hash_diagnostics);
 
+            config.enable_control_flow_analysis = value
+                .get("enableControlFlowAnalysis")
+                .and_then(Value::as_bool)
+                .unwrap_or(config.enable_control_flow_analysis);
+
+            config.suppress_register_warnings = value
+                .get("suppressRegisterWarnings")
+                .and_then(Value::as_bool)
+                .unwrap_or(config.suppress_register_warnings);
+
             self.client.log_message(MessageType::INFO, format!("suppress_hash_diagnostics set to: {}", config.suppress_hash_diagnostics)).await;
         }
 
@@ -817,13 +845,25 @@ impl LanguageServer for Backend {
             }
         }
 
-        // Also show inlays for HASH("...") tokens (hash_preproc in the grammar)
+        // Also show inlays for HASH("...") functions (hash_function in the grammar)
         let mut cursor_hash = QueryCursor::new();
-        let hash_query = Query::new(tree_sitter_ic10::language(), "(hash_preproc)@call").unwrap();
+        let hash_query = Query::new(tree_sitter_ic10::language(), "(hash_function)@call").unwrap();
 
         for (cap, _) in cursor_hash.captures(&hash_query, tree.root_node(), document.content.as_bytes()) {
             let call_node = cap.captures[0].node;
+            
+            // Skip incomplete HASH() calls - check if node has errors or is missing closing paren
+            if call_node.has_error() {
+                continue;
+            }
+            
             let call_text = call_node.utf8_text(document.content.as_bytes()).unwrap();
+            
+            // Also skip if the text doesn't end with ) - incomplete HASH
+            if !call_text.trim().ends_with(')') {
+                continue;
+            }
+            
             if let Some(device_name) = crate::hash_utils::extract_hash_argument(call_text) {
                 if let Some(hash_val) = crate::hash_utils::get_device_hash(&device_name) {
                     // Look up the display name for this hash
@@ -861,6 +901,46 @@ impl LanguageServer for Backend {
                 }
             }
         }
+        
+        // Also show inlays for STR("...") functions (str_function in the grammar)
+        let mut cursor_str = QueryCursor::new();
+        let str_query = Query::new(tree_sitter_ic10::language(), "(str_function)@call").unwrap();
+
+        for (cap, _) in cursor_str.captures(&str_query, tree.root_node(), document.content.as_bytes()) {
+            let call_node = cap.captures[0].node;
+            let call_text = call_node.utf8_text(document.content.as_bytes()).unwrap();
+            if let Some(string_content) = crate::hash_utils::extract_str_argument(call_text) {
+                // Compute the hash value for the string
+                let hash_val = crate::hash_utils::compute_crc32(&string_content);
+                
+                let Some(line_node) = call_node.find_parent("line") else {
+                    continue;
+                };
+
+                let endpos = if let Some(newline) =
+                    line_node.query("(newline)@x", document.content.as_bytes())
+                {
+                    Position::from(newline.range().start_point)
+                } else if let Some(instruction) =
+                    line_node.query("(instruction)@x", document.content.as_bytes())
+                {
+                    Position::from(instruction.range().end_point)
+                } else {
+                    Position::from(call_node.range().end_point)
+                };
+
+                ret.push(InlayHint {
+                    position: endpos.into(),
+                    label: InlayHintLabel::String(format!(" → {}", hash_val)),
+                    kind: Some(InlayHintKind::TYPE),
+                    text_edits: None,
+                    tooltip: None,
+                    padding_left: None,
+                    padding_right: None,
+                    data: None,
+                });
+            }
+        }
         // Persistent parameter hint: when only opcode is typed (no operands yet),
         // show the remaining signature as faint inline text after the opcode.
         // This helps the user until they type the first operand.
@@ -880,11 +960,31 @@ impl LanguageServer for Backend {
                 continue;
             }
 
-            // Build syntax and take the suffix (parameters part) after opcode
+            // Also skip if there's any text after the opcode (even whitespace indicates typing)
+            // This prevents the hint from being "accepted" when user presses space/tab
             let opcode_raw = match op_node.utf8_text(document.content.as_bytes()) {
                 Ok(t) => t,
                 Err(_) => continue,
             };
+            
+            // Check if there's anything after the opcode on the same line
+            let line_text = match instr_node.find_parent("line") {
+                Some(line_node) => line_node.utf8_text(document.content.as_bytes()).unwrap_or(""),
+                None => continue,
+            };
+            
+            // Get the position where opcode ends
+            let opcode_end_byte = op_node.range().end_byte - instr_node.range().start_byte;
+            if opcode_end_byte < line_text.len() {
+                let after_opcode = &line_text[opcode_end_byte..];
+                // If there's ANY character after opcode (including space), skip hint
+                // This prevents cursor jumping when space is pressed
+                if !after_opcode.is_empty() && !after_opcode.starts_with('\n') && !after_opcode.starts_with('\r') {
+                    continue;
+                }
+            }
+
+            // Build syntax and take the suffix (parameters part) after opcode
             let lowered;
             let opcode: &str = if instructions::INSTRUCTIONS.contains_key(opcode_raw) {
                 opcode_raw
@@ -1310,12 +1410,136 @@ impl LanguageServer for Backend {
             completions[start_entries..length].sort_by(|x, y| x.label.cmp(&y.label));
         }
 
+        fn sort_completions_by_usage(
+            completions: &mut Vec<CompletionItem>,
+            start_idx: usize,
+            used_items: &std::collections::HashSet<String>,
+        ) {
+            // Sort so that used items come first (alphabetically), then unused items (alphabetically)
+            let end_idx = completions.len();
+            completions[start_idx..end_idx].sort_by(|a, b| {
+                let a_used = used_items.contains(&a.label);
+                let b_used = used_items.contains(&b.label);
+                
+                match (a_used, b_used) {
+                    (true, false) => std::cmp::Ordering::Less,   // a used, b not used -> a first
+                    (false, true) => std::cmp::Ordering::Greater, // b used, a not used -> b first
+                    _ => a.label.cmp(&b.label),                   // both used or both unused -> alphabetical
+                }
+            });
+        }
+
+        fn param_completions_builtin(
+            prefix: &str,
+            param_type: &instructions::Union,
+            completions: &mut Vec<CompletionItem>,
+            used_items: Option<&std::collections::HashSet<String>>,
+        ) {
+            use instructions::DataType;
+
+            let prefix_trimmed = prefix.trim_start();
+            let start_entries = completions.len();
+
+            // Show registers if parameter accepts Register or Number
+            if param_type.match_type(DataType::Register) || param_type.match_type(DataType::Number) {
+                // Standard registers r0-r15
+                for i in 0..=15 {
+                    let reg = format!("r{}", i);
+                    if prefix_trimmed.is_empty() || reg.starts_with(prefix_trimmed) {
+                        completions.push(CompletionItem {
+                            label: reg.clone(),
+                            label_details: Some(CompletionItemLabelDetails {
+                                description: None,
+                                detail: Some(" register".to_string()),
+                            }),
+                            kind: Some(CompletionItemKind::VARIABLE),
+                            documentation: Some(Documentation::String(format!("Register {}", reg))),
+                            ..Default::default()
+                        });
+                    }
+                }
+                
+                // Special registers
+                for special in ["ra", "sp"] {
+                    if prefix_trimmed.is_empty() || special.starts_with(prefix_trimmed) {
+                        completions.push(CompletionItem {
+                            label: special.to_string(),
+                            label_details: Some(CompletionItemLabelDetails {
+                                description: None,
+                                detail: Some(" register".to_string()),
+                            }),
+                            kind: Some(CompletionItemKind::VARIABLE),
+                            documentation: Some(Documentation::String(
+                                if special == "ra" {
+                                    "Return address register".to_string()
+                                } else {
+                                    "Stack pointer register".to_string()
+                                }
+                            )),
+                            ..Default::default()
+                        });
+                    }
+                }
+            }
+
+            // Show devices if parameter accepts Device
+            if param_type.match_type(DataType::Device) {
+                // Standard devices d0-d5
+                for i in 0..=5 {
+                    let dev = format!("d{}", i);
+                    if prefix_trimmed.is_empty() || dev.starts_with(prefix_trimmed) {
+                        completions.push(CompletionItem {
+                            label: dev.clone(),
+                            label_details: Some(CompletionItemLabelDetails {
+                                description: None,
+                                detail: Some(" device".to_string()),
+                            }),
+                            kind: Some(CompletionItemKind::VARIABLE),
+                            documentation: Some(Documentation::String(format!("Device pin {}", dev))),
+                            ..Default::default()
+                        });
+                    }
+                }
+                
+                // Special device db
+                if prefix_trimmed.is_empty() || "db".starts_with(prefix_trimmed) {
+                    completions.push(CompletionItem {
+                        label: "db".to_string(),
+                        label_details: Some(CompletionItemLabelDetails {
+                            description: None,
+                            detail: Some(" device".to_string()),
+                        }),
+                        kind: Some(CompletionItemKind::VARIABLE),
+                        documentation: Some(Documentation::String("Device on IC housing".to_string())),
+                        ..Default::default()
+                    });
+                }
+            }
+
+            let length = completions.len();
+            // Apply usage-based sorting if provided
+            if let Some(used) = used_items {
+                completions[start_entries..length].sort_by(|a, b| {
+                    let a_used = used.contains(&a.label);
+                    let b_used = used.contains(&b.label);
+                    match (a_used, b_used) {
+                        (true, false) => std::cmp::Ordering::Less,
+                        (false, true) => std::cmp::Ordering::Greater,
+                        _ => a.label.cmp(&b.label),
+                    }
+                });
+            } else {
+                completions[start_entries..length].sort_by(|x, y| x.label.cmp(&y.label));
+            }
+        }
+
         fn param_completions_dynamic<T>(
             prefix: &str,
             map: &HashMap<String, DefinitionData<T>>,
             detail: &str,
             param_type: &instructions::Union,
             completions: &mut Vec<CompletionItem>,
+            used_items: Option<&std::collections::HashSet<String>>,
         ) where
             DefinitionData<T>: HasType,
             T: std::fmt::Display,
@@ -1336,7 +1560,20 @@ impl LanguageServer for Backend {
                 }
             }
             let length = completions.len();
-            completions[start_entries..length].sort_by(|x, y| x.label.cmp(&y.label));
+            // Apply usage-based sorting if provided
+            if let Some(used) = used_items {
+                completions[start_entries..length].sort_by(|a, b| {
+                    let a_used = used.contains(&a.label);
+                    let b_used = used.contains(&b.label);
+                    match (a_used, b_used) {
+                        (true, false) => std::cmp::Ordering::Less,
+                        (false, true) => std::cmp::Ordering::Greater,
+                        _ => a.label.cmp(&b.label),
+                    }
+                });
+            } else {
+                completions[start_entries..length].sort_by(|x, y| x.label.cmp(&y.label));
+            }
         }
 
         fn enum_completions(
@@ -1405,6 +1642,90 @@ impl LanguageServer for Backend {
         let Some(node) = self.node_at_position(position, tree) else {
             return Ok(None);
         };
+
+        // Global HASH(" detection - trigger device completions anywhere HASH(" is typed
+        // This works in defines, instructions, anywhere a device hash might be used
+        if let Some(line_node) = node.find_parent("line") {
+            let line_text = line_node.utf8_text(document.content.as_bytes()).unwrap();
+            
+            // Get cursor position within the line by using byte offsets
+            let line_start_byte = line_node.start_byte();
+            let cursor_byte = document.content.len().min(
+                document.content
+                    .lines()
+                    .take(position.0.line as usize)
+                    .map(|l| l.len() + 1) // +1 for newline
+                    .sum::<usize>()
+                    + position.0.character as usize
+            );
+            
+            let cursor_pos_in_line = if cursor_byte >= line_start_byte {
+                cursor_byte - line_start_byte
+            } else {
+                0
+            };
+            
+            let line_up_to_cursor = &line_text[..cursor_pos_in_line.min(line_text.len())];
+            
+            // Check if we're typing inside HASH("
+            let last_hash_open = line_up_to_cursor.rfind("HASH(\"").or_else(|| line_up_to_cursor.rfind("hash(\""));
+            let last_hash_close = line_up_to_cursor.rfind("\")");
+            let typing_in_hash = if let Some(open_pos) = last_hash_open {
+                last_hash_close.map_or(true, |close_pos| close_pos < open_pos)
+            } else {
+                false
+            };
+            
+            if typing_in_hash {
+                let search_start = line_up_to_cursor.rfind("HASH(\"").or_else(|| line_up_to_cursor.rfind("hash(\""));
+                if let Some(start_pos) = search_start {
+                    let search_text = &line_up_to_cursor[start_pos + 6..];
+                    let search_lower = search_text.to_lowercase();
+                    
+                    // Check if already complete
+                    let already_complete = if let Some(open_pos) = last_hash_open {
+                        line_text[open_pos..].contains("\")")
+                    } else {
+                        false
+                    };
+                    
+                    // Provide device name completions
+                    for hash_name in crate::device_hashes::DEVICE_NAME_TO_HASH.keys() {
+                        let hash_value = crate::device_hashes::DEVICE_NAME_TO_HASH[hash_name];
+                        let display_name = crate::device_hashes::HASH_TO_DISPLAY_NAME
+                            .get(&hash_value)
+                            .unwrap_or(hash_name);
+
+                        let matches = search_text.is_empty()
+                            || hash_name.to_lowercase().contains(&search_lower)
+                            || display_name.to_lowercase().contains(&search_lower);
+
+                        if matches {
+                            let insert_text = if already_complete {
+                                hash_name.to_string()
+                            } else {
+                                format!("{}\")", hash_name)
+                            };
+
+                            ret.push(CompletionItem {
+                                label: hash_name.to_string(),
+                                kind: Some(CompletionItemKind::CONSTANT),
+                                detail: Some(format!("{} → {}", display_name, hash_value)),
+                                documentation: Some(Documentation::String(format!(
+                                    "Device: {}\nHash: {}",
+                                    display_name, hash_value
+                                ))),
+                                insert_text: Some(insert_text),
+                                insert_text_format: Some(InsertTextFormat::PLAIN_TEXT),
+                                ..Default::default()
+                            });
+                        }
+                    }
+                    ret.sort_by(|x, y| x.label.cmp(&y.label));
+                    return Ok(Some(CompletionResponse::Array(ret)));
+                }
+            }
+        }
 
         if let Some(node) = node.find_parent("operation") {
             let raw = node.utf8_text(document.content.as_bytes()).unwrap();
@@ -1491,6 +1812,162 @@ impl LanguageServer for Backend {
                     return Ok(None);
                 };
 
+                // Special case: suggest HASH(" for instructions that commonly use device hashes
+                // - define: second parameter (index 1) is usually a device hash
+                // - lbn/sbn: third parameter (index 2) is the nameHash for targeting specific device by name
+                let suggest_hash = (text == "define" && current_param == 1) 
+                    || ((text == "lbn" || text == "sbn") && current_param == 2);
+                
+                if suggest_hash && !prefix.contains("HASH") && !prefix.contains("hash") {
+                    ret.push(CompletionItem {
+                        label: "HASH(\"".to_string(),
+                        kind: Some(CompletionItemKind::SNIPPET),
+                        detail: Some("Device hash function".to_string()),
+                        documentation: Some(Documentation::String(
+                            "Insert HASH(\"\") to get device hash by name".to_string()
+                        )),
+                        insert_text: Some("HASH(\"".to_string()),
+                        insert_text_format: Some(InsertTextFormat::PLAIN_TEXT),
+                        sort_text: Some("0000".to_string()), // Sort to top
+                        ..Default::default()
+                    });
+                }
+
+                // Check if we're typing HASH(" even before it's fully parsed
+                // This handles the case where user types HASH(" and we want to show device completions immediately
+                // Only trigger if HASH(" is being typed RIGHT NOW at cursor (not earlier in line)
+                let line_text = line_node.utf8_text(document.content.as_bytes()).unwrap();
+                let line_up_to_cursor = &line_text[..cursor_pos.min(line_text.len())];
+                // Check if cursor is immediately after HASH(" or within an unclosed HASH("
+                let just_opened_hash = line_up_to_cursor.ends_with("HASH(\"") || line_up_to_cursor.ends_with("hash(\"");
+                // Check if we're currently inside an unclosed HASH(" - find last occurrence
+                let last_hash_open = line_up_to_cursor.rfind("HASH(\"").or_else(|| line_up_to_cursor.rfind("hash(\""));
+                let last_hash_close = line_up_to_cursor.rfind("\")");
+                let typing_in_hash = if let Some(open_pos) = last_hash_open {
+                    // We're typing in HASH if there's an open quote and either no close quote,
+                    // or the close quote comes before the open quote
+                    last_hash_close.map_or(true, |close_pos| close_pos < open_pos)
+                } else {
+                    false
+                };
+                
+                if just_opened_hash || typing_in_hash {
+                    // Extract the search text after HASH("
+                    let search_start = line_up_to_cursor.rfind("HASH(\"").or_else(|| line_up_to_cursor.rfind("hash(\""));
+                    if let Some(start_pos) = search_start {
+                        let search_text = &line_up_to_cursor[start_pos + 6..]; // Skip past HASH("
+                        let start_entries = ret.len();
+                        let search_lower = search_text.to_lowercase();
+
+                        // Check if HASH call is already complete (has closing ") somewhere on the line)
+                        // Look for ") after the HASH(" opening
+                        let already_complete = if let Some(open_pos) = last_hash_open {
+                            line_text[open_pos..].contains("\")")
+                        } else {
+                            false
+                        };
+
+                        // Provide device name completions
+                        for hash_name in crate::device_hashes::DEVICE_NAME_TO_HASH.keys() {
+                            let hash_value = crate::device_hashes::DEVICE_NAME_TO_HASH[hash_name];
+                            let display_name = crate::device_hashes::HASH_TO_DISPLAY_NAME
+                                .get(&hash_value)
+                                .unwrap_or(hash_name);
+
+                            let matches = search_text.is_empty()
+                                || hash_name.to_lowercase().contains(&search_lower)
+                                || display_name.to_lowercase().contains(&search_lower);
+
+                            if matches {
+                                // If already complete, just insert device name
+                                // Otherwise, insert device name + closing ")
+                                let insert_text = if already_complete {
+                                    hash_name.to_string()
+                                } else {
+                                    format!("{}\")", hash_name)
+                                };
+
+                                ret.push(CompletionItem {
+                                    label: hash_name.to_string(),
+                                    kind: Some(CompletionItemKind::CONSTANT),
+                                    detail: Some(format!("{} → {}", display_name, hash_value)),
+                                    documentation: Some(Documentation::String(format!(
+                                        "Device: {}\nHash: {}",
+                                        display_name, hash_value
+                                    ))),
+                                    insert_text: Some(insert_text),
+                                    insert_text_format: Some(InsertTextFormat::PLAIN_TEXT),
+                                    ..Default::default()
+                                });
+                            }
+                        }
+                        let length = ret.len();
+                        ret[start_entries..length].sort_by(|x, y| x.label.cmp(&y.label));
+                        
+                        // Return early - we're typing HASH(), don't show other completions
+                        return Ok(Some(CompletionResponse::Array(ret)));
+                    }
+                }
+
+                // Check if we're inside a HASH() function's string argument
+                // If so, provide device name completions
+                if let Some(hash_func_node) = node.find_parent("hash_function") {
+                    if let Some(hash_string_node) = hash_func_node.child_by_field_name("argument") {
+                        let string_text = hash_string_node
+                            .utf8_text(file_data.document_data.content.as_bytes())
+                            .unwrap();
+                        
+                        // Extract content without quotes
+                        let search_text = if string_text.starts_with('"') && string_text.ends_with('"') && string_text.len() >= 2 {
+                            &string_text[1..string_text.len() - 1]
+                        } else {
+                            string_text
+                        };
+                        
+                        let start_entries = ret.len();
+                        let search_lower = search_text.to_lowercase();
+
+                        // Provide device name completions
+                        for hash_name in crate::device_hashes::DEVICE_NAME_TO_HASH.keys() {
+                            let hash_value = crate::device_hashes::DEVICE_NAME_TO_HASH[hash_name];
+                            let display_name = crate::device_hashes::HASH_TO_DISPLAY_NAME
+                                .get(&hash_value)
+                                .unwrap_or(hash_name);
+
+                            let matches = search_text.is_empty()
+                                || hash_name.to_lowercase().contains(&search_lower)
+                                || display_name.to_lowercase().contains(&search_lower);
+
+                            if matches {
+                                ret.push(CompletionItem {
+                                    label: hash_name.to_string(),
+                                    kind: Some(CompletionItemKind::CONSTANT),
+                                    detail: Some(format!("{} → {}", display_name, hash_value)),
+                                    documentation: Some(Documentation::String(format!(
+                                        "Device: {}\nHash: {}",
+                                        display_name, hash_value
+                                    ))),
+                                    insert_text: Some(hash_name.to_string()),
+                                    ..Default::default()
+                                });
+                            }
+                        }
+                        let length = ret.len();
+                        ret[start_entries..length].sort_by(|x, y| x.label.cmp(&y.label));
+                        
+                        // Return early - we're inside HASH(), don't show other completions
+                        return Ok(Some(CompletionResponse::Array(ret)));
+                    }
+                }
+                
+                // Check if we're inside a STR() function's string argument
+                // If so, suppress logic type completions (no completions needed for STR)
+                if let Some(_str_func_node) = node.find_parent("str_function") {
+                    // Inside STR() - no completions needed
+                    return Ok(Some(CompletionResponse::Array(ret)));
+                }
+
+                // Legacy preproc_string support (for backwards compatibility)
                 if let Some(preproc_string_node) = instruction_node.query(
                     "(preproc_string)@x",
                     file_data.document_data.content.as_bytes(),
@@ -1534,61 +2011,181 @@ impl LanguageServer for Backend {
                     ret[start_entries..length].sort_by(|x, y| x.label.cmp(&y.label));
                 };
 
+                // Context-aware completions based on parameter type
+                // Only show completions that match the expected parameter type
+                
                 if !text.starts_with("br") && text.starts_with("b") || text == "j" || text == "jal"
                 {
-                    param_completions_static(prefix, "", param_type, &mut ret);
-
+                    // Branch instructions - ONLY show labels
+                    // User specifically requested ONLY labels, no defines/aliases/constants
                     param_completions_dynamic(
                         prefix,
                         &file_data.type_data.labels,
                         " label",
                         param_type,
                         &mut ret,
+                        None,
                     );
-
-                    param_completions_dynamic(
-                        prefix,
-                        &file_data.type_data.defines,
-                        " define",
-                        param_type,
-                        &mut ret,
-                    );
-
-                    param_completions_dynamic(
-                        prefix,
-                        &file_data.type_data.aliases,
-                        " alias",
-                        param_type,
-                        &mut ret,
-                    );
-                    enum_completions(prefix, param_type, &mut ret);
+                    
+                    // Do NOT show anything else for branch instructions
                 } else {
-                    param_completions_static(prefix, "", param_type, &mut ret);
+                    // Regular instructions - prioritize script-specific items first
+                    // Collect items that are actually used in the script for smart sorting
+                    let mut used_items = std::collections::HashSet::new();
+                    
+                    // Scan the document for used registers, devices, aliases, defines
+                    let content_lower = document.content.to_lowercase();
+                    for i in 0..=15 {
+                        let reg = format!("r{}", i);
+                        if content_lower.contains(&reg) {
+                            used_items.insert(reg);
+                        }
+                    }
+                    if content_lower.contains("ra") { used_items.insert("ra".to_string()); }
+                    if content_lower.contains("sp") { used_items.insert("sp".to_string()); }
+                    for i in 0..=5 {
+                        let dev = format!("d{}", i);
+                        if content_lower.contains(&dev) {
+                            used_items.insert(dev);
+                        }
+                    }
+                    if content_lower.contains("db") { used_items.insert("db".to_string()); }
+                    
+                    // Add all defined aliases and defines to used_items
+                    for alias_name in file_data.type_data.aliases.keys() {
+                        used_items.insert(alias_name.clone());
+                    }
+                    for define_name in file_data.type_data.defines.keys() {
+                        used_items.insert(define_name.clone());
+                    }
+                    
+                    // Special case: batch instructions expect device hash at specific parameter positions
+                    // Load batch (lb, lbn, lbs, lbns): device hash at parameter 1
+                    // Store batch (sb, sbn, sbs): device hash at parameter 0
+                    let is_load_batch = matches!(text, "lb" | "lbn" | "lbs" | "lbns");
+                    let is_store_batch = matches!(text, "sb" | "sbn" | "sbs");
+                    let is_device_hash_param = (is_load_batch && current_param == 1) || (is_store_batch && current_param == 0);
+                    
+                    if is_device_hash_param {
+                        // This is the device hash parameter for a batch instruction
+                        // Show device names for HASH() completion instead of numbers/enums
+                        
+                        // Check if we're typing HASH(" for device hash
+                        let line_text = line_node.utf8_text(document.content.as_bytes()).unwrap();
+                        let line_up_to_cursor = &line_text[..cursor_pos.min(line_text.len())];
+                        let has_hash_quote = line_up_to_cursor.contains("HASH(\"") || line_up_to_cursor.contains("hash(\"");
+                        
+                        if has_hash_quote {
+                            // Already handled above in HASH detection
+                        } else {
+                            // Not typing HASH yet - suggest starting with HASH(
+                            // Show defines that might be device hashes, and suggest HASH( pattern
+                            param_completions_dynamic(
+                                prefix,
+                                &file_data.type_data.defines,
+                                " define",
+                                param_type,
+                                &mut ret,
+                                Some(&used_items),
+                            );
+                            
+                            // Add a helpful hint to use HASH()
+                            if prefix.is_empty() || "HASH".starts_with(&prefix.to_uppercase()) {
+                                ret.push(CompletionItem {
+                                    label: "HASH(\"\")" .to_string(),
+                                    label_details: Some(CompletionItemLabelDetails {
+                                        description: None,
+                                        detail: Some(" device hash".to_string()),
+                                    }),
+                                    kind: Some(CompletionItemKind::SNIPPET),
+                                    documentation: Some(Documentation::String("Start typing device name".to_string())),
+                                    insert_text: Some("HASH(\"".to_string()),
+                                    ..Default::default()
+                                });
+                            }
+                        }
+                        // Skip other completions for device hash parameter
+                        return Ok(Some(CompletionResponse::Array(ret)));
+                    }
+                    
+                    // Check if this is a static-only parameter type (BatchMode, LogicType, SlotLogicType)
+                    let is_static_only = param_type.0.iter().any(|t| matches!(t, 
+                        DataType::BatchMode | DataType::LogicType | DataType::SlotLogicType | DataType::ReagentMode));
+                    
+                    if is_static_only {
+                        // For static-only parameters, ONLY show the predefined constants
+                        // Don't show registers, aliases, defines, or enums
+                        param_completions_static("", "", param_type, &mut ret);
+                    } else {
+                        // For other parameters, show the full completion list
+                        let builtin_start = ret.len();
+                        // 0. Show built-in registers and devices first (always available)
+                        param_completions_builtin(prefix, param_type, &mut ret, Some(&used_items));
+                        // Already sorted by usage inside param_completions_builtin
+                        
+                        // 1. Show aliases (registers and devices) - MOST RELEVANT, script-specific
+                        param_completions_dynamic(
+                            prefix,
+                            &file_data.type_data.aliases,
+                            " alias",
+                            param_type,
+                            &mut ret,
+                            Some(&used_items),
+                        );
 
-                    param_completions_dynamic(
-                        prefix,
-                        &file_data.type_data.defines,
-                        " define",
-                        param_type,
-                        &mut ret,
-                    );
+                        // 2. Show defines (often used for device hashes and constants) - script-specific
+                        param_completions_dynamic(
+                            prefix,
+                            &file_data.type_data.defines,
+                            " define",
+                            param_type,
+                            &mut ret,
+                            Some(&used_items),
+                        );
 
-                    param_completions_dynamic(
-                        prefix,
-                        &file_data.type_data.aliases,
-                        " alias",
-                        param_type,
-                        &mut ret,
-                    );
-
-                    param_completions_dynamic(
-                        prefix,
-                        &file_data.type_data.labels,
-                        " label",
-                        param_type,
-                        &mut ret,
-                    );
-                    enum_completions(prefix, param_type, &mut ret);
+                        // 3. Show labels (less common for non-branch instructions) - script-specific
+                        param_completions_dynamic(
+                            prefix,
+                            &file_data.type_data.labels,
+                            " label",
+                            param_type,
+                            &mut ret,
+                            Some(&used_items),
+                        );
+                        
+                        // 4. Show enum completions last - global numeric constants
+                        if param_type.match_type(DataType::Number) {
+                            enum_completions(prefix, param_type, &mut ret);
+                        }
+                        
+                        // Final sort: prioritize defines for numeric/value parameters
+                        // Defines are often device hashes or important constants that should appear first
+                        if param_type.match_type(DataType::Number) {
+                            ret.sort_by(|a, b| {
+                                let a_is_define = a.label_details.as_ref()
+                                    .and_then(|d| d.detail.as_ref())
+                                    .map(|s| s.contains("define"))
+                                    .unwrap_or(false);
+                                let b_is_define = b.label_details.as_ref()
+                                    .and_then(|d| d.detail.as_ref())
+                                    .map(|s| s.contains("define"))
+                                    .unwrap_or(false);
+                                let a_used = used_items.contains(&a.label);
+                                let b_used = used_items.contains(&b.label);
+                                
+                                // Priority: used defines > unused defines > used others > unused others
+                                match (a_is_define, b_is_define, a_used, b_used) {
+                                    (true, false, _, _) => std::cmp::Ordering::Less,  // defines first
+                                    (false, true, _, _) => std::cmp::Ordering::Greater,
+                                    (true, true, true, false) => std::cmp::Ordering::Less,  // used defines before unused
+                                    (true, true, false, true) => std::cmp::Ordering::Greater,
+                                    (false, false, true, false) => std::cmp::Ordering::Less,  // used before unused
+                                    (false, false, false, true) => std::cmp::Ordering::Greater,
+                                    _ => a.label.cmp(&b.label),  // alphabetical within same category
+                                }
+                            });
+                        }
+                    }
                 }
             }
         }
@@ -1729,28 +2326,6 @@ impl LanguageServer for Backend {
                 continue;
             };
             match code.as_str() {
-                LINT_NUMBER_BATCH_MODE => {
-                    let Some(data) = diagnostic.data.as_ref() else {
-                        continue;
-                    };
-                    let Some(replacement) = data.as_str() else {
-                        continue;
-                    };
-
-                    let edit = TextEdit::new(diagnostic.range, replacement.to_string());
-
-                    ret.push(CodeActionOrCommand::CodeAction(CodeAction {
-                        title: format!("Replace with {replacement}"),
-                        kind: Some(CodeActionKind::QUICKFIX),
-                        diagnostics: Some(vec![diagnostic]),
-                        edit: Some(WorkspaceEdit::new(HashMap::from([(
-                            uri.clone(),
-                            vec![edit],
-                        )]))),
-                        is_preferred: Some(true),
-                        ..Default::default()
-                    }));
-                }
                 LINT_ABSOLUTE_JUMP => {
                     const REPLACEMENTS: phf::Map<&'static str, &'static str> = phf::phf_map! {
                         "bdns" => "brdns",
@@ -1787,6 +2362,73 @@ impl LanguageServer for Backend {
 
                             ret.push(CodeActionOrCommand::CodeAction(CodeAction {
                                 title: format!("Replace with {replacement}"),
+                                kind: Some(CodeActionKind::QUICKFIX),
+                                diagnostics: Some(vec![diagnostic]),
+                                edit: Some(WorkspaceEdit::new(HashMap::from([(
+                                    uri.clone(),
+                                    vec![edit],
+                                )]))),
+                                command: None,
+                                is_preferred: Some(true),
+                                disabled: None,
+                                data: None,
+                            }));
+                        }
+
+                        break;
+                    }
+                }
+                LINT_RELATIVE_BRANCH_TO_LABEL => {
+                    const REPLACEMENTS: phf::Map<&'static str, &'static str> = phf::phf_map! {
+                        "brdns" => "bdns",
+                        "brdnsal" => "bdnsal",
+                        "brdse" => "bdse",
+                        "brdseal" => "bdseal",
+                        "brap" => "bap",
+                        "brapz" => "bapz",
+                        "brapzal" => "bapzal",
+                        "breq" => "beq",
+                        "breqal" => "beqal",
+                        "breqz" => "beqz",
+                        "breqzal" => "beqzal",
+                        "brge" => "bge",
+                        "brgeal" => "bgeal",
+                        "brgez" => "bgez",
+                        "brgezal" => "bgezal",
+                        "brgt" => "bgt",
+                        "brgtal" => "bgtal",
+                        "brgtz" => "bgtz",
+                        "brgtzal" => "bgtzal",
+                        "brle" => "ble",
+                        "brleal" => "bleal",
+                        "brlez" => "blez",
+                        "brlezal" => "blezal",
+                        "brlt" => "blt",
+                        "brltal" => "bltal",
+                        "brltz" => "bltz",
+                        "brltzal" => "bltzal",
+                        "brna" => "bna",
+                        "brnaz" => "bnaz",
+                        "brnazal" => "bnazal",
+                        "brne" => "bne",
+                        "brneal" => "bneal",
+                        "brnez" => "bnez",
+                        "brnezal" => "bnezal",
+                    };
+
+                    if let Some(node) =
+                        line_node.query("(instruction (operation)@x)", document.content.as_bytes())
+                    {
+                        let text = node.utf8_text(document.content.as_bytes()).unwrap();
+
+                        if let Some(replacement) = REPLACEMENTS.get(text) {
+                            let edit = TextEdit::new(
+                                Range::from(node.range()).into(),
+                                replacement.to_string(),
+                            );
+
+                            ret.push(CodeActionOrCommand::CodeAction(CodeAction {
+                                title: format!("Convert to absolute branch: {replacement}"),
                                 kind: Some(CodeActionKind::QUICKFIX),
                                 diagnostics: Some(vec![diagnostic]),
                                 edit: Some(WorkspaceEdit::new(HashMap::from([(
@@ -1887,6 +2529,78 @@ impl LanguageServer for Backend {
             additional_features::get_instruction_code_actions(&node, &document.content)
         {
             ret.extend(instruction_actions);
+        }
+
+        // HASH conversion code actions (HASH("device") <-> number)
+        // Check if we're on a hash_function node
+        if let Some(hash_func_node) = node.find_parent("hash_function") {
+            if let Some(hash_string_node) = hash_func_node.child_by_field_name("argument") {
+                let string_text = hash_string_node
+                    .utf8_text(document.content.as_bytes())
+                    .unwrap();
+                
+                // Extract device name without quotes
+                if let Some(device_name) = crate::hash_utils::extract_hash_argument(string_text) {
+                    // Look up the hash value
+                    if let Some(&hash_value) = crate::device_hashes::DEVICE_NAME_TO_HASH.get(device_name.as_str()) {
+                        // Offer to convert HASH("DeviceName") to hash number
+                        let edit = TextEdit::new(
+                            Range::from(hash_func_node.range()).into(),
+                            hash_value.to_string(),
+                        );
+
+                        ret.push(CodeActionOrCommand::CodeAction(CodeAction {
+                            title: format!("Convert to hash number: {}", hash_value),
+                            kind: Some(CodeActionKind::REFACTOR),
+                            diagnostics: None,
+                            edit: Some(WorkspaceEdit::new(HashMap::from([(
+                                uri.clone(),
+                                vec![edit],
+                            )]))),
+                            is_preferred: Some(false),
+                            ..Default::default()
+                        }));
+                    }
+                }
+            }
+        }
+        
+        // Check if we're on a number that is a known device hash
+        if node.kind() == "number" {
+            let number_text = node.utf8_text(document.content.as_bytes()).unwrap();
+            if let Ok(hash_value) = number_text.parse::<i32>() {
+                // Check if this is a known device hash by looking it up in the reverse map
+                if let Some(display_name) = crate::device_hashes::HASH_TO_DISPLAY_NAME.get(&hash_value) {
+                    // Find the device name (key) that maps to this hash
+                    let mut device_name_opt = None;
+                    for device_name in crate::device_hashes::DEVICE_NAME_TO_HASH.keys() {
+                        if crate::device_hashes::DEVICE_NAME_TO_HASH[device_name] == hash_value {
+                            device_name_opt = Some(device_name);
+                            break;
+                        }
+                    }
+                    
+                    if let Some(device_name) = device_name_opt {
+                        // Offer to convert hash number to HASH("DeviceName")
+                        let edit = TextEdit::new(
+                            Range::from(node.range()).into(),
+                            format!("HASH(\"{}\")", device_name),
+                        );
+
+                        ret.push(CodeActionOrCommand::CodeAction(CodeAction {
+                            title: format!("Convert to HASH(\"{}\")", display_name),
+                            kind: Some(CodeActionKind::REFACTOR),
+                            diagnostics: None,
+                            edit: Some(WorkspaceEdit::new(HashMap::from([(
+                                uri.clone(),
+                                vec![edit],
+                            )]))),
+                            is_preferred: Some(false),
+                            ..Default::default()
+                        }));
+                    }
+                }
+            }
         }
 
         Ok(Some(ret))
@@ -2382,6 +3096,20 @@ impl Backend {
         false
     }
 
+    fn should_ignore_register_warnings(content: &str) -> bool {
+        // Check for #IgnoreRegisterWarnings directive in comments (case-insensitive)
+        for line in content.lines() {
+            let trimmed = line.trim();
+            if let Some(comment_start) = trimmed.find('#') {
+                let comment = trimmed[comment_start + 1..].trim().to_lowercase();
+                if comment.starts_with("ignoreregisterwarnings") {
+                    return true;
+                }
+            }
+        }
+        false
+    }
+
     async fn update_content(&self, uri: Url, mut text: String) {
         let mut files = self.files.write().await;
 
@@ -2498,7 +3226,8 @@ impl Backend {
                                         value_node.child(0).map(|x| x.kind()).unwrap_or("");
                                     if child_kind != "number"
                                         && child_kind != "function_call"
-                                        && child_kind != "hash_preproc"
+                                        && child_kind != "hash_function"
+                                        && child_kind != "str_function"
                                         && child_kind != "preproc_string"
                                         && child_kind != "identifier"
                                     {
@@ -2805,35 +3534,38 @@ impl Backend {
                                 }
                             }
                         }
-                        "function_call" | "hash_preproc" => {
-                            // Treat HASH("...") and similar constant-producing functions as numbers
+                        "hash_function" => {
+                            // Treat HASH("...") as producing a device hash number
                             let call_text =
                                 operand.utf8_text(document.content.as_bytes()).unwrap();
-                            if is_hash_function_call(call_text) {
-                                // Optional: if known device name, we can warn on case differences or unknown names
-                                if let Some(name) = extract_hash_argument(call_text) {
-                                    if let Some(_) = get_device_hash(name.as_str()) {
-                                        // Known device name; optionally could inlay the numeric value
-                                    } else {
-                                        // Unknown device string; still treat as number but nudge (unless suppressed)
-                                        if !suppress_hash_diagnostics {
-                                            diagnostics.push(Diagnostic::new(
-                                                Range::from(operand.range()).into(),
-                                                Some(DiagnosticSeverity::INFORMATION),
-                                                None,
-                                                None,
-                                                format!("Unrecognized device name '{}' in HASH(...). Will be treated as number.", name),
-                                                None,
-                                                None,
-                                            ));
-                                        }
+                            if let Some(name) = extract_hash_argument(call_text) {
+                                if let Some(_) = get_device_hash(name.as_str()) {
+                                    // Known device name
+                                } else {
+                                    // Unknown device string; still treat as number but nudge (unless suppressed)
+                                    if !suppress_hash_diagnostics {
+                                        diagnostics.push(Diagnostic::new(
+                                            Range::from(operand.range()).into(),
+                                            Some(DiagnosticSeverity::INFORMATION),
+                                            None,
+                                            None,
+                                            format!("Unrecognized device name '{}' in HASH(...). Will be treated as number.", name),
+                                            None,
+                                            None,
+                                        ));
                                     }
                                 }
-                                instructions::Union(&[DataType::Number])
-                            } else {
-                                // Unknown function: conservatively treat as number to avoid spurious errors
-                                instructions::Union(&[DataType::Number])
                             }
+                            instructions::Union(&[DataType::Number])
+                        }
+                        "str_function" => {
+                            // STR("...") produces a string hash number
+                            // No type mismatch diagnostics needed - it's valid usage
+                            instructions::Union(&[DataType::Number])
+                        }
+                        "function_call" => {
+                            // Unknown function: conservatively treat as number to avoid spurious errors
+                            instructions::Union(&[DataType::Number])
                         }
                         _ => {
                             continue;
@@ -3111,28 +3843,47 @@ impl Backend {
             if !Self::should_ignore_limits(&document.content) {
                 let mut byte_count = 0;
                 let mut start_pos: Option<LspPosition> = None;
-                let mut current_line = 0;
-                let mut current_col = 0;
+                let lines: Vec<&str> = document.content.lines().collect();
 
-                for char in document.content.chars() {
-                    let char_len = if char == '\n' { 2 } else { 1 };
-
-                    if byte_count <= config.max_bytes && byte_count + char_len > config.max_bytes {
-                        if start_pos.is_none() {
-                            start_pos = Some(LspPosition::new(current_line, current_col));
-                        }
-                    }
-                    byte_count += char_len;
-
-                    if char == '\n' {
-                        current_line += 1;
-                        current_col = 0;
-                    } else {
-                        current_col += 1;
+                // Stationeers byte counting (matches UpdateFileSize() method):
+                // After paste, each line is trimmed with TrimEnd()
+                // Then UpdateFileSize() counts: line.Length + 2 bytes (CRLF) for all except last line
+                // This matches the file loading behavior from InputSourceCode.cs lines 562-568
+                for (line_idx, line) in lines.iter().enumerate() {
+                    let trimmed = line.trim_end();
+                    byte_count += trimmed.len();
+                    
+                    // Add CRLF (2 bytes) for all lines except the last
+                    // Matches C# code: if (j < this.LinesOfCode.Count - 1)
+                    if line_idx < lines.len() - 1 {
+                        byte_count += 2;
                     }
                 }
 
+                // Find position where limit is exceeded (scan content for position)
                 if byte_count > config.max_bytes {
+                    let mut current_line = 0;
+                    let mut current_col = 0;
+                    let mut running_count = 0;
+
+                    for char in document.content.chars() {
+                        let char_len = char.len_utf8();
+
+                        if running_count <= config.max_bytes && running_count + char_len > config.max_bytes {
+                            if start_pos.is_none() {
+                                start_pos = Some(LspPosition::new(current_line, current_col));
+                            }
+                        }
+                        running_count += char_len;
+
+                        if char == '\n' {
+                            current_line += 1;
+                            current_col = 0;
+                        } else if char != '\r' {
+                            current_col += 1;
+                        }
+                    }
+
                     let end_line = document.content.lines().count().saturating_sub(1) as u32;
                     let end_col = document.content.lines().last().map_or(0, |l| l.len()) as u32;
 
@@ -3204,22 +3955,123 @@ impl Backend {
             }
         }
 
+        // Relative branch to label lint (should use absolute branch)
+        {
+            const RELATIVE_BRANCH_INSTRUCTIONS: phf::Set<&'static str> = phf_set!(
+                "brdns", "brdnsal", "brdse", "brdseal", "brap", "brapz", "brapzal", "breq", "breqal",
+                "breqz", "breqzal", "brge", "brgeal", "brgez", "brgezal", "brgt", "brgtal", "brgtz",
+                "brgtzal", "brle", "brleal", "brlez", "brlezal", "brlt", "brltal", "brltz", "brltzal",
+                "brna", "brnaz", "brnazal", "brne", "brneal", "brnez", "brnezal"
+            );
+            let mut cursor = QueryCursor::new();
+            let query = Query::new(
+                tree_sitter_ic10::language(),
+                "(instruction operand: (operand (identifier))) @x",
+            )
+            .unwrap();
+            let mut tree_cursor = tree.walk();
+            let captures = cursor.captures(&query, tree.root_node(), document.content.as_bytes());
+            for (capture, _) in captures {
+                let capture = capture.captures[0].node;
+                let Some(operation_node) = capture.child_by_field_name("operation") else {
+                    continue;
+                };
+                let operation = operation_node
+                    .utf8_text(document.content.as_bytes())
+                    .unwrap();
+                if !RELATIVE_BRANCH_INSTRUCTIONS.contains(operation) {
+                    continue;
+                }
+
+                tree_cursor.reset(capture);
+                let Some(last_operand) = capture
+                    .children_by_field_name("operand", &mut tree_cursor)
+                    .into_iter()
+                    .last()
+                else {
+                    continue;
+                };
+                if let Some(last_operand_child) = last_operand.child(0) {
+                    if last_operand_child.kind() == "identifier" {
+                        let identifier_text = last_operand_child
+                            .utf8_text(document.content.as_bytes())
+                            .unwrap();
+                        // Check if this identifier is a label (exists in labels map)
+                        if file_data.type_data.labels.contains_key(identifier_text) {
+                            diagnostics.push(Diagnostic::new(
+                                Range::from(capture.range()).into(),
+                                Some(DiagnosticSeverity::WARNING),
+                                Some(NumberOrString::String(LINT_RELATIVE_BRANCH_TO_LABEL.to_string())),
+                                None,
+                                "Relative branch to label - do you REALLY want to use a relative branch here? Relative branches use the numeric value at the label, not the label's line number. Use absolute branch instead.".to_string(),
+                                None,
+                                None,
+                            ));
+                        }
+                    }
+                }
+            }
+        }
+
+        // Check for numbers inside HASH() functions
+        {
+            use crate::hash_utils::{extract_hash_argument, is_numeric_string};
+            let mut cursor = QueryCursor::new();
+            let query = Query::new(
+                tree_sitter_ic10::language(),
+                "(hash_function argument: (hash_string)) @hash",
+            )
+            .unwrap();
+            let captures = cursor.captures(&query, tree.root_node(), document.content.as_bytes());
+            
+            for (capture, _) in captures {
+                let hash_func_node = capture.captures[0].node;
+                
+                // Get the argument node (hash_string)
+                if let Some(arg_node) = hash_func_node.child_by_field_name("argument") {
+                    let arg_text = arg_node.utf8_text(document.content.as_bytes()).unwrap();
+                    
+                    // Extract the string content (strip quotes)
+                    if let Some(content) = extract_hash_argument(arg_text) {
+                        // Check if the content is numeric
+                        if is_numeric_string(&content) {
+                            diagnostics.push(Diagnostic::new(
+                                Range::from(hash_func_node.range()).into(),
+                                Some(DiagnosticSeverity::ERROR),
+                                None,
+                                None,
+                                format!(
+                                    "Content inside HASH() argument cannot be a number. Use the hash value directly: {}",
+                                    content
+                                ),
+                                None,
+                                None,
+                            ));
+                        }
+                    }
+                }
+            }
+        }
+
         // Register usage analysis
         {
-            let mut register_analyzer = additional_features::RegisterAnalyzer::new();
-            register_analyzer.analyze_register_usage(
-                tree,
-                &document.content,
-                &file_data.type_data.aliases,
-            );
-            let register_diagnostics = register_analyzer.generate_diagnostics();
-            let mut seen = HashSet::new();
-            for existing in diagnostics.iter() {
-                seen.insert(diagnostic_identity(existing));
-            }
-            for diag in register_diagnostics {
-                if seen.insert(diagnostic_identity(&diag)) {
-                    diagnostics.push(diag);
+            // Skip register diagnostics if globally suppressed
+            if !config.suppress_register_warnings {
+                let mut register_analyzer = additional_features::RegisterAnalyzer::new();
+                register_analyzer.analyze_register_usage(
+                    tree,
+                    &document.content,
+                    &file_data.type_data.aliases,
+                );
+                let register_diagnostics = register_analyzer.generate_diagnostics();
+                let mut seen = HashSet::new();
+                for existing in diagnostics.iter() {
+                    seen.insert(diagnostic_identity(existing));
+                }
+                for diag in register_diagnostics {
+                    if seen.insert(diagnostic_identity(&diag)) {
+                        diagnostics.push(diag);
+                    }
                 }
             }
         }
@@ -3422,7 +4274,8 @@ fn compute_diagnostics_for_text(content: &str) -> Vec<tower_lsp::lsp_types::Diag
                             let child_kind = value_node.child(0).map(|x| x.kind()).unwrap_or("");
                             if child_kind == "number"
                                 || child_kind == "function_call"
-                                || child_kind == "hash_preproc"
+                                || child_kind == "hash_function"
+                                || child_kind == "str_function"
                                 || child_kind == "preproc_string"
                                 || child_kind == "identifier"
                             {
@@ -3663,7 +4516,7 @@ fn compute_diagnostics_for_text(content: &str) -> Vec<tower_lsp::lsp_types::Diag
                                     }
                                 }
                             }
-                            "function_call" | "hash_preproc" => {
+                            "function_call" | "hash_function" | "str_function" => {
                                 let call_text = operand.utf8_text(content.as_bytes()).unwrap();
                                 if is_hash_function_call(call_text) {
                                     instructions::Union(&[DataType::Number])

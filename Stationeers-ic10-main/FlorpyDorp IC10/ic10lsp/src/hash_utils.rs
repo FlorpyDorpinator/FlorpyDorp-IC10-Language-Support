@@ -15,8 +15,16 @@ pub fn extract_hash_argument(input: &str) -> Option<String> {
     // Handle HASH("device_name") format
     let input = input.trim();
 
-    // Must start with HASH(
-    if !input.starts_with("HASH(") {
+    // New format: just the quoted string "device_name" (from hash_string node)
+    // or legacy format: HASH("device_name")
+    
+    // Check if it's just a quoted string
+    if input.starts_with('"') && input.ends_with('"') && input.len() >= 2 {
+        return Some(input[1..input.len() - 1].to_string());
+    }
+
+    // Legacy: Must start with HASH(
+    if !input.to_uppercase().starts_with("HASH(") {
         return None;
     }
 
@@ -42,9 +50,54 @@ pub fn extract_hash_argument(input: &str) -> Option<String> {
     Some(content.to_string())
 }
 
+/// Extracts the string from a STR("string") function call
+pub fn extract_str_argument(input: &str) -> Option<String> {
+    // Handle STR("string") format
+    let input = input.trim();
+
+    // New format: just the quoted string "string" (from str_string node)
+    // or legacy format: STR("string")
+    
+    // Check if it's just a quoted string
+    if input.starts_with('"') && input.ends_with('"') && input.len() >= 2 {
+        return Some(input[1..input.len() - 1].to_string());
+    }
+
+    // Legacy: Must start with STR(
+    if !input.to_uppercase().starts_with("STR(") {
+        return None;
+    }
+
+    // Must end with )
+    if !input.ends_with(')') {
+        return None;
+    }
+
+    // Extract content between STR( and )
+    let content = &input[4..input.len() - 1].trim();
+
+    // Handle quoted strings
+    if content.len() >= 2 {
+        let first_char = content.chars().next()?;
+        let last_char = content.chars().last()?;
+
+        if (first_char == '"' && last_char == '"') || (first_char == '\'' && last_char == '\'') {
+            return Some(content[1..content.len() - 1].to_string());
+        }
+    }
+
+    // Handle unquoted strings (edge case)
+    Some(content.to_string())
+}
+
 /// Checks if a string is a valid HASH() function call
 pub fn is_hash_function_call(input: &str) -> bool {
     extract_hash_argument(input).is_some()
+}
+
+/// Checks if a string is a valid STR() function call
+pub fn is_str_function_call(input: &str) -> bool {
+    extract_str_argument(input).is_some()
 }
 
 /// Looks up device name in device registry and returns the corresponding hash
@@ -55,6 +108,18 @@ pub fn get_device_hash(device_name: &str) -> Option<i32> {
 /// Gets device name for a given hash value from the registry
 pub fn get_device_name_for_hash(hash_value: i32) -> Option<&'static str> {
     HASH_TO_DISPLAY_NAME.get(&hash_value).copied()
+}
+
+/// Checks if a string contains only digits (potentially negative)
+pub fn is_numeric_string(s: &str) -> bool {
+    let trimmed = s.trim();
+    if trimmed.is_empty() {
+        return false;
+    }
+    
+    // Check if it starts with optional minus and contains only digits
+    let without_minus = trimmed.strip_prefix('-').unwrap_or(trimmed);
+    !without_minus.is_empty() && without_minus.chars().all(|c| c.is_ascii_digit())
 }
 
 #[cfg(test)]

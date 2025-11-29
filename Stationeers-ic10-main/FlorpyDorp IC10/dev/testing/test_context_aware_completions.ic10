@@ -1,0 +1,41 @@
+# Test Context-Aware Completions
+# This file tests that completions are filtered by parameter type
+
+# Test 1: Device completions inside HASH()
+# Type HASH("Struct") - should only show device names starting with Struct
+define pump HASH("")
+
+# Test 2: LogicType completions for 'l' instruction
+# Type "l r0 d0 " - should only show LogicType completions (Temperature, Pressure, etc.)
+l r0 d0 
+
+# Test 3: Register completions for 'add' instruction  
+# Type "add " - should show register completions (r0-r15, ra, sp)
+add r0 
+
+# Test 4: Device completions for 's' instruction
+# Type "s d0 " - should show LogicType completions for the parameter
+s d0 Setting 
+
+# Test 5: Number completions for numeric parameters
+# Type "add r0 r1 " - should show defines/numbers
+add r0 r1 
+
+# Test 6: HASH() with number should error
+define bad HASH("12345")
+
+# Test 7: STR() should not show completions
+alias msg STR("")
+
+# Test 8: Branch instruction completions
+# Should prioritize labels
+j 
+
+# Test 9: SlotLogicType for 'ls' instruction
+ls r0 d0 0 
+
+# Test 10: BatchMode for 'lb' instruction
+lb r0 HASH("") 
+cat:
+
+breq r0 r0 cat

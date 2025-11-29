@@ -9,7 +9,7 @@
     "displayName": "FlorpyDorp IC10 Language Support",
     "description": "IC10 MIPS-like Language Support for Stationeers - Featuring completions, hover information, signature help, goto definition, diagnostics, and more.",
     "publisher": "FlorpyDorp",
-    "version": "1.2.18",
+    "version": "2.0.0",
     "engines": {
         "vscode": "^1.74.0"
     },
@@ -99,6 +99,11 @@
                 "description": "Toggle diagnostics for HASH() and device hash values"
             },
             {
+                "command": "ic10.ignoreRegisterWarnings",
+                "title": "IC10: Ignore Register Warnings",
+                "description": "Add #IgnoreRegisterWarnings directive to suppress register assignment/read warnings"
+            },
+            {
                 "command": "ic10.toggleStationeersTheme",
                 "title": "IC10: Toggle Stationeers Theme",
                 "description": "Switch between Stationeers Dark theme and your previous theme"
@@ -123,6 +128,11 @@
             {
                 "command": "ic10.suppressHashDiagnostics",
                 "key": "ctrl+alt+h",
+                "when": "editorTextFocus && editorLangId == 'ic10'"
+            },
+            {
+                "command": "ic10.ignoreRegisterWarnings",
+                "key": "ctrl+alt+w",
                 "when": "editorTextFocus && editorLangId == 'ic10'"
             },
             {
@@ -192,6 +202,18 @@
                     "default": false,
                     "title": "Suppress Hash Diagnostics",
                     "description": "Hide diagnostics related to HASH() functions and device hash values. Toggle with Ctrl+Alt+H."
+                },
+                "ic10.lsp.enableControlFlowAnalysis": {
+                    "type": "boolean",
+                    "default": true,
+                    "title": "Enable Control Flow Analysis",
+                    "description": "Analyze unconditional jumps (j) to reduce false positives for register warnings. May be 3-5x slower on large files."
+                },
+                "ic10.lsp.suppressRegisterWarnings": {
+                    "type": "boolean",
+                    "default": false,
+                    "title": "Suppress Register Warnings",
+                    "description": "Globally suppress all register usage warnings (assigned but never read, read before assign) across all files."
                 },
                 "ic10.lsp.warnings.overline_comment": {
                     "type": "boolean",

@@ -1,5 +1,158 @@
 ### Changelog Beginning 11-01-2025
 
+## [2.0.0] - 2025-11-28
+
+### 🎉 Major Update: Respawn Update Beta Support
+- **Game Version**: Updated to Stationeers v0.2.6054.26551 (Respawn Update Beta)
+- **Device Hashes**: Expanded from ~1200 to 1709 devices (+509 new devices)
+  - ✨ **Modular Console Mod**: Full support for all 101 modular console devices
+  - Includes: ModularDeviceConsole, buttons, switches, dials, sliders, throttles
+  - LED displays, gauges, meters, label plates, and all console variants
+  - HASH() tooltips now recognize modular device names
+
+### 🚀 New Instructions (13 Added)
+- **Math**: `atan2` (arc tangent of y/x in radians), `pow` (power function), `lerp` (linear interpolation)
+- **Bit Operations**: `ext` (extract bit field), `ins` (insert bit field)
+- **Direct Device Access**: `ld` (load by ID), `sd` (store by ID)
+- **Device Validation**: `bdnvl` (branch if device not valid for load), `bdnvs` (branch if not valid for store)
+- **Stack Operations**: `clr` (clear device stack), `clrd` (clear by device ID), `poke` (store at stack address)
+- **Recipe Mapping**: `rmap` (map reagent hash to prefab hash for autolathes/fabricators)
+- All instructions include hover documentation and signature help
+
+### 📊 Logic Types Expansion
+- Verified all 242 logic types from latest Stationpedia
+- Comprehensive coverage of all device properties:
+  - Orbital mechanics (Eccentricity, SemiMajorAxis, TrueAnomaly, etc.)
+  - Celestial navigation (CelestialHash, CelestialParentHash, DistanceAu, DistanceKm)
+  - Advanced gas ratios (all Input/Output/Input2/Output2 variants)
+  - Liquid ratios (all variants)
+  - Solar positioning and efficiency metrics
+- All logic types properly recognized in autocomplete and diagnostics
+
+### ✨ Intelligent Completions System
+- **Context-Aware Filtering**: Completions now filter based on instruction parameter types
+  - LogicType/BatchMode parameters show ONLY their predefined constants (e.g., `Average`, `Sum`, `Maximum`, `Minimum`)
+  - Register parameters (e.g., `add r0 _`) show registers and register aliases
+  - Device parameters show device references and aliases
+  - Number parameters show defines and numeric literals
+  - Branch instructions (j, jal, b*) show ONLY labels (no defines/aliases/constants)
+  - Batch instructions (lb, lbn, lbs, lbns, sb, sbn, sbs) recognize device hash parameter and suggest HASH()
+  
+- **Device Completions in HASH()**: Revolutionary dropdown experience
+  - Typing `HASH("")` shows all 1709 device names with fuzzy filtering
+  - Example: `HASH("Struct")` shows StructureVolumePump, StructureBatterySmall, etc.
+  - Display format: `DeviceName` with detail showing `DisplayName → HashValue`
+  - Case-insensitive matching for ease of use
+  - Smart detection: Only triggers when cursor is inside HASH(""), not for completed HASH() calls
+  - Smart quote handling: Auto-adds closing `")` for new HASH calls, but not when editing existing complete HASH
+  - Prevents logic types/registers from appearing in HASH() context
+  
+- **Usage-Based Sorting**: Frequently-used items appear first
+  - Registers (r0-r17, ra, sp) that appear earlier in your script are prioritized
+  - Devices (d0-d5, db) used in your code float to the top
+  - Aliases and defines you've created appear before unused items
+  - Makes completions more relevant to your specific script
+  
+- **Automatic Dropdown Triggers**:
+  - Space after instruction: Shows appropriate parameter completions
+  - Opening quote in HASH(): Immediately shows device name completions
+  - Empty LogicType/BatchMode parameters: Dropdown appears automatically
+  
+- **HASH() Number Validation**: New error diagnostic
+  - `HASH("123")` shows ERROR diagnostic with message
+  - "Content inside HASH() argument cannot be a number. Use the hash value directly: 123"
+  - Prevents common mistake of putting hash values inside HASH()
+
+- **Relative Branch to Label Warning**: New diagnostic for critical mistakes
+  - Relative branches (e.g., `breq r0 0 labelName`) to labels now show warning
+  - Message: "Relative branch to label - do you REALLY want to use a relative branch here? Relative branches use the numeric value at the label, not the label's line number."
+  - Quick-fix action converts to absolute branch (e.g., `breq` → `beq`)
+  - Prevents script-breaking mistake: relative branches read the value stored at the label position, not the label's line number
+  
+- **STR() Completion Suppression**: No completions inside STR()
+  - `STR("")` strings are freeform text and don't trigger completions
+  - Cleaner editing experience without irrelevant suggestions
+
+### ⚡ Code Actions & Refactoring
+- **HASH Conversion Refactoring**: Bidirectional conversion between HASH strings and numeric values
+  - Right-click on `HASH("StructureVolumePump")` → Refactor → "Convert to hash number: -1258351925"
+  - Right-click on numeric hash (e.g., `-1258351925`) → Refactor → "Convert to HASH(\"StructureVolumePump\")"
+  - Works for all 1709 recognized device hashes
+  - Appears in "Refactor..." submenu (CodeActionKind::REFACTOR)
+  - Uses device_hashes.rs mapping for accurate conversions
+  
+- **Branch Conversion Quick-Fixes**: Convert between relative and absolute branches
+  - Relative to Absolute: `breq r0 0 label` → Quick-fix → "Change to absolute branch (beq)"
+  - Absolute to Relative: `beq r0 0 123` → Quick-fix → "Change to relative branch (breq)"
+  - Tied to diagnostics: LINT_RELATIVE_BRANCH_TO_LABEL and LINT_ABSOLUTE_JUMP
+  - Prevents common mistake of using relative branches with labels
+  
+- **Register Diagnostic Suppression**: Quick-fix to ignore false-positive register warnings
+  - Click lightbulb on register diagnostic → "Ignore diagnostics for rX"
+  - Automatically adds `# ignore rX` comment to suppress specific register warnings
+  - Useful for complex control flow (loops, jumps) that static analysis can't follow
+  - Hotkey alternative: Ctrl+Alt+I suppresses all register diagnostics
+
+### 🎨 Visual Improvements
+- **HASH()/STR() Syntax Highlighting**: Fixed content color
+  - Content inside HASH("Device") and STR("text") now displays white instead of green
+  - Changed TextMate scope from `string.quoted.double` to `variable.other.ic10`
+  - Maintains consistent color with other device/variable references
+
+- **Inlay Hint Behavior**: Improved shadow text (parameter hints) user experience
+  - Parameter hints now disappear immediately when you start typing after an instruction
+  - Prevents cursor jumping when pressing space after instruction names
+  - Hints only appear when instruction has no operands and nothing typed after it
+  - HASH() inlay hints (device name/hash value display) only show for complete HASH() calls
+  - Incomplete HASH() calls don't show hints, preventing interference while typing
+
+### 🐛 Bug Fixes
+- **Batch Instruction Completions**: Fixed device hash parameter detection
+  - Store batch instructions (sb, sbn, sbs): Device hash parameter correctly identified at position 0
+  - Load batch instructions (lb, lbn, lbs, lbns): Device hash parameter at position 1
+  - HASH() completions now trigger properly for all batch instruction variants
+  
+- **HASH() Completion Smart Quotes**: Fixed quote handling when editing existing HASH calls
+  - Auto-adds closing `")` when typing new HASH() calls
+  - Does NOT add closing quotes when editing inside existing complete HASH("device")
+  - Detects if closing `")` already exists on the line after HASH("
+  - Prevents duplicate quotes: `HASH("DeviceName")")` no longer occurs
+
+- **Global HASH() Detection**: HASH() device completions now work anywhere
+  - Typing `HASH("` triggers device completions in any context (defines, instructions, etc.)
+  - Example: `define Satellite HASH("` shows device dropdown
+  - No longer limited to instruction parameters
+  - Fixed cursor position calculation for accurate detection
+
+- **HASH(" Suggestions**: Smart suggestions for instructions that commonly use device hashes
+  - `define` instruction: `HASH("` appears at top of completion list for value parameter
+  - `lbn`/`sbn` instructions: `HASH("` suggested for nameHash parameter (3rd parameter)
+  - Helps discover HASH function for device name lookup
+  - Sort priority ensures HASH(" appears first in list
+
+- **Define Prioritization**: Defines now appear at top of completion lists
+  - For numeric/value parameters, defines are prioritized over registers
+  - Sorting: Used defines → Unused defines → Used registers → Unused registers → Enums
+  - Recognizes that defines often contain device hashes and important constants
+  - Makes script-specific values more discoverable
+
+### 🔧 Technical Improvements
+- **Grammar Restructure**: HASH/STR now parsed as proper functions
+  - Changed from single tokens (`hash_preproc`/`str_preproc`) to function nodes
+  - New structure: `hash_function(hash_keyword, '(', hash_string, ')')`
+  - Enables querying argument content for intelligent completions
+  - All existing features (inlay hints, validation) updated for new structure
+  
+- **Tree-sitter Grammar**: Rebuilt parser with new function nodes and instructions
+- **LSP Server**: Recompiled with context-aware completions and validation (v0.8.0)
+- **Extension**: Rebuilt with latest game data and features (794.2kb bundle)
+
+### 📝 Documentation
+- Updated README with feature overview and completion screenshots
+- Comprehensive changelog entry with all changes
+- Created `CONTEXT_AWARE_COMPLETIONS_SUMMARY.md` technical documentation
+- Version bump reflects major content and feature update
+
 ## [1.2.18] - 2025-11-27
 
 ### 🐛 Bug Fixes (Extension)

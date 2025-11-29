@@ -133,10 +133,19 @@ impl RegisterAnalyzer {
 
     fn parse_ignore_directives(&mut self, content: &str) {
         // Parse comments like: # ignore r2, r5, r10 (with or without colon)
+        // Also check for #IgnoreRegisterWarnings to suppress ALL register warnings
+        let mut ignore_all_registers = false;
+        
         for line in content.lines() {
             let trimmed = line.trim();
             if let Some(comment_start) = trimmed.find('#') {
-                let comment = &trimmed[comment_start + 1..].trim();
+                let comment = &trimmed[comment_start + 1..].trim().to_lowercase();
+                
+                // Check for #IgnoreRegisterWarnings directive (case-insensitive)
+                if comment.starts_with("ignoreregisterwarnings") {
+                    ignore_all_registers = true;
+                    break; // No need to parse individual registers if ignoring all
+                }
                 
                 // Look for ignore or ignore: directive
                 if let Some(ignore_start) = comment.find("ignore") {
@@ -156,6 +165,18 @@ impl RegisterAnalyzer {
                         }
                     }
                 }
+            }
+        }
+        
+        // If #IgnoreRegisterWarnings found, add ALL registers to ignored list
+        if ignore_all_registers {
+            for reg in [
+                "r0", "r1", "r2", "r3", "r4", "r5", "r6", "r7", "r8", "r9", "r10", "r11", "r12", "r13",
+                "r14", "r15", "ra", "sp",
+                "rr0", "rr1", "rr2", "rr3", "rr4", "rr5", "rr6", "rr7", "rr8", "rr9", "rr10", "rr11", "rr12", "rr13",
+                "rr14", "rr15",
+            ] {
+                self.ignored_registers.insert(reg.to_string());
             }
         }
     }
@@ -477,8 +498,8 @@ impl RegisterAnalyzer {
                     }
                 }
                 RegisterState::ReadBeforeAssign => {
-                    // Do not flag stack pointer or rr registers as read-before-assign; they're implicitly initialized
-                    if register_name == "sp" || register_name.starts_with("rr") {
+                    // Do not flag stack pointer, return address, or rr registers as read-before-assign; they're implicitly initialized
+                    if register_name == "sp" || register_name == "ra" || register_name.starts_with("rr") {
                         continue;
                     }
                     for read_range in &usage.reads {

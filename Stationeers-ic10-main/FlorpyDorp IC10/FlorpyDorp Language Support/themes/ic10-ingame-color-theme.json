@@ -7,7 +7,7 @@
   "semanticTokenColors": {
     "type": "#800080",
     "enum": "#20B2AA",
-    "string": "#FFA500",
+    "string": "#ff6516",
     "number": "#20B2AA",
     "macro": "#0080FF",
     "function": "#00FF00"
@@ -31,7 +31,7 @@
     },
     {
       "scope": ["support.type.logic.ic10"],
-      "settings": { "foreground": "#FFA500" }
+      "settings": { "foreground": "#ff6516" }
     },
     {
       "scope": ["comment.line.number-sign.ic10"],
@@ -44,6 +44,10 @@
     {
       "scope": ["variable.other.ic10"],
       "settings": { "foreground": "#FFFFFF" }
+    },
+    {
+      "scope": ["support.function.builtin.ic10"],
+      "settings": { "foreground": "#808080" }
     }
   ]
 }
