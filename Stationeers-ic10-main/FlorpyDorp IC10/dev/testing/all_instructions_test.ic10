@@ -1,0 +1,184 @@
+# Complete IC10 Instruction Set Test
+# Each instruction at start of line for completion testing
+
+# Aliases and Defines
+alias
+define
+label
+
+# Device Detection
+bdns
+bdnsal
+bdse
+bdseal
+brdns
+brdse
+
+# Load Instructions
+l r0 d0 Acceleration
+lb r0 
+lr
+ls r0 d0 
+
+# Store Instructions
+s
+sb
+sbn
+sbs
+ss
+sd
+
+# Branch Instructions (4 params)
+bap
+bapal
+bna
+bnaal
+brap
+brna
+
+# Branch Instructions (3 params)
+bapz
+bapzal
+bnaz
+bnazal
+brapz
+brnaz
+beq
+beqal
+bne
+bneal
+bge
+bgeal
+ble
+bleal
+bgt
+bgtal
+blt
+bltal
+breq
+brne
+brge
+brle
+brgt
+brlt
+
+# Branch Instructions (2 params)
+bgez
+bgezal
+blez
+blezal
+bgtz
+bgtzal
+bltz
+bltzal
+beqz
+beqzal
+bnez
+bnezal
+brgez
+brlez
+brgtz
+brltz
+breqz
+brnez
+bnan
+brnan
+bdnvl
+bdnvs
+
+# Jump Instructions
+j
+jal
+jr
+
+# Set Instructions
+sap
+sapz
+sdns
+sdse
+select
+seq
+seqz
+sge
+sgez
+sgt
+sgtz
+sle
+slez
+slt
+sltz
+sna
+snaz
+sne
+snez
+snan
+snanz
+
+# Math Instructions
+abs
+acos
+add
+asin
+atan
+atan2
+ceil
+cos
+div
+exp
+floor
+log
+max
+min
+mod
+mul
+rand
+round
+sin
+sqrt
+sub
+tan
+trunc
+pow
+lerp
+
+# Bitwise Instructions
+and
+nor
+or
+xor
+not
+sla
+sll
+sra
+srl
+ext
+ins
+
+# Stack Instructions
+peek
+pop
+push
+poke
+
+# Device Stack Instructions
+get
+getd
+put
+putd
+clr
+clrd
+
+# Control Flow
+hcf
+move
+sleep
+yield
+
+# Batch Load Instructions
+lbn
+lbns
+lbs
+
+# Direct ID Instructions
+ld
+rmap

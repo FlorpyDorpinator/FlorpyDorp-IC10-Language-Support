@@ -304,8 +304,8 @@ fn main() {
             }
         }
         
-        // Extract SlotLogicType
-        if let Some(slot_logic_type) = script_enums.get("SlotLogicType") {
+        // Extract LogicSlotType
+        if let Some(slot_logic_type) = script_enums.get("LogicSlotType") {
             if let Some(values) = slot_logic_type.get("values").and_then(|x| x.as_object()) {
                 for (name, data) in values.iter() {
                     let deprecated = data.get("deprecated").and_then(|x| x.as_bool()).unwrap_or(false);
@@ -318,8 +318,8 @@ fn main() {
             }
         }
         
-        // Extract BatchMode
-        if let Some(batch_mode) = script_enums.get("BatchMode") {
+        // Extract LogicBatchMethod
+        if let Some(batch_mode) = script_enums.get("LogicBatchMethod") {
             if let Some(values) = batch_mode.get("values").and_then(|x| x.as_object()) {
                 for (name, data) in values.iter() {
                     let deprecated = data.get("deprecated").and_then(|x| x.as_bool()).unwrap_or(false);
@@ -332,8 +332,8 @@ fn main() {
             }
         }
         
-        // Extract ReagentMode
-        if let Some(reagent_mode) = script_enums.get("ReagentMode") {
+        // Extract LogicReagentMode
+        if let Some(reagent_mode) = script_enums.get("LogicReagentMode") {
             if let Some(values) = reagent_mode.get("values").and_then(|x| x.as_object()) {
                 for (name, data) in values.iter() {
                     let deprecated = data.get("deprecated").and_then(|x| x.as_bool()).unwrap_or(false);
