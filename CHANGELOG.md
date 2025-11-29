@@ -206,7 +206,7 @@
 
 ### 🎨 Theme Improvements
 - **Renamed Themes for Clarity**:
-  - "Stationeers Dark" → "Stationeers Full Color Theme" (complete UI + syntax)
+  - "Stationeers Full Color Theme" → "Stationeers Full Color Theme" (complete UI + syntax)
   - "IC10 In-Game Colors" → "Stationeers IC10 Syntax Only" (syntax highlighting only)
 - Updated theme toggle command (Ctrl+Alt+T) to use new names
 - Improved theme descriptions for better discoverability
@@ -239,7 +239,7 @@
   - Dark blue sidebar (#062030) and activity bar (#041820)
   - Orange window border when active
   - Complete coverage: editor, tabs, sidebar, terminal, menus, notifications, and more
-- **Theme Toggle Command**: Press **Ctrl+Alt+T** to switch between Stationeers Dark and your previous theme
+- **Theme Toggle Command**: Press **Ctrl+Alt+T** to switch between Stationeers Full Color Theme and your previous theme
   - Remembers your previous theme across sessions
   - Works globally from any file type
 - **Register Diagnostic Suppression**: Added `# ignore` directive to suppress false-positive register warnings

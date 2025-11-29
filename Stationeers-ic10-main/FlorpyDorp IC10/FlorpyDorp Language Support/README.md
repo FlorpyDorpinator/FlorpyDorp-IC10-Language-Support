@@ -11,7 +11,7 @@
 ## ✨ Highlights
 
 - Full IC10 syntax highlighting (`.ic10`)
-- **Two immersive color themes**: IC10 In-Game Colors (syntax) and Stationeers Dark (full UI) with a hotkey to swap
+- **Two immersive color themes**: IC10 In-Game Colors (syntax) and Stationeers Full Color Theme (full UI) with a hotkey to swap
 - **Latest game support**: Updated for Stationeers Respawn Update Beta (v0.2.6054.26551)
 - **Modular Console Mod**: Full support for all 101 modular console devices
 - **13 new instructions**: atan2, pow, lerp, ext, ins, ld, sd, bdnvl, bdnvs, clr, clrd, poke, rmap
