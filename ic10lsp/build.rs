@@ -147,7 +147,7 @@ fn main() {
         out
     }
 
-    let enums_file = Path::new("../../../data/game-sources/Enums.json");
+    let enums_file = Path::new("../data/game-sources/Enums.json");
     let enums_json =
         fs::read_to_string(enums_file).expect("Failed to read game-sources/Enums.json");
     let v: Value = serde_json::from_str(&enums_json).expect("Failed to parse Enums.json");
@@ -257,7 +257,7 @@ fn main() {
     .unwrap();
     // (No direct value->name PHF map emitted; use runtime scan helper.)
 
-    println!("cargo:rerun-if-changed=../../../data/game-sources/Enums.json");
+    println!("cargo:rerun-if-changed=../data/game-sources/Enums.json");
 
     // =========================
     // Generate instruction signatures and logic types from game sources
@@ -265,14 +265,14 @@ fn main() {
     let instructions_out_path = Path::new(&out_dir).join("instructions_generated.rs");
     
     // Read Enums.json for logic types
-    let enums_game_file = Path::new("../../../data/game-sources/Enums.json");
+    let enums_game_file = Path::new("../data/game-sources/Enums.json");
     let enums_game_json = fs::read_to_string(enums_game_file)
         .expect("Failed to read game-sources/Enums.json");
     let enums_game: Value = serde_json::from_str(&enums_game_json)
         .expect("Failed to parse game-sources/Enums.json");
     
     // Read ProgrammableChip.cs for instruction signatures
-    let chip_file = Path::new("../../../data/game-sources/ProgrammableChip.cs");
+    let chip_file = Path::new("../data/game-sources/ProgrammableChip.cs");
     let chip_cs = fs::read_to_string(chip_file)
         .expect("Failed to read game-sources/ProgrammableChip.cs");
     
@@ -443,8 +443,8 @@ fn main() {
     }
     writeln!(&mut inst_writer, "];").unwrap();
     
-    println!("cargo:rerun-if-changed=../../../data/game-sources/ProgrammableChip.cs");
-    println!("cargo:rerun-if-changed=../../../data/game-sources/Stationpedia.json");
+    println!("cargo:rerun-if-changed=../data/game-sources/ProgrammableChip.cs");
+    println!("cargo:rerun-if-changed=../data/game-sources/Stationpedia.json");
 }
 
 // Parse instruction signatures from ProgrammableChip.cs GetCommandExample method
