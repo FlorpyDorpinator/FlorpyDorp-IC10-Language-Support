@@ -30,8 +30,8 @@ const DEVICE: Union = Union(&[DataType::Device]);
 const VALUE: Union = Union(&[DataType::Register, DataType::Number]);
 const LOGIC_TYPE: Union = Union(&[DataType::LogicType]);
 const SLOT_LOGIC_TYPE: Union = Union(&[DataType::SlotLogicType]);
+// BatchMode now only accepts numeric values (0-3) - same as VALUE
 const BATCH_MODE: Union = Union(&[DataType::Number, DataType::Register]);
-const BATCH_MODE_ONLY: Union = Union(&[DataType::Number, DataType::Register]);
 const REAGENT_MODE: Union = Union(&[DataType::ReagentMode, DataType::Number, DataType::Register]);
 
 pub const INSTRUCTIONS: phf::Map<&'static str, InstructionSignature> = phf_map! {
@@ -45,7 +45,7 @@ pub const INSTRUCTIONS: phf::Map<&'static str, InstructionSignature> = phf_map! 
     "brdns" => InstructionSignature(&[Union(&[DataType::Register, DataType::Device, DataType::Number]),VALUE]),
     "brdse" => InstructionSignature(&[Union(&[DataType::Register, DataType::Device, DataType::Number]),VALUE]),
     "l" => InstructionSignature(&[REGISTER,Union(&[DataType::Register, DataType::Device, DataType::Number]),LOGIC_TYPE]),
-    "lb" => InstructionSignature(&[REGISTER,VALUE,LOGIC_TYPE,BATCH_MODE_ONLY]),
+    "lb" => InstructionSignature(&[REGISTER,VALUE,LOGIC_TYPE,BATCH_MODE]),
     "ld" => InstructionSignature(&[REGISTER,Union(&[DataType::Register, DataType::Device, DataType::Number]),LOGIC_TYPE]),
     "lr" => InstructionSignature(&[REGISTER,Union(&[DataType::Register, DataType::Device, DataType::Number]),REAGENT_MODE,VALUE]),
     "ls" => InstructionSignature(&[REGISTER,Union(&[DataType::Register, DataType::Device, DataType::Number]),VALUE,SLOT_LOGIC_TYPE]),
@@ -157,9 +157,9 @@ pub const INSTRUCTIONS: phf::Map<&'static str, InstructionSignature> = phf_map! 
     "yield" => InstructionSignature(&[]),
     "bnan" => InstructionSignature(&[VALUE, VALUE]),
     "brnan" => InstructionSignature(&[VALUE, VALUE]),
-    "lbn" => InstructionSignature(&[REGISTER, VALUE, VALUE, LOGIC_TYPE, BATCH_MODE_ONLY]),
-    "lbns" => InstructionSignature(&[REGISTER, VALUE, VALUE, VALUE, SLOT_LOGIC_TYPE, BATCH_MODE_ONLY]),
-    "lbs" => InstructionSignature(&[REGISTER, VALUE, VALUE, SLOT_LOGIC_TYPE, BATCH_MODE_ONLY]),
+    "lbn" => InstructionSignature(&[REGISTER, VALUE, VALUE, LOGIC_TYPE, BATCH_MODE]),
+    "lbns" => InstructionSignature(&[REGISTER, VALUE, VALUE, VALUE, SLOT_LOGIC_TYPE, BATCH_MODE]),
+    "lbs" => InstructionSignature(&[REGISTER, VALUE, VALUE, SLOT_LOGIC_TYPE, BATCH_MODE]),
     "not" => InstructionSignature(&[REGISTER, VALUE]),
     "sbn" => InstructionSignature(&[VALUE, VALUE, LOGIC_TYPE, VALUE]),
     "sbs" => InstructionSignature(&[VALUE, VALUE, SLOT_LOGIC_TYPE, REGISTER]),
@@ -539,7 +539,7 @@ pub fn logictype_candidates(text: &str) -> Vec<DataType> {
 #[allow(dead_code)]
 pub const INSTRUCTION_DOCS: phf::Map<&'static str, &'static str> = phf_map! {
     "l" => "Loads device var to register.",
-    "lb" => "Loads var from all output network devices with provided type hash using the provided batch mode. Use numeric value: 0 (Average), 1 (Sum), 2 (Minimum), 3 (Maximum).",
+    "lb" => "Loads var from all output network devices with provided type hash using a batch mode: 0 (Average), 1 (Sum), 2 (Minimum), 3 (Maximum).",
     "s" => "Stores register value to var on device.",
     "sb" => "Stores register value to var on all output network devices with provided type hash.",
     "ls" => "Loads slot var on device to register.",
@@ -671,10 +671,10 @@ pub const INSTRUCTION_DOCS: phf::Map<&'static str, &'static str> = phf_map! {
     "ss" => "Stores register value to device stored in a slot LogicSlotType on device.",
     "rmap" => "Given a reagent hash, store the corresponding prefab hash that the device expects to fulfill the reagent requirement. For example, on an autolathe, the hash for Iron will store the hash for ItemIronIngot.",
     "sbs" => "Stores register value to LogicSlotType on all output network devices with provided type hash in the provided slot.",
-    "lbn" => "Loads var from all output network devices with provided type hash using the provided batch mode. Use numeric value: 0 (Average), 1 (Sum), 2 (Minimum), 3 (Maximum).",
+    "lbn" => "Loads var from all output network devices with provided type hash using a batch mode: 0 (Average), 1 (Sum), 2 (Minimum), 3 (Maximum).",
     "sbn" => "Stores register value to var on all output network devices with provided type hash.",
-    "lbns" => "Loads slot var from all output network devices with provided type hash using the provided batch mode, with specific slot filtering. Use numeric value: 0 (Average), 1 (Sum), 2 (Minimum), 3 (Maximum).",
-    "lbs" => "Loads slot var from all output network devices with provided type hash in the provided slot using the provided batch mode. Use numeric value: 0 (Average), 1 (Sum), 2 (Minimum), 3 (Maximum).",
+    "lbns" => "Loads slot var from all output network devices with provided type hash using a batch mode, with specific slot filtering: 0 (Average), 1 (Sum), 2 (Minimum), 3 (Maximum).",
+    "lbs" => "Loads slot var from all output network devices with provided type hash in the provided slot using a batch mode: 0 (Average), 1 (Sum), 2 (Minimum), 3 (Maximum).",
     "not" => "Register = 1 if a is zero, otherwise 0 (logical NOT operation)",
     "sla" => "Register = a shifted left by b bits (arithmetic shift, maintains sign)",
     "sll" => "Register = a shifted left by b bits (logical shift, fills with zeros)",
