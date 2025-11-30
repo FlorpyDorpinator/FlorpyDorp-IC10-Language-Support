@@ -1321,9 +1321,6 @@ impl LanguageServer for Backend {
     }
 
     async fn completion(&self, params: CompletionParams) -> Result<Option<CompletionResponse>> {
-        eprintln!("\n=== COMPLETION REQUEST at line={}, char={} ===", 
-            params.text_document_position.position.line,
-            params.text_document_position.position.character);
         
         fn instruction_completions(prefix: &str, completions: &mut Vec<CompletionItem>) {
             let start_entries = completions.len();
@@ -1380,30 +1377,23 @@ impl LanguageServer for Backend {
             let prefix_trimmed = prefix.trim_start();
             let prefix_lower = prefix_trimmed.to_ascii_lowercase();
 
-            eprintln!("DEBUG param_completions_static: Union has {} types", param_type.0.len());
             
             for typ in param_type.0 {
-                eprintln!("DEBUG param_completions_static: Processing type: {:?}", typ);
                 let map = match typ {
                     DataType::LogicType => {
-                        eprintln!("DEBUG: Matched LogicType, map has {} entries", instructions::LOGIC_TYPE_DOCS.len());
                         instructions::LOGIC_TYPE_DOCS
                     }
                     DataType::SlotLogicType => {
-                        eprintln!("DEBUG: Matched SlotLogicType, map has {} entries", instructions::SLOT_TYPE_DOCS.len());
                         instructions::SLOT_TYPE_DOCS
                     }
                     DataType::BatchMode => {
-                        eprintln!("DEBUG: Matched BatchMode, map has {} entries", instructions::BATCH_MODE_DOCS.len());
                         instructions::BATCH_MODE_DOCS
                     }
                     _ => {
-                        eprintln!("DEBUG: Type did not match any case, continuing");
                         continue;
                     }
                 };
 
-                eprintln!("DEBUG: About to iterate map.entries(), map has {} entries", map.len());
                 for entry in map.entries() {
                     let name = *entry.0;
                     let docs = *entry.1;
@@ -1661,7 +1651,6 @@ impl LanguageServer for Backend {
         };
 
         let Some(node) = self.node_at_position(position, tree) else {
-            eprintln!("DEBUG: node_at_position returned None - falling back to text-based completion");
             
             // Tree-sitter hasn't parsed this position yet (common after typing space)
             // Fall back to text-based completion logic
@@ -1682,8 +1671,6 @@ impl LanguageServer for Backend {
                     || (first_word == "lbn" && (param_count == 1 || param_count == 2))
                     || (first_word == "define" && param_count == 1);
                 
-                eprintln!("DEBUG: Text fallback - instruction: {}, param_count: {}, suggest_hash: {}", 
-                    first_word, param_count, suggest_hash);
                 
                 if suggest_hash {
                     // Check if already typing HASH(
@@ -1751,16 +1738,10 @@ impl LanguageServer for Backend {
             return Ok(Some(CompletionResponse::Array(ret)));
         };
 
-        eprintln!("DEBUG: node kind='{}', parent kinds: operation={}, invalid={}, line={}", 
-            node.kind(),
-            node.find_parent("operation").is_some(),
-            node.find_parent("invalid_instruction").is_some(),
-            node.find_parent("line").is_some());
 
         // Global HASH(" detection - trigger device completions anywhere HASH(" is typed
         // This works in defines, instructions, anywhere a device hash might be used
         if let Some(line_node) = node.find_parent("line") {
-            eprintln!("DEBUG: Entered global HASH detection block");
             let line_text = line_node.utf8_text(document.content.as_bytes()).unwrap();
             
             // Get cursor position within the line by using byte offsets
@@ -1787,8 +1768,6 @@ impl LanguageServer for Backend {
                 byte_offset
             };
             
-            eprintln!("DEBUG: Global HASH - original char={}, cursor_byte={}", 
-                original_position.character, cursor_byte);
             
             let cursor_pos_in_line = if cursor_byte >= line_start_byte {
                 cursor_byte - line_start_byte
@@ -1796,18 +1775,14 @@ impl LanguageServer for Backend {
                 0
             };
             
-            eprintln!("DEBUG: Global HASH - line_text.len()={}, cursor_pos_in_line={}, line_start_byte={}, cursor_byte={}", 
-                line_text.len(), cursor_pos_in_line, line_start_byte, cursor_byte);
             
             let line_up_to_cursor = &line_text[..cursor_pos_in_line.min(line_text.len())];
             
-            eprintln!("DEBUG: Global HASH - slice succeeded, line_up_to_cursor.len()={}", line_up_to_cursor.len());
             
             // Check if we're typing inside HASH("
             let last_hash_open = line_up_to_cursor.rfind("HASH(\"").or_else(|| line_up_to_cursor.rfind("hash(\""));
             let last_hash_close = line_up_to_cursor.rfind("\")");
             
-            eprintln!("DEBUG: Global HASH - last_hash_open={:?}, last_hash_close={:?}", last_hash_open, last_hash_close);
             
             let typing_in_hash = if let Some(open_pos) = last_hash_open {
                 last_hash_close.map_or(true, |close_pos| close_pos < open_pos)
@@ -1815,27 +1790,18 @@ impl LanguageServer for Backend {
                 false
             };
             
-            eprintln!("DEBUG: Global HASH - typing_in_hash={}", typing_in_hash);
             
             if typing_in_hash {
-                eprintln!("DEBUG: Global HASH - inside typing_in_hash block");
                 let search_start = line_up_to_cursor.rfind("HASH(\"").or_else(|| line_up_to_cursor.rfind("hash(\""));
-                eprintln!("DEBUG: Global HASH - search_start={:?}", search_start);
                 if let Some(start_pos) = search_start {
-                    eprintln!("DEBUG: Global HASH - found HASH( at pos {}", start_pos);
                     let search_text = &line_up_to_cursor[start_pos + 6..];
-                    eprintln!("DEBUG: Global HASH - search_text={:?}", search_text);
                     let search_lower = search_text.to_lowercase();
                     
-                    eprintln!("DEBUG: Global HASH - about to check already_complete");
                     
                     // Check if already complete
                     let already_complete = if let Some(open_pos) = last_hash_open {
-                        eprintln!("DEBUG: Global HASH - open_pos={}, line_text.len()={}", open_pos, line_text.len());
                         let slice_result = line_text.get(open_pos..);
-                        eprintln!("DEBUG: Global HASH - slice_result exists: {}", slice_result.is_some());
                         if let Some(slice) = slice_result {
-                            eprintln!("DEBUG: Global HASH - checking contains in slice");
                             slice.contains("\")")
                         } else {
                             false
@@ -1844,16 +1810,12 @@ impl LanguageServer for Backend {
                         false
                     };
                     
-                    eprintln!("DEBUG: Global HASH - already_complete={}", already_complete);
                     
                     // If HASH is already complete (has closing "), don't offer device completions
                     // Let it fall through to normal parameter completion logic
                     if already_complete {
-                        eprintln!("DEBUG: Global HASH - skipping device completions, HASH already complete");
                         // Don't return here - let it continue to normal parameter completion
                     } else {
-                        eprintln!("DEBUG: Global HASH - starting device loop, device count={}", 
-                            crate::device_hashes::DEVICE_NAME_TO_HASH.len());
                     
                         // Provide device name completions
                         let mut match_count = 0;
@@ -1885,19 +1847,15 @@ impl LanguageServer for Backend {
                                 });
                             }
                         }
-                        eprintln!("DEBUG: Global HASH - loop finished, match_count={}, ret.len()={}", match_count, ret.len());
                         ret.sort_by(|x, y| x.label.cmp(&y.label));
-                        eprintln!("DEBUG: Global HASH - sorted, about to return");
                         return Ok(Some(CompletionResponse::Array(ret)));
                     }
                 }
             }
         }
 
-        eprintln!("DEBUG: After global HASH block");
 
         if let Some(node) = node.find_parent("operation") {
-            eprintln!("DEBUG: Entering operation block");
             let raw = node.utf8_text(document.content.as_bytes()).unwrap();
             let lowered;
             let text: &str = if instructions::INSTRUCTIONS.contains_key(raw) {
@@ -1911,7 +1869,6 @@ impl LanguageServer for Backend {
 
             instruction_completions(prefix, &mut ret);
         } else if let Some(node) = node.find_parent("invalid_instruction") {
-            eprintln!("DEBUG: Entering invalid_instruction block");
             let raw = node.utf8_text(document.content.as_bytes()).unwrap();
             let lowered;
             let text: &str = if instructions::INSTRUCTIONS.contains_key(raw) {
@@ -1925,22 +1882,17 @@ impl LanguageServer for Backend {
 
             instruction_completions(prefix, &mut ret);
         } else if let Some(line_node) = node.find_parent("line") {
-            eprintln!("DEBUG: Entering line_node block");
             let text = line_node.utf8_text(document.content.as_bytes()).unwrap();
             let cursor_pos = position.0.character as usize - line_node.start_position().column;
             let global_prefix = &text[..cursor_pos as usize + 1];
 
-            eprintln!("DEBUG: In line block - text len={}, cursor_pos={}, global_prefix={:?}", 
-                text.len(), cursor_pos, global_prefix);
 
             // Check if cursor is at start of line (all whitespace before cursor)
             // OR if we're in a whitespace gap after an instruction (for parameter completion)
             let at_line_start = global_prefix.chars().all(char::is_whitespace);
             
-            eprintln!("DEBUG: at_line_start={}", at_line_start);
             
             if at_line_start {
-                eprintln!("DEBUG: Offering instruction completions (at line start)");
                 instruction_completions("", &mut ret);
             } else {
                 // Position: line={}, char={}
@@ -1948,21 +1900,13 @@ impl LanguageServer for Backend {
                 
                 // Try to find instruction node that contains cursor, fallback to querying line
                 let instruction_node_opt = if let Some(inst) = node.find_parent("instruction") {
-                    eprintln!("DEBUG: Found via find_parent, line {}", position.0.line);
                     Some(inst)
                 } else {
-                    eprintln!("DEBUG: No parent, trying query on line {}", position.0.line);
-                    eprintln!("DEBUG: line_node range: {}:{} to {}:{}", 
-                        line_node.start_position().row, line_node.start_position().column,
-                        line_node.end_position().row, line_node.end_position().column);
                     
                     // No instruction parent found - try querying the line for any instruction
                     // This handles cases where tree-sitter parsing is incomplete
                     let result = line_node.query("(instruction)@x", file_data.document_data.content.as_bytes());
                     if let Some(ref inst) = result {
-                        eprintln!("DEBUG: Query found instruction at {}:{} to {}:{}", 
-                            inst.start_position().row, inst.start_position().column,
-                            inst.end_position().row, inst.end_position().column);
                         
                         // Calculate cursor byte position using original_position
                         // Account for actual line endings in the document
@@ -1983,20 +1927,15 @@ impl LanguageServer for Backend {
                             byte_offset
                         };
                         
-                        eprintln!("DEBUG: cursor_byte={}, inst bytes: {}-{}", 
-                            cursor_byte, inst.start_byte(), inst.end_byte());
                         
                         // CRITICAL: Verify the instruction actually contains the cursor!
                         // query() returns the FIRST match, which might be from a different line
                         if cursor_byte < inst.start_byte() || cursor_byte > inst.end_byte() {
-                            eprintln!("DEBUG: REJECTED - cursor outside instruction");
                             None
                         } else {
-                            eprintln!("DEBUG: ACCEPTED");
                             result
                         }
                     } else {
-                        eprintln!("DEBUG: Query found nothing");
                         None
                     }
                 };
@@ -2013,11 +1952,8 @@ impl LanguageServer for Backend {
                         .unwrap_or("");
                     let cursor_col = original_position.character as usize;
                     
-                    eprintln!("DEBUG: Fallback - actual line {}: {:?}", original_position.line, actual_line);
-                    eprintln!("DEBUG: Fallback - cursor_col: {}", cursor_col);
                     
                     let first_word = actual_line.split_whitespace().next().unwrap_or("");
-                    eprintln!("DEBUG: Fallback - first_word: {:?}", first_word);
                     
                     if let Some(_signature) = instructions::INSTRUCTIONS.get(first_word) {
                         // We found an instruction at the start of the line!
@@ -2025,8 +1961,6 @@ impl LanguageServer for Backend {
                         let text_up_to_cursor = &actual_line[..cursor_col.min(actual_line.len())];
                         let param_count = text_up_to_cursor.split_whitespace().count().saturating_sub(1);
                         
-                        eprintln!("DEBUG: Fallback - text_up_to_cursor: {:?}", text_up_to_cursor);
-                        eprintln!("DEBUG: Fallback - param_count: {}", param_count);
                         
                         // Check if we should suggest HASH(" for this position
                         // Match the same logic as the main path (lines ~2226-2234)
@@ -2039,7 +1973,6 @@ impl LanguageServer for Backend {
                             || (first_word == "sb" && param_count == 0)
                             || (first_word == "sbs" && param_count == 0);
                         
-                        eprintln!("DEBUG: Fallback - suggest_hash: {}", suggest_hash);
                         
                         if suggest_hash {
                             ret.insert(0, CompletionItem {
@@ -2071,10 +2004,8 @@ impl LanguageServer for Backend {
                         } else {
                             false
                         };
-                        eprintln!("DEBUG: Fallback - typing_in_hash: {}", typing_in_hash);
                         
                         if typing_in_hash {
-                            eprintln!("DEBUG: Fallback - typing in HASH, offering device completions");
                             let search_start = line_up_to_cursor.rfind("HASH(\"").or_else(|| line_up_to_cursor.rfind("hash(\""));
                             if let Some(start_pos) = search_start {
                                 let search_text = &line_up_to_cursor[start_pos + 6..];
@@ -2111,11 +2042,9 @@ impl LanguageServer for Backend {
                             }
                         } else {
                             // Not typing in HASH - provide regular parameter completions
-                            eprintln!("DEBUG: Fallback - providing regular parameter completions");
                             if let Some(signature) = instructions::INSTRUCTIONS.get(first_word) {
                                 if param_count < signature.0.len() {
                                     let param_type = &signature.0[param_count];
-                                    eprintln!("DEBUG: Fallback - param {} type: {:?}", param_count, param_type);
                                     
                                     // Extract the text after the last space (the current parameter being typed)
                                     let prefix = if let Some(last_space) = text_up_to_cursor.rfind(' ') {
@@ -2124,7 +2053,6 @@ impl LanguageServer for Backend {
                                         text_up_to_cursor
                                     };
                                     
-                                    eprintln!("DEBUG: Fallback - prefix for completion: {:?}", prefix);
                                     
                                     // For branch/jump instructions, provide label completions on the jump target parameter
                                     let is_branch = first_word.starts_with('b');
@@ -2165,11 +2093,12 @@ impl LanguageServer for Backend {
                                         }
                                     }
                                     
-                                    // Provide both builtin (registers, numbers, devices) and static (LogicType, etc.) completions
-                                    param_completions_builtin(prefix, param_type, &mut ret, None);
-                                    param_completions_static(prefix, "", param_type, &mut ret);
+                                    // For non-label parameters, provide both builtin and static completions
+                                    if !should_show_labels {
+                                        param_completions_builtin(prefix, param_type, &mut ret, None);
+                                        param_completions_static(prefix, "", param_type, &mut ret);
+                                    }
                                     
-                                    eprintln!("DEBUG: Fallback - after param_completions, ret.len()={}", ret.len());
                                 }
                             }
                         }
@@ -2207,7 +2136,6 @@ impl LanguageServer for Backend {
                 let (current_param, operand_node) =
                     get_current_parameter(instruction_node, cursor_byte, document.content.as_bytes());
 
-                eprintln!("DEBUG: Main path - instruction: {}, current_param: {}", text, current_param);
 
                 let operand_text = operand_node
                     .map(|node| {
@@ -2215,7 +2143,6 @@ impl LanguageServer for Backend {
                     })
                     .unwrap_or("");
                 
-                eprintln!("DEBUG: Main path - operand_text: {:?}", operand_text);
 
                 let prefix = {
                     if let Some(operand_node) = operand_node {
@@ -2229,16 +2156,13 @@ impl LanguageServer for Backend {
                 };
 
                 let Some(signature) = instructions::INSTRUCTIONS.get(text) else {
-                    eprintln!("DEBUG: Main path - no signature found for instruction");
                     return Ok(None);
                 };
 
                 let Some(param_type) = signature.0.get(current_param) else {
-                    eprintln!("DEBUG: Main path - no param_type at index {}, returning early", current_param);
                     return Ok(None);
                 };
                 
-                eprintln!("DEBUG: Main path - param_type found: {:?}", param_type);
                 
 
                 // Special case: suggest HASH(" for instructions that commonly use device hashes
@@ -2256,20 +2180,14 @@ impl LanguageServer for Backend {
                     || (text == "sb" && current_param == 0)
                     || (text == "sbs" && current_param == 0);
                 
-                eprintln!("DEBUG: Main path - suggest_hash: {}", suggest_hash);
                 
                 // Only suggest HASH(" if we're typing in the right parameter position
                 // Don't show it if the current parameter already starts with HASH (typed or autocompleted)
                 // Use trim() to handle spaces, and check prefix (what's typed so far) not operand_text
                 let prefix_trimmed = prefix.trim_start();
                 
-                eprintln!("DEBUG: Main path - prefix_trimmed: {:?}", prefix_trimmed);
-                eprintln!("DEBUG: Main path - about to check: suggest_hash={}, !starts_with_HASH={}", 
-                    suggest_hash, 
-                    !prefix_trimmed.starts_with("HASH") && !prefix_trimmed.starts_with("hash"));
                 
                 if suggest_hash && !prefix_trimmed.starts_with("HASH") && !prefix_trimmed.starts_with("hash") {
-                    eprintln!("DEBUG: Main path - ADDING HASH(\" completion");
                     // Add HASH(" with multiple strategies to ensure visibility
                     // Strategy 1: Standard completion with highest priority
                     ret.insert(0, CompletionItem {
@@ -2511,7 +2429,6 @@ impl LanguageServer for Backend {
                 if (is_load_batch || is_store_batch) && !is_device_hash_param && !is_name_hash_param {
                     // Not a hash parameter - fall through to normal parameter completions below
                     // This allows SlotLogicType, LogicType, BatchMode, etc. to show properly
-                    eprintln!("DEBUG: Batch instruction but not a hash param - falling through to normal completions");
                 }
 
                 // Legacy preproc_string support (for backwards compatibility)
@@ -2690,7 +2607,6 @@ impl LanguageServer for Backend {
             }
         }
 
-        eprintln!("DEBUG: About to return final ret with {} items", ret.len());
 
         Ok(Some(CompletionResponse::Array(ret)))
     }
@@ -2762,10 +2678,6 @@ impl LanguageServer for Backend {
         // Use enriched syntax for the display label
         let label = crate::tooltip_documentation::get_instruction_syntax(text);
         
-        eprintln!("====== SIGNATURE HOVER DEBUG ======");
-        eprintln!("Instruction: {}", text);
-        eprintln!("Label string: '{}'", label);
-        eprintln!("Current param index: {}", current_param);
 
         let mut parameters: Vec<[u32; 2]> = Vec::new();
 
@@ -2774,17 +2686,13 @@ impl LanguageServer for Backend {
         // Split by whitespace and skip the first token (instruction name)
         
         let tokens: Vec<&str> = label.split_whitespace().collect();
-        eprintln!("Label tokens: {:?}", tokens);
         
         if tokens.is_empty() {
-            eprintln!("No tokens found in label!");
-            eprintln!("====== END SIGNATURE DEBUG ======");
             return Ok(None);
         }
         
         // Skip first token (instruction name), rest are parameters
         let param_tokens = &tokens[1..];
-        eprintln!("Parameter tokens: {:?}", param_tokens);
         
         // Now find byte positions of each parameter in the label string
         let mut search_start = 0;
@@ -2804,8 +2712,6 @@ impl LanguageServer for Backend {
                 let abs_start = search_start + token_pos;
                 let abs_end = abs_start + param_token.len();
                 
-                eprintln!("Parameter {}: '{}' at label bytes [{}, {}]", 
-                         idx, param_token, abs_start, abs_end);
                 
                 parameters.push([abs_start as u32, abs_end as u32]);
                 
@@ -2816,13 +2722,9 @@ impl LanguageServer for Backend {
                     search_start += 1;
                 }
             } else {
-                eprintln!("WARNING: Could not find parameter token '{}' in label starting at {}", 
-                         param_token, search_start);
             }
         }
         
-        eprintln!("Total parameters found: {}", parameters.len());
-        eprintln!("====== END SIGNATURE DEBUG ======");
 
         Ok(Some(SignatureHelp {
             signatures: vec![SignatureInformation {
@@ -5436,3 +5338,7 @@ impl From<Range> for tower_lsp::lsp_types::Range {
         value.0
     }
 }
+
+
+
+

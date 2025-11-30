@@ -1,6 +1,6 @@
 ### Changelog Beginning 11-01-2025
 
-## [2.1.0] - 2025-11-28
+## [2.1.0] - 2025-11-29
 
 ### 🚀 Major Feature: Auto-Generation System
 - **Automatic Type Definitions**: LSP now auto-generates all type definitions from Stationeers game source files
@@ -28,6 +28,33 @@
   - ✅ Authoritative source - data comes directly from game
   - ✅ Type safety - compile-time generation ensures correctness
   - ✅ Future-proof for new Stationeers features
+
+### 🐛 Critical Bug Fixes
+- **Fixed SlotLogicType Completions**: Now shows all 31 slot types (was showing 0)
+  - Root cause: Enum name mismatch in build.rs (SlotLogicType vs LogicSlotType)
+  - Fixed enum names: `LogicSlotType`, `LogicBatchMethod`, `LogicReagentMode`
+  - All 31 types now available: Occupant, OccupantHash, Charge, ChargeRatio, Class, etc.
+  
+- **Fixed BatchMode Strict Validation**: Only 4 modes allowed (Average, Sum, Minimum, Maximum)
+  - Batch instructions (lb, lbn, lbs, lbns, sb, sbn, sbs) now enforce strict mode list
+  - Registers no longer suggested for BatchMode parameters
+  - Prevents invalid code like `lbn r0 HASH("Device") HASH("Device") Acceleration r5`
+  
+- **Fixed Label Completions**: Branch/jump instructions now show ONLY labels
+  - Instructions starting with 'b' (except 'br*') and 'j'/'jal' get label-only completions
+  - Removed defines, aliases, and registers from branch target suggestions
+  - Cleaner completion list for jump targets
+  
+- **Fixed HASH(" Suggestions**: Now appears for all batch instruction hash parameters
+  - Shows at top of completions for deviceHash and nameHash parameters
+  - Instructions: define (param 1), lbn/lbns (params 1, 2), sbn (params 0, 1), lb/lbs (param 1), sb/sbs (param 0)
+  - Automatically triggers device completions when typing inside HASH("...")
+  
+- **Fixed Signature Hover Parameter Highlighting**: Blue highlight now works on all lines
+  - Root cause: Converting LSP position column to document byte offset incorrectly
+  - Now uses `line_start_byte + column` for accurate byte position
+  - Parameter highlighting tracks correctly as you type on lines 0, 1, 2, ... N
+  - Each parameter highlights blue in the signature popup as you reach it
 
 ### ✨ Completion System Improvements
 - **Fixed Global HASH Detection**: HASH() completions now work correctly everywhere
