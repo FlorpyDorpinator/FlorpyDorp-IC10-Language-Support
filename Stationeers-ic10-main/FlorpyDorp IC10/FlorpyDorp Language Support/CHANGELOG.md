@@ -1,12 +1,18 @@
 ### Changelog Beginning 11-01-2025
 
-## [2.1.0] - 2025-11-29
+## [2.1.0] - 2025-11-29 The "Completions" Update
+### Overview
+ - Major improvements to many of the underlying systems related to auto completions. There were some deep errors in how that was working and now you should be able to auto-complete your instructions seamlessly. 
+ - The extension now pulls from the game's source code which I've decompiled for the purpose of pulling these values. It also takes the enums & stationpedia .jsons from a mod that rips those directly. This should be absolutely the most complete version now. Every item, structure, etc. should be in the game. This means that I can easily add mods to my game and pull their names whenever I want. So if you have a mod you want added let me know.
+ - Some other issues with hovering and various instruction types are now fixed too. This should all be quite stable. Still testing on a large library of ic10 scripts to see if it fails. 
+ - Cleaned up the folder heirarchy and got rid of some duplicate files and organized it better. More to do here but a good start.
+
 
 ### 🚀 Major Feature: Auto-Generation System
-- **Automatic Type Definitions**: LSP now auto-generates all type definitions from Stationeers game source files
+- **Automatic Type Definitions**: LSP now auto-generates all type definitions from Stationeers game source files for easy maintenance
   - Replaces 187 manually-maintained logic types with 257 types extracted from game data
   - All types include descriptions from game (93 missing types added, including `VolumeOfLiquid`)
-  - Zero manual maintenance required - just replace source files and rebuild
+  - Zero manual maintenance required - just replace 3 source files and rebuild
   - Uses phf crate for compile-time perfect hashing (O(1) lookups, zero runtime cost)
   
 - **Build-Time Code Generation**: New `build.rs` system parses game sources during compilation
@@ -68,6 +74,7 @@
   - Added `original_position` variable to preserve LSP position before adjustments
   - Rewrote cursor byte calculation using `char_indices()` for accurate CRLF handling
   - Fixed two separate cursor_byte calculations (global HASH and instruction bounds)
+  - Should fix mismatch with in game editor byte counts.
   
 - **Complete Fallback Completions**: Added comprehensive fallback when cursor outside instruction bounds
   - Registers (r0-r17, ra, sp) for all parameter types

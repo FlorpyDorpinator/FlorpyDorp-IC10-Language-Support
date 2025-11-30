@@ -17,6 +17,7 @@
 - **13 new instructions**: atan2, pow, lerp, ext, ins, ld, sd, bdnvl, bdnvs, clr, clrd, poke, rmap
 - **242 logic types**: Complete coverage including orbital mechanics and celestial navigation
 - **1709+ device hashes**: Comprehensive device name resolution with HASH() tooltips
+- **Every in-game hash represented!**: Directly pulled from the game files, this Extension has EVERYTHING.
 - **Intelligent context-aware completions**: Dropdowns filter by parameter type
 - **Device completions in HASH()**: All 1709 devices with fuzzy search
 - **Usage-based sorting**: Frequently-used registers/devices prioritized
