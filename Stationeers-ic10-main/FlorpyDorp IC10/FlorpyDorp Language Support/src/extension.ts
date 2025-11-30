@@ -27,6 +27,8 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import * as net from 'net';
+import * as fs from 'fs';
+import * as os from 'os';
 import {
     DidChangeConfigurationNotification,
     LanguageClient,
@@ -1062,6 +1064,620 @@ export function activate(context: vscode.ExtensionContext) {
         await context.globalState.update('ic10.hasAskedAboutTheme', undefined);
         vscode.window.showInformationMessage('Theme prompt state reset. Reload window to see the prompt again.');
     }));
+
+    // ============================================================================
+    // Branch Visualization Feature
+    // ============================================================================
+    
+    let branchVisualizationActive = false;
+    const branchDecorations: vscode.TextEditorDecorationType[] = [];
+    let svgTempDir: string | undefined;
+    
+    // Create SVG icons for branch visualization
+    function createBranchSVGIcons() {
+        if (!svgTempDir) {
+            svgTempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ic10-branch-'));
+        }
+        
+        const icons: { [key: string]: string } = {};
+        
+        branchColors.forEach((color, index) => {
+            const rgbColor = color.border.replace('rgba(', 'rgb(').replace(/, 0\.[0-9]+\)/, ')');
+            
+            // Vertical line
+            const lineSVG = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="20" viewBox="0 0 16 20">
+                <line x1="8" y1="0" x2="8" y2="20" stroke="${rgbColor}" stroke-width="2"/>
+            </svg>`;
+            const linePath = path.join(svgTempDir, `line-${index}.svg`);
+            fs.writeFileSync(linePath, lineSVG);
+            icons[`line-${index}`] = linePath;
+            
+            // Up arrow
+            const upArrowSVG = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="20" viewBox="0 0 16 20">
+                <line x1="8" y1="4" x2="8" y2="20" stroke="${rgbColor}" stroke-width="2"/>
+                <polygon points="8,2 4,6 12,6" fill="${rgbColor}"/>
+            </svg>`;
+            const upArrowPath = path.join(svgTempDir, `up-arrow-${index}.svg`);
+            fs.writeFileSync(upArrowPath, upArrowSVG);
+            icons[`up-arrow-${index}`] = upArrowPath;
+            
+            // Down arrow
+            const downArrowSVG = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="20" viewBox="0 0 16 20">
+                <line x1="8" y1="0" x2="8" y2="16" stroke="${rgbColor}" stroke-width="2"/>
+                <polygon points="8,18 4,14 12,14" fill="${rgbColor}"/>
+            </svg>`;
+            const downArrowPath = path.join(svgTempDir, `down-arrow-${index}.svg`);
+            fs.writeFileSync(downArrowPath, downArrowSVG);
+            icons[`down-arrow-${index}`] = downArrowPath;
+            
+            // Dot (target)
+            const dotSVG = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="20" viewBox="0 0 16 20">
+                <line x1="8" y1="0" x2="8" y2="20" stroke="${rgbColor}" stroke-width="2"/>
+                <circle cx="8" cy="10" r="4" fill="${rgbColor}"/>
+            </svg>`;
+            const dotPath = path.join(svgTempDir, `dot-${index}.svg`);
+            fs.writeFileSync(dotPath, dotSVG);
+            icons[`dot-${index}`] = dotPath;
+        });
+        
+        return icons;
+    }
+    
+    // Store the webview panel for branch visualization
+    let branchVisualizationPanel: vscode.WebviewPanel | undefined;
+    
+    // Color palette for matching branch pairs
+    const branchColors = [
+        { bg: 'rgba(255, 215, 0, 0.15)', border: 'rgba(255, 215, 0, 0.5)' },    // Gold
+        { bg: 'rgba(138, 43, 226, 0.15)', border: 'rgba(138, 43, 226, 0.5)' },  // Purple
+        { bg: 'rgba(0, 191, 255, 0.15)', border: 'rgba(0, 191, 255, 0.5)' },    // Sky Blue
+        { bg: 'rgba(255, 105, 180, 0.15)', border: 'rgba(255, 105, 180, 0.5)' }, // Hot Pink
+        { bg: 'rgba(50, 205, 50, 0.15)', border: 'rgba(50, 205, 50, 0.5)' },    // Lime Green
+        { bg: 'rgba(255, 140, 0, 0.15)', border: 'rgba(255, 140, 0, 0.5)' },    // Dark Orange
+    ];
+    
+    /**
+     * Identifies relative branch instructions (jr, br*, bnan, brnan)
+     */
+    const relativeBranchOpcodes = new Set([
+        'jr', 'brdse', 'brdns', 'brlt', 'brgt', 'brle', 'brge', 
+        'breq', 'brne', 'brap', 'brna', 'brltz', 'brgez', 'brlez', 
+        'brgtz', 'breqz', 'brnez', 'brapz', 'brnaz', 'brnan', 'brnaz'
+    ]);
+    
+    /**
+     * Parse a line to extract relative branch information
+     * Returns: { opcode: string, offset: number, targetLine: number } or null
+     */
+    function parseRelativeBranch(lineText: string, currentLine: number): { opcode: string, offset: number, targetLine: number } | null {
+        // Match instruction pattern: opcode [operands...] offset
+        const match = lineText.match(/^\s*([a-z]+)\s+(.+)$/i);
+        if (!match) return null;
+        
+        const opcode = match[1].toLowerCase();
+        if (!relativeBranchOpcodes.has(opcode)) return null;
+        
+        const operandsStr = match[2].trim();
+        
+        // Extract the last operand (the offset) - skip comments
+        const beforeComment = operandsStr.split('#')[0].trim();
+        const operands = beforeComment.split(/\s+/);
+        
+        if (operands.length === 0) return null;
+        
+        const offsetStr = operands[operands.length - 1];
+        const offset = parseInt(offsetStr, 10);
+        
+        if (isNaN(offset)) return null;
+        
+        // Calculate target line (current line + offset, 0-indexed)
+        const targetLine = currentLine + offset;
+        
+        return { opcode, offset, targetLine };
+    }
+    
+    /**
+     * Create transparent webview overlay for branch visualization
+     */
+    function createBranchVisualizationWebview(
+        editor: vscode.TextEditor,
+        branches: Array<{ sourceLine: number, targetLine: number, offset: number, opcode: string }>,
+        branchDepths: Map<number, number>,
+        maxDepth: number,
+        branchColors: Array<{ bg: string, border: string }>,
+        lineToColors: Map<number, number[]>
+    ) {
+        // Close existing panel if any
+        if (branchVisualizationPanel) {
+            branchVisualizationPanel.dispose();
+        }
+        
+        // Create webview panel - positioned beside editor
+        branchVisualizationPanel = vscode.window.createWebviewPanel(
+            'branchVisualization',
+            'Branch Flow',
+            { viewColumn: vscode.ViewColumn.Beside, preserveFocus: true },
+            {
+                enableScripts: true,
+                retainContextWhenHidden: true,
+                enableFindWidget: false
+            }
+        );
+        
+        // Get editor metrics for positioning
+        const document = editor.document;
+        const fontSize = vscode.workspace.getConfiguration('editor').get<number>('fontSize', 14);
+        const lineHeight = fontSize * 1.5; // Approximate line height
+        
+        // Build visualization data
+        const visualizationData = branches.map((branch, idx) => {
+            const depth = branchDepths.get(idx) || 0;
+            const minLine = Math.min(branch.sourceLine, branch.targetLine);
+            const maxLine = Math.max(branch.sourceLine, branch.targetLine);
+            const isUpward = branch.offset < 0;
+            const color = branchColors[depth % branchColors.length];
+            
+            return {
+                branchIndex: idx,
+                depth,
+                sourceLine: branch.sourceLine,
+                targetLine: branch.targetLine,
+                minLine,
+                maxLine,
+                isUpward,
+                color: color.border,
+                bgColor: color.bg
+            };
+        });
+        
+        // Generate HTML for webview
+        branchVisualizationPanel.webview.html = getBranchVisualizationHTML(
+            visualizationData,
+            lineHeight,
+            fontSize,
+            maxDepth,
+            document.lineCount
+        );
+        
+        // Handle panel disposal
+        branchVisualizationPanel.onDidDispose(() => {
+            branchVisualizationPanel = undefined;
+        });
+    }
+    
+    /**
+     * Generate HTML for branch visualization webview
+     */
+    function getBranchVisualizationHTML(
+        branches: Array<{
+            branchIndex: number,
+            depth: number,
+            sourceLine: number,
+            targetLine: number,
+            minLine: number,
+            maxLine: number,
+            isUpward: boolean,
+            color: string,
+            bgColor: string
+        }>,
+        lineHeight: number,
+        fontSize: number,
+        maxDepth: number,
+        lineCount: number
+    ): string {
+        // Calculate dimensions
+        const depthWidth = 30; // pixels per depth level
+        const startX = 50; // left margin
+        const totalHeight = lineCount * lineHeight;
+        const totalWidth = startX + (maxDepth + 1) * depthWidth + 50;
+        
+        // Build SVG paths for each branch
+        const svgPaths = branches.map(branch => {
+            const x = startX + branch.depth * depthWidth;
+            const y1 = branch.sourceLine * lineHeight + lineHeight / 2;
+            const y2 = branch.targetLine * lineHeight + lineHeight / 2;
+            
+            // Arrow pointing LEFT (into the code)
+            const arrowSize = 8;
+            const arrowX = x - 5; // Position arrow slightly before the line end
+            const arrowPoints = `${arrowX},${y2} ${arrowX + arrowSize},${y2 - arrowSize} ${arrowX + arrowSize},${y2 + arrowSize}`;
+            
+            // Draw corner indicators at source
+            const horizontalLineLength = 15;
+            let cornerPath = '';
+            
+            if (branch.isUpward) {
+                // Bottom-right corner for upward branch
+                cornerPath = `M ${x} ${y1} L ${x + horizontalLineLength} ${y1}`;
+            } else {
+                // Top-right corner for downward branch
+                cornerPath = `M ${x} ${y1} L ${x + horizontalLineLength} ${y1}`;
+            }
+            
+            return `
+                <!-- Branch ${branch.branchIndex} (depth ${branch.depth}) -->
+                <!-- Main vertical line -->
+                <line x1="${x}" y1="${y1}" x2="${x}" y2="${y2}" 
+                      stroke="${branch.color}" stroke-width="2.5" opacity="0.9"
+                      stroke-linecap="round"/>
+                
+                <!-- Corner indicator at source -->
+                <path d="${cornerPath}" 
+                      stroke="${branch.color}" stroke-width="2.5" 
+                      fill="none" stroke-linecap="round" opacity="0.9"/>
+                
+                <!-- Arrow head at target pointing LEFT -->
+                <polygon points="${arrowPoints}" 
+                         fill="${branch.color}" opacity="0.9"/>
+            `;
+        }).join('\n');
+        
+        return `<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: #1e1e1e;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+        }
+        #container {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+        svg {
+            display: block;
+            min-height: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <svg width="${totalWidth}" height="${totalHeight}" xmlns="http://www.w3.org/2000/svg">
+            ${svgPaths}
+        </svg>
+    </div>
+</body>
+</html>`;
+    }
+    
+    /**
+     * Apply branch visualization to the active editor
+     */
+    function applyBranchVisualization(editor: vscode.TextEditor) {
+        // Clear existing decorations - UPDATED
+        clearBranchDecorations();
+        
+        const document = editor.document;
+        const branches: Array<{ sourceLine: number, targetLine: number, offset: number, opcode: string }> = [];
+        
+        // Find all relative branches in the document
+        for (let line = 0; line < document.lineCount; line++) {
+            const lineText = document.lineAt(line).text;
+            const branchInfo = parseRelativeBranch(lineText, line);
+            
+            if (branchInfo && branchInfo.targetLine >= 0 && branchInfo.targetLine < document.lineCount) {
+                branches.push({
+                    sourceLine: line,
+                    targetLine: branchInfo.targetLine,
+                    offset: branchInfo.offset,
+                    opcode: branchInfo.opcode
+                });
+            }
+        }
+        
+        if (branches.length === 0) {
+            vscode.window.showInformationMessage('No relative branch instructions found in this file');
+            return;
+        }
+        
+        // Build a map of line -> [branch colors] for lines referenced by multiple branches
+        const lineToColors = new Map<number, number[]>();
+        const branchIndexToTarget = new Map<number, number>(); // Track which branch index points to which target line
+        const ghostTextMap = new Map<number, string>();
+        
+        branches.forEach((branch, branchIndex) => {
+            // Add color ONLY to source and target lines (not middle lines)
+            if (!lineToColors.has(branch.sourceLine)) {
+                lineToColors.set(branch.sourceLine, []);
+            }
+            lineToColors.get(branch.sourceLine)!.push(branchIndex);
+            
+            if (!lineToColors.has(branch.targetLine)) {
+                lineToColors.set(branch.targetLine, []);
+            }
+            lineToColors.get(branch.targetLine)!.push(branchIndex);
+            branchIndexToTarget.set(branchIndex, branch.targetLine); // Map branch index to its target line
+            
+            // Store ghost text for source line (inline hint showing target)
+            const targetLineText = document.lineAt(branch.targetLine).text.trim();
+            const targetPreview = targetLineText.length > 50 
+                ? targetLineText.substring(0, 50) + '...' 
+                : targetLineText;
+            const direction = branch.offset < 0 ? '⇑' : '⇓';
+            ghostTextMap.set(branch.sourceLine, ` ${direction} line ${branch.targetLine + 1}: ${targetPreview}`);
+        });
+        
+        // Calculate gutter line positions to avoid overlaps
+        // IMPORTANT: Shorter spans get drawn further LEFT (depth 0), longer spans further RIGHT
+        const sortedBranches = branches
+            .map((branch, index) => ({ ...branch, index, span: Math.abs(branch.targetLine - branch.sourceLine) }))
+            .sort((a, b) => a.span - b.span); // Ascending: shortest first (for right-side display)
+        
+        // Assign depth (horizontal position) to each branch
+        const branchDepths = new Map<number, number>(); // branchIndex -> depth
+        const occupiedRanges: Array<{ minLine: number, maxLine: number, depth: number, branchIndex: number }> = [];
+        
+        sortedBranches.forEach(branch => {
+            const minLine = Math.min(branch.sourceLine, branch.targetLine);
+            const maxLine = Math.max(branch.sourceLine, branch.targetLine);
+            
+            // Find the first depth level where this branch doesn't conflict
+            // Two branches conflict if they share ANY line
+            let depth = 0;
+            let conflict = true;
+            
+            while (conflict) {
+                // Check if ANY line of this branch overlaps with ANY line of another branch at this depth
+                conflict = occupiedRanges.some(range => {
+                    if (range.depth !== depth) return false;
+                    // Check if ranges overlap (they conflict if they share ANY line)
+                    return !(maxLine < range.minLine || minLine > range.maxLine);
+                });
+                
+                if (conflict) {
+                    depth++;
+                }
+            }
+            
+            branchDepths.set(branch.index, depth);
+            occupiedRanges.push({ minLine, maxLine, depth, branchIndex: branch.index });
+        });
+        
+        // Calculate max depth to determine indentation needed
+        const maxDepth = Math.max(...Array.from(branchDepths.values()), 0);
+        const indentPerDepth = 2; // characters per depth level
+        const totalIndent = (maxDepth + 1) * indentPerDepth;
+        
+        // Debug: Log branch assignments
+        console.log(`[Branch Viz] Found ${branches.length} branches, maxDepth=${maxDepth}, totalIndent=${totalIndent}`);
+        branches.forEach((branch, idx) => {
+            const depth = branchDepths.get(idx) || 0;
+            console.log(`  Branch ${idx}: line ${branch.sourceLine+1} → ${branch.targetLine+1} (offset=${branch.offset}, depth=${depth})`);
+        });
+        
+        // Find the range of lines that need spacing (all lines within any branch)
+        let minBranchLine = document.lineCount;
+        let maxBranchLine = 0;
+        branches.forEach(branch => {
+            const minLine = Math.min(branch.sourceLine, branch.targetLine);
+            const maxLine = Math.max(branch.sourceLine, branch.targetLine);
+            minBranchLine = Math.min(minBranchLine, minLine);
+            maxBranchLine = Math.max(maxBranchLine, maxLine);
+        });
+        
+        // Track which lines have arrows/dots
+        const linesWithIndicators = new Set<number>();
+        branches.forEach(branch => {
+            linesWithIndicators.add(branch.sourceLine);
+            linesWithIndicators.add(branch.targetLine);
+        });
+        
+        // Add spacing to ALL lines within the branch range for consistent alignment
+        const spacerWidth = '  '; // 2 characters to match arrow/dot decorations
+        for (let lineNum = minBranchLine; lineNum <= maxBranchLine; lineNum++) {
+            if (!linesWithIndicators.has(lineNum)) {
+                // Add invisible spacing to lines without indicators
+                const spacerDecoration = vscode.window.createTextEditorDecorationType({
+                    before: {
+                        contentText: spacerWidth,
+                        color: 'transparent'
+                    }
+                });
+                
+                branchDecorations.push(spacerDecoration);
+                editor.setDecorations(spacerDecoration, [
+                    new vscode.Range(lineNum, 0, lineNum, 0)
+                ]);
+            }
+        }
+        
+        // Simple approach: arrow at source, dot at target
+        // All decorations use same width for consistent alignment
+        
+        branches.forEach((branch, branchIndex) => {
+            const depth = branchDepths.get(branchIndex) || 0;
+            const color = branchColors[depth % branchColors.length];
+            const isUpward = branch.offset < 0;
+            
+            // Arrow at source line (in before decoration) - using double-line arrows
+            const arrowChar = isUpward ? '⇑' : '⇓';
+            const sourceDecoration = vscode.window.createTextEditorDecorationType({
+                before: {
+                    contentText: arrowChar + ' ',
+                    color: color.border.replace('0.5', '1.0'),
+                    fontWeight: 'bold'
+                }
+            });
+            
+            branchDecorations.push(sourceDecoration);
+            editor.setDecorations(sourceDecoration, [
+                new vscode.Range(branch.sourceLine, 0, branch.sourceLine, 0)
+            ]);
+            
+            // Dot at target line (in before decoration)
+            const dotDecoration = vscode.window.createTextEditorDecorationType({
+                before: {
+                    contentText: '● ',
+                    color: color.border.replace('0.5', '1.0'),
+                    fontWeight: 'bold'
+                }
+            });
+            
+            branchDecorations.push(dotDecoration);
+            editor.setDecorations(dotDecoration, [
+                new vscode.Range(branch.targetLine, 0, branch.targetLine, 0)
+            ]);
+        });
+        
+        // Add ghost text (inline hints) at the end of branch source lines
+        ghostTextMap.forEach((ghostText, lineNum) => {
+            const lineLength = document.lineAt(lineNum).text.length;
+            
+            const ghostDecoration = vscode.window.createTextEditorDecorationType({
+                after: {
+                    contentText: ghostText,
+                    color: 'rgba(128, 128, 128, 0.6)',
+                    fontStyle: 'italic'
+                }
+            });
+            
+            branchDecorations.push(ghostDecoration);
+            editor.setDecorations(ghostDecoration, [
+                new vscode.Range(lineNum, lineLength, lineNum, lineLength)
+            ]);
+        });
+        
+        // For each line, create segments based on how many colors it has
+        // Only highlight the actual instruction code
+        lineToColors.forEach((colorIndices, lineNum) => {
+            const lineText = document.lineAt(lineNum).text;
+            const lineLength = lineText.length;
+            
+            // Debug: Log highlighting info
+            console.log(`  Line ${lineNum+1}: ${colorIndices.length} colors [${colorIndices.join(',')}]`);
+            
+            // Find where actual code starts (first non-whitespace after indentation)
+            const firstNonWhitespace = lineText.search(/\S/);
+            if (firstNonWhitespace === -1) return; // Skip empty lines
+            
+            // Start highlighting from where code begins
+            const highlightStart = firstNonWhitespace;
+            
+            if (colorIndices.length === 1) {
+                // Single color - highlight entire instruction
+                const colorIndex = colorIndices[0];
+                const color = branchColors[colorIndex % branchColors.length];
+                
+                // Check if THIS specific branch has this line as its target
+                const isTargetForThisBranch = branchIndexToTarget.get(colorIndex) === lineNum;
+                const bgColor = isTargetForThisBranch 
+                    ? color.bg.replace('0.15', '0.45') // Much darker for targets
+                    : color.bg;
+                
+                const decorationType = vscode.window.createTextEditorDecorationType({
+                    backgroundColor: bgColor,
+                    borderWidth: '1px',
+                    borderStyle: 'solid',
+                    borderColor: color.border
+                });
+                
+                branchDecorations.push(decorationType);
+                const range = new vscode.Range(lineNum, highlightStart, lineNum, lineLength);
+                editor.setDecorations(decorationType, [range]);
+            } else {
+                // Multiple colors - split the code portion into equal segments
+                const codeLength = lineLength - highlightStart;
+                const segmentWidth = codeLength / colorIndices.length;
+                
+                colorIndices.forEach((colorIndex, segmentIndex) => {
+                    const color = branchColors[colorIndex % branchColors.length];
+                    
+                    // Check if THIS specific branch has this line as its target
+                    const isTargetForThisBranch = branchIndexToTarget.get(colorIndex) === lineNum;
+                    const bgColor = isTargetForThisBranch 
+                        ? color.bg.replace('0.15', '0.45') // Much darker for targets
+                        : color.bg;
+                    
+                    const startCol = highlightStart + Math.floor(segmentIndex * segmentWidth);
+                    const endCol = segmentIndex === colorIndices.length - 1 
+                        ? lineLength
+                        : highlightStart + Math.floor((segmentIndex + 1) * segmentWidth);
+                    
+                    const decorationType = vscode.window.createTextEditorDecorationType({
+                        backgroundColor: bgColor,
+                        borderWidth: '1px',
+                        borderStyle: 'solid',
+                        borderColor: color.border
+                    });
+                    
+                    branchDecorations.push(decorationType);
+                    const range = new vscode.Range(lineNum, startCol, lineNum, endCol);
+                    editor.setDecorations(decorationType, [range]);
+                });
+            }
+        });
+        
+        vscode.window.showInformationMessage(`Branch visualization active (${branches.length} branch${branches.length === 1 ? '' : 'es'} found)`);
+    }
+    
+    /**
+     * Clear all branch decorations
+     */
+    function clearBranchDecorations() {
+        branchDecorations.forEach(decoration => decoration.dispose());
+        branchDecorations.length = 0;
+        
+        // Clean up temp SVG files
+        if (svgTempDir && fs.existsSync(svgTempDir)) {
+            try {
+                const files = fs.readdirSync(svgTempDir);
+                files.forEach(file => {
+                    fs.unlinkSync(path.join(svgTempDir!, file));
+                });
+                fs.rmdirSync(svgTempDir);
+                svgTempDir = undefined;
+            } catch (err) {
+                console.error('Failed to clean up SVG temp files:', err);
+            }
+        }
+    }
+    
+    /**
+     * Toggle branch visualization on/off
+     */
+    context.subscriptions.push(vscode.commands.registerCommand('ic10.toggleBranchVisualization', () => {
+        const editor = vscode.window.activeTextEditor;
+        
+        if (!editor || editor.document.languageId !== 'ic10') {
+            vscode.window.showInformationMessage('Open an IC10 file to visualize branches');
+            return;
+        }
+        
+        branchVisualizationActive = !branchVisualizationActive;
+        
+        if (branchVisualizationActive) {
+            applyBranchVisualization(editor);
+        } else {
+            clearBranchDecorations();
+            vscode.window.showInformationMessage('Branch visualization disabled');
+        }
+    }));
+    
+    // Clear decorations when switching files or closing editor
+    context.subscriptions.push(vscode.window.onDidChangeActiveTextEditor(() => {
+        if (branchVisualizationActive) {
+            clearBranchDecorations();
+            branchVisualizationActive = false;
+        }
+    }));
+    
+    // Clear decorations on deactivation
+    context.subscriptions.push({
+        dispose: () => clearBranchDecorations()
+    });
 
 }
 

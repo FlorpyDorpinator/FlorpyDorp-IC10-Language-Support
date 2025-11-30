@@ -1,5 +1,39 @@
 ### Changelog Beginning 11-01-2025
 
+## [2.1.5] - 2025-11-29
+
+### ✨ New Features
+- **Branch Visualization**: Visual indicators for relative branch instructions (jr, breq*, bne*, blt*, bgt*, etc.)
+  - Color-coded arrows (⇑/⇓) at source lines showing branch direction
+  - Dots (●) at target lines marking jump destinations
+  - Ghost text descriptions showing target line and preview: ` ⇑ line 17: l r0 d0 On`
+  - Multi-color highlights with intelligent depth assignment (shortest branches leftmost)
+  - Per-segment opacity: Source lines lighter (0.15), target lines darker (0.45)
+  - Split highlights when multiple branches overlap - each segment independently shows correct opacity
+  - Toggle on/off with **Ctrl+Alt+B**
+  - Helps visualize control flow and understand complex branching logic
+  - Consistent spacing within branch ranges for clean alignment
+
+### 🔧 Instruction Improvements
+- **Updated Instruction Signatures**: Added missing parameters to instructions
+  - `sdse`: Now properly shows 3 parameters (device, slotIndex, value)
+  - `sdns`: Now properly shows 3 parameters (device, nameHash, value)
+  - `alias`: Now properly shows 2 parameters (aliasName, registerOrDevice)
+  - Hover documentation and signature help updated to match
+  - InlayHints (shadow text) now display correct parameter counts
+
+### 🐛 Bug Fixes
+- **Fixed Register Alias Collision**: Instruction `r` (remainder/modulo) no longer triggers register completions
+  - Previously typing `r` would incorrectly suggest r0-r17 registers
+  - Now correctly recognized as the modulo instruction
+  - Prevents accidental register references when using remainder operation
+- Fixed instruction parameter validation for `sdse`, `sdns`, and `alias` instructions
+- Branch visualization correctly handles lines that are both source and target for different branches
+- Improved ghost text positioning to avoid cursor interference
+
+### ⌨️ New Keybindings
+- **Ctrl+Alt+B** - Toggle branch visualization on/off
+
 ## [2.1.0] - 2025-11-29 The "Completions" Update
 ### Overview
  - Major improvements to many of the underlying systems related to auto completions. There were some deep errors in how that was working and now you should be able to auto-complete your instructions seamlessly. 
