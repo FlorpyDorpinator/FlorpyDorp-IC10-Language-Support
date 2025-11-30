@@ -1,0 +1,21 @@
+
+
+
+alias refid r14
+alias index r15
+alias devicecount r13
+alias ticks r12
+define centrifuge HASH("StructureCentrifuge")
+
+test:
+
+get refid db:0 index
+
+get r14 db:0 3
+
+
+l r0 refid PrefabHash
+bne r0 centrifuge test
+push refid
+s refid On 1
+
