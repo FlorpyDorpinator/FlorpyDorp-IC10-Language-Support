@@ -86,6 +86,21 @@ pub struct RegisterAnalyzer {
     ignored_registers: std::collections::HashSet<String>, // registers to suppress diagnostics for
 }
 
+// Helper function to recursively find identifier nodes within operands
+fn find_identifier_in_node(node: tree_sitter::Node) -> Option<tree_sitter::Node> {
+    if node.kind() == "identifier" {
+        return Some(node);
+    }
+    
+    let mut cursor = node.walk();
+    for child in node.children(&mut cursor) {
+        if let Some(found) = find_identifier_in_node(child) {
+            return Some(found);
+        }
+    }
+    None
+}
+
 impl RegisterAnalyzer {
     pub fn new() -> Self {
         Self {
@@ -99,6 +114,30 @@ impl RegisterAnalyzer {
         self.register_usage
             .entry(name.to_string())
             .or_insert_with(RegisterUsage::new)
+    }
+
+    /// Check if a string is a valid register name (r0-r15, ra, sp, rr0-rr15)
+    fn is_register_name(name: &str) -> bool {
+        if name == "ra" || name == "sp" {
+            return true;
+        }
+        // Check for r0-r15 pattern
+        if name.len() >= 2 && name.starts_with('r') {
+            if let Ok(num) = name[1..].parse::<u8>() {
+                if num <= 15 {
+                    return true;
+                }
+            }
+        }
+        // Check for rr0-rr15 pattern
+        if name.len() >= 3 && name.starts_with("rr") {
+            if let Ok(num) = name[2..].parse::<u8>() {
+                if num <= 15 {
+                    return true;
+                }
+            }
+        }
+        false
     }
 
     fn bootstrap_registers(&mut self) {
@@ -246,13 +285,11 @@ impl RegisterAnalyzer {
             .capture_index_for_name("instruction")
             .unwrap();
 
-        for (capture, _) in
-            cursor.captures(&instruction_query, tree.root_node(), content.as_bytes())
-        {
+        for query_match in cursor.matches(&instruction_query, tree.root_node(), content.as_bytes()) {
             let mut operation = None;
             let mut instruction_node = None;
 
-            for cap in capture.captures {
+            for cap in query_match.captures {
                 if cap.index == op_idx {
                     operation = Some(cap.node.utf8_text(content.as_bytes()).unwrap());
                 } else if cap.index == instruction_idx {
@@ -274,6 +311,10 @@ impl RegisterAnalyzer {
                                 "register" => {
                                     let reg_name =
                                         operand_child.utf8_text(content.as_bytes()).unwrap();
+                                    if reg_name == "r14" || reg_name == "r15" {
+                                        eprintln!("DEBUG ASSIGN: Direct register {} at line {} op={}", 
+                                            reg_name, inst_node.start_position().row + 1, operation.unwrap_or("?"));
+                                    }
                                     let usage = self.ensure_register_entry(reg_name);
                                     usage.assignments.push(Range::from(operand_child.range()));
                                 }
@@ -284,6 +325,10 @@ impl RegisterAnalyzer {
                                         if let crate::AliasValue::Register(reg_name) =
                                             &alias_data.value
                                         {
+                                            if reg_name == "r14" || reg_name == "r15" {
+                                                eprintln!("DEBUG ASSIGN: Via alias '{}' -> {} at line {} op={}", 
+                                                    identifier, reg_name, inst_node.start_position().row + 1, operation.unwrap_or("?"));
+                                            }
                                             let usage = self.ensure_register_entry(reg_name);
                                             usage
                                                 .assignments
@@ -339,13 +384,11 @@ impl RegisterAnalyzer {
             .capture_index_for_name("instruction")
             .unwrap();
 
-        for (capture, _) in
-            cursor.captures(&instruction_query, tree.root_node(), content.as_bytes())
-        {
+        for query_match in cursor.matches(&instruction_query, tree.root_node(), content.as_bytes()) {
             let mut operation = None;
             let mut instruction_node = None;
 
-            for cap in capture.captures {
+            for cap in query_match.captures {
                 if cap.index == op_idx {
                     operation = Some(cap.node.utf8_text(content.as_bytes()).unwrap());
                 } else if cap.index == instruction_idx {
@@ -354,6 +397,11 @@ impl RegisterAnalyzer {
             }
 
             if let (Some(op), Some(inst_node)) = (operation, instruction_node) {
+                // Skip alias instruction entirely - it doesn't perform runtime reads
+                if op.to_ascii_lowercase() == "alias" {
+                    continue;
+                }
+                
                 let mut tree_cursor = inst_node.walk();
                 let operands: Vec<_> = inst_node
                     .children_by_field_name("operand", &mut tree_cursor)
@@ -368,25 +416,45 @@ impl RegisterAnalyzer {
                 };
 
                 for operand in operands.into_iter().skip(start_idx) {
-                    if let Some(operand_child) = operand.child(0) {
-                        match operand_child.kind() {
+                    // Try to get child node first (for complex operands), otherwise use operand itself
+                    let nodes_to_check = if let Some(child) = operand.child(0) {
+                        vec![child, operand] // Check child first, then operand as fallback
+                    } else {
+                        vec![operand] // Only check operand if no child
+                    };
+                    
+                    for node_to_check in nodes_to_check {
+                        match node_to_check.kind() {
                             "register" => {
-                                let reg_name = operand_child.utf8_text(content.as_bytes()).unwrap();
+                                let reg_name = node_to_check.utf8_text(content.as_bytes()).unwrap();
                                 let usage = self.ensure_register_entry(reg_name);
-                                usage.reads.push(Range::from(operand_child.range()));
+                                usage.reads.push(Range::from(node_to_check.range()));
+                                break; // Found a match, stop checking
                             }
                             "identifier" => {
-                                let identifier =
-                                    operand_child.utf8_text(content.as_bytes()).unwrap();
+                                let identifier = node_to_check.utf8_text(content.as_bytes()).unwrap();
                                 if let Some(alias_data) = aliases.get(identifier) {
-                                    if let crate::AliasValue::Register(reg_name) = &alias_data.value
-                                    {
+                                    if let crate::AliasValue::Register(reg_name) = &alias_data.value {
                                         let usage = self.ensure_register_entry(reg_name);
-                                        usage.reads.push(Range::from(operand_child.range()));
+                                        usage.reads.push(Range::from(node_to_check.range()));
+                                        break; // Found a match, stop checking
                                     }
                                 }
                             }
-                            _ => {}
+                            _ => {
+                                // Check if this operand contains an identifier that's a register alias
+                                // (handles indirect device references like "l r0 refid Temperature")
+                                if let Some(identifier_node) = find_identifier_in_node(node_to_check) {
+                                    let identifier = identifier_node.utf8_text(content.as_bytes()).unwrap();
+                                    if let Some(alias_data) = aliases.get(identifier) {
+                                        if let crate::AliasValue::Register(reg_name) = &alias_data.value {
+                                            let usage = self.ensure_register_entry(reg_name);
+                                            usage.reads.push(Range::from(identifier_node.range()));
+                                            break; // Found a match, stop checking
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -410,13 +478,11 @@ impl RegisterAnalyzer {
             .capture_index_for_name("instruction")
             .unwrap();
 
-        for (capture, _) in
-            cursor.captures(&instruction_query, tree.root_node(), content.as_bytes())
-        {
+        for query_match in cursor.matches(&instruction_query, tree.root_node(), content.as_bytes()) {
             let mut operation = None;
             let mut instruction_node = None;
 
-            for cap in capture.captures {
+            for cap in query_match.captures {
                 if cap.index == op_idx {
                     operation = Some(cap.node.utf8_text(content.as_bytes()).unwrap());
                 } else if cap.index == instruction_idx {
@@ -444,11 +510,11 @@ impl RegisterAnalyzer {
             "abs" | "ceil" | "floor" | "round" | "sqrt" | "trunc" | "exp" | "log" |
             "sin" | "cos" | "tan" | "asin" | "acos" | "atan" | "atan2" |
             "and" | "or" | "xor" | "nor" | "not" | "sla" | "sll" | "sra" | "srl" |
-            "l" | "lb" | "lr" | "ls" | "lbn" | "lbs" | "lbns" | "lhz" | "lhs" |
+            "l" | "lb" | "lr" | "ls" | "lbn" | "lbs" | "lbns" |
             "peek" | "pop" | "sap" | "sapz" |
             "sdns" | "sdse" | "select" | "seq" | "seqz" | "sge" | "sgez" |
             "sgt" | "sgtz" | "sle" | "slez" | "slt" | "sltz" | "sna" | "snaz" |
-            "sne" | "snez" | "rget" | "alias" |
+            "sne" | "snez" | "snan" | "snanz" | "rget" |
             // Additional load/generate operations that assign to first register
             "get" | "getd" | "ld" | "rmap" | "rand" | "pow" | "ext" | "ins" | "lerp"
         )
@@ -457,7 +523,21 @@ impl RegisterAnalyzer {
     pub fn generate_diagnostics(&self) -> Vec<Diagnostic> {
         let mut diagnostics = Vec::new();
 
+        // DEBUG: Print ALL HashMap keys to find phantom entries
+        eprintln!("DEBUG HASHMAP KEYS: {:?}", self.register_usage.keys().collect::<Vec<_>>());
+
         for (register_name, usage) in &self.register_usage {
+            // Debug: log the state for the problematic registers
+            if register_name == "r14" || register_name == "r15" {
+                eprintln!("DEBUG FINAL: {} - assignments: {}, reads: {}, state: {:?}, alias: {:?}", 
+                    register_name, 
+                    usage.assignments.len(), 
+                    usage.reads.len(),
+                    usage.get_state(),
+                    usage.alias_name
+                );
+            }
+            
             // Skip registers that are in the ignore list
             if self.ignored_registers.contains(register_name) {
                 continue;
@@ -487,6 +567,9 @@ impl RegisterAnalyzer {
                             .map(|alias| format!("'{}' ({})", alias, register_name))
                             .unwrap_or_else(|| register_name.clone());
 
+                        eprintln!("DEBUG DIAGNOSTIC: AssignedNotRead for {} at range {:?} (reads={})", 
+                            register_display, assignment_range, usage.reads.len());
+
                         diagnostics.push(Diagnostic {
                             range: assignment_range.clone().into(),
                             severity: Some(DiagnosticSeverity::WARNING),
@@ -509,6 +592,8 @@ impl RegisterAnalyzer {
                             .map(|alias| format!("'{}' ({})", alias, register_name))
                             .unwrap_or_else(|| register_name.clone());
 
+                        eprintln!("DEBUG DIAGNOSTIC: ReadBeforeAssign for {} at range {:?}", register_display, read_range);
+                        
                         diagnostics.push(Diagnostic {
                             range: read_range.clone().into(),
                             severity: Some(DiagnosticSeverity::ERROR),
@@ -551,13 +636,11 @@ impl RegisterAnalyzer {
             .capture_index_for_name("instruction")
             .unwrap();
 
-        for (capture, _) in
-            cursor.captures(&instruction_query, tree.root_node(), content.as_bytes())
-        {
+        for query_match in cursor.matches(&instruction_query, tree.root_node(), content.as_bytes()) {
             let mut operation = None;
             let mut instruction_node = None;
 
-            for cap in capture.captures {
+            for cap in query_match.captures {
                 if cap.index == op_idx {
                     operation = Some(cap.node.utf8_text(content.as_bytes()).unwrap());
                 } else if cap.index == instruction_idx {
@@ -611,13 +694,11 @@ impl RegisterAnalyzer {
             .capture_index_for_name("instruction")
             .unwrap();
 
-        for (capture, _) in
-            cursor.captures(&instruction_query, tree.root_node(), content.as_bytes())
-        {
+        for query_match in cursor.matches(&instruction_query, tree.root_node(), content.as_bytes()) {
             let mut operation: Option<&str> = None;
             let mut instruction_node: Option<tree_sitter::Node> = None;
 
-            for cap in capture.captures {
+            for cap in query_match.captures {
                 if cap.index == op_idx {
                     operation = Some(cap.node.utf8_text(content.as_bytes()).unwrap());
                 } else if cap.index == instruction_idx {
@@ -653,7 +734,8 @@ impl RegisterAnalyzer {
                     let mut saw_reference = false;
                     for operand in operands.iter().skip(1) {
                         if let Some(kind_node) = operand.child(0) {
-                            if kind_node.kind() == "logictype" || kind_node.kind() == "identifier" {
+                            // Only check LogicType tokens, not identifiers (which could be aliases)
+                            if kind_node.kind() == "logictype" {
                                 let lt = kind_node.utf8_text(content.as_bytes()).unwrap_or("");
                                 // Record that a logic token was found; classify specifically if ReferenceId
                                 if lt.eq_ignore_ascii_case("ReferenceId") {
@@ -741,6 +823,10 @@ impl RegisterAnalyzer {
                 "l" => {
                     if tokens.len() >= 4 {
                         let target = tokens[1];
+                        // CRITICAL: Only process direct register names, skip aliases
+                        if !Self::is_register_name(target) {
+                            continue;
+                        }
                         let logic = tokens[3];
                         let usage = self.ensure_register_entry(target);
                         if logic.eq_ignore_ascii_case("ReferenceId") {
@@ -755,44 +841,53 @@ impl RegisterAnalyzer {
                         let dst = tokens[1];
                         let src = tokens[2];
                         
+                        // CRITICAL: Only process direct register names, skip aliases
+                        if !Self::is_register_name(dst) {
+                            continue;
+                        }
+                        
                         // Check if source is a LogicType or SlotLogicType identifier
                         if src.contains("LogicType.") || src.contains("SlotLogicType.") {
                             self.ensure_register_entry(dst).value_kind = ValueKind::LogicType;
-                        } else {
+                        } else if Self::is_register_name(src) {
+                            // Direct register-to-register move
                             let src_kind = self
                                 .register_usage
                                 .get(src)
                                 .map(|u| u.value_kind)
                                 .unwrap_or(ValueKind::Unknown);
                             self.ensure_register_entry(dst).value_kind = src_kind;
-                            // If src is an alias name (non-register) try to resolve to underlying register for propagation
-                            if !src.starts_with('r') {
-                                if let Some(reg_name) = self.alias_to_register.get(src).cloned() {
-                                    let alias_kind = self
-                                        .register_usage
-                                        .get(reg_name.as_str())
-                                        .map(|u| u.value_kind)
-                                        .unwrap_or(ValueKind::Unknown);
-                                    self.ensure_register_entry(dst).value_kind = alias_kind;
-                                    if alias_kind == ValueKind::Unknown {
-                                        // heuristic: prior ReferenceId load into reg_name
-                                        if content.lines().any(|l| {
-                                            l.contains(reg_name.as_str()) && l.contains("ReferenceId")
-                                        }) {
-                                            self.ensure_register_entry(dst).value_kind =
-                                                ValueKind::DeviceId;
-                                        }
-                                    }
-                                }
-                            }
                         }
+                        // Skip alias sources - tree-sitter handles those
                     }
                 }
                 "get" | "getd" | "pop" | "peek" => {
                     if tokens.len() >= 2 {
-                        let reg = tokens[1];
-                        let ru = self.ensure_register_entry(reg);
-                        // Ensure an assignment range exists; fabricate zero-length if needed
+                        let operand = tokens[1];
+                        
+                        eprintln!("DEBUG FALLBACK: Line {} op={} operand='{}' starts_with_r={}", 
+                            idx + 1, tokens[0], operand, operand.starts_with('r'));
+                        
+                        // CRITICAL: Only process register names (r0-r15, etc), never alias names
+                        // Aliases are compile-time only and shouldn't have runtime entries
+                        if !Self::is_register_name(operand) {
+                            eprintln!("DEBUG FALLBACK: Skipping non-register operand '{}'", operand);
+                            // This is an alias or other identifier - skip it entirely
+                            // The tree-sitter detection already handles aliases by resolving them to registers
+                            continue;
+                        }
+                        
+                        // Direct register name - check if tree-sitter already detected it
+                        if let Some(ru) = self.register_usage.get(operand) {
+                            if !ru.assignments.is_empty() {
+                                eprintln!("DEBUG FALLBACK: Tree-sitter already detected {} (skipping)", operand);
+                                continue; // Tree-sitter already detected this
+                            }
+                        }
+                        
+                        // Tree-sitter missed this direct register - add fallback assignment
+                        eprintln!("DEBUG FALLBACK: Adding fallback assignment for {}", operand);
+                        let ru = self.ensure_register_entry(operand);
                         if ru.assignments.is_empty() {
                             let fabricated = LspRange::new(
                                 LspPosition::new(idx as u32, 0),
@@ -800,14 +895,16 @@ impl RegisterAnalyzer {
                             );
                             ru.assignments.push(Range(fabricated));
                         }
-                        // Leave as Unknown - these operations can return any type of data
-                        // (device IDs, numbers, etc.) and we can't determine it statically
                     }
                 }
                 "add" | "sub" | "mul" | "div" | "mod" | "max" | "min" => {
                     // Arithmetic operations: check if any operand is a LogicType constant
                     if tokens.len() >= 3 {
                         let dst = tokens[1];
+                        // CRITICAL: Only process direct register names, skip aliases
+                        if !Self::is_register_name(dst) {
+                            continue;
+                        }
                         // If source contains LogicType, the operation produces a Number
                         let has_logictype = tokens[2..].iter().any(|t| t.contains("LogicType.") || t.contains("SlotLogicType."));
                         if has_logictype {
