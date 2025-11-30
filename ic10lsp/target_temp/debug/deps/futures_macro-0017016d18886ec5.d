@@ -1,9 +1,0 @@
-C:\Users\marka\Desktop\VS IC10 Extension Repo\Stationeers-ic10-main\FlorpyDorp IC10\ic10lsp\target_temp\debug\deps\futures_macro-0017016d18886ec5.d: C:\Users\marka\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\futures-macro-0.3.27\src\lib.rs C:\Users\marka\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\futures-macro-0.3.27\src\executor.rs C:\Users\marka\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\futures-macro-0.3.27\src\join.rs C:\Users\marka\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\futures-macro-0.3.27\src\select.rs C:\Users\marka\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\futures-macro-0.3.27\src\stream_select.rs
-
-C:\Users\marka\Desktop\VS IC10 Extension Repo\Stationeers-ic10-main\FlorpyDorp IC10\ic10lsp\target_temp\debug\deps\futures_macro-0017016d18886ec5.dll: C:\Users\marka\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\futures-macro-0.3.27\src\lib.rs C:\Users\marka\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\futures-macro-0.3.27\src\executor.rs C:\Users\marka\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\futures-macro-0.3.27\src\join.rs C:\Users\marka\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\futures-macro-0.3.27\src\select.rs C:\Users\marka\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\futures-macro-0.3.27\src\stream_select.rs
-
-C:\Users\marka\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\futures-macro-0.3.27\src\lib.rs:
-C:\Users\marka\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\futures-macro-0.3.27\src\executor.rs:
-C:\Users\marka\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\futures-macro-0.3.27\src\join.rs:
-C:\Users\marka\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\futures-macro-0.3.27\src\select.rs:
-C:\Users\marka\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\futures-macro-0.3.27\src\stream_select.rs:

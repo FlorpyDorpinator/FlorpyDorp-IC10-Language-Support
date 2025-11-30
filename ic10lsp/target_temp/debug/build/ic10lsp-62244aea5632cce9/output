@@ -1,4 +1,0 @@
-cargo:rerun-if-changed=../dev/extractor/StationeersDataExtractor/output/stationpedia.txt
-cargo:rerun-if-changed=../../../data/game-sources/Enums.json
-cargo:rerun-if-changed=../../../data/game-sources/ProgrammableChip.cs
-cargo:rerun-if-changed=../../../data/game-sources/Stationpedia.json
