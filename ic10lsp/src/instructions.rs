@@ -38,18 +38,18 @@ pub const INSTRUCTIONS: phf::Map<&'static str, InstructionSignature> = phf_map! 
     "alias" => InstructionSignature(&[Union(&[DataType::Name]), Union(&[DataType::Register, DataType::Device])]),
     "label" => InstructionSignature(&[Union(&[DataType::Name]), Union(&[DataType::Register, DataType::Device])]),
     "define" => InstructionSignature(&[Union(&[DataType::Name]), Union(&[DataType::Number, DataType::Register])]),
-    "bdns" => InstructionSignature(&[DEVICE,VALUE]),
-    "bdnsal" => InstructionSignature(&[DEVICE,VALUE]),
-    "bdse" => InstructionSignature(&[DEVICE,VALUE]),
-    "bdseal" => InstructionSignature(&[DEVICE,VALUE]),
-    "brdns" => InstructionSignature(&[DEVICE,VALUE]),
-    "brdse" => InstructionSignature(&[DEVICE,VALUE]),
+    "bdns" => InstructionSignature(&[Union(&[DataType::Register, DataType::Device, DataType::Number]),VALUE]),
+    "bdnsal" => InstructionSignature(&[Union(&[DataType::Register, DataType::Device, DataType::Number]),VALUE]),
+    "bdse" => InstructionSignature(&[Union(&[DataType::Register, DataType::Device, DataType::Number]),VALUE]),
+    "bdseal" => InstructionSignature(&[Union(&[DataType::Register, DataType::Device, DataType::Number]),VALUE]),
+    "brdns" => InstructionSignature(&[Union(&[DataType::Register, DataType::Device, DataType::Number]),VALUE]),
+    "brdse" => InstructionSignature(&[Union(&[DataType::Register, DataType::Device, DataType::Number]),VALUE]),
     "l" => InstructionSignature(&[REGISTER,Union(&[DataType::Register, DataType::Device, DataType::Number]),LOGIC_TYPE]),
     "lb" => InstructionSignature(&[REGISTER,VALUE,LOGIC_TYPE,BATCH_MODE_ONLY]),
     "ld" => InstructionSignature(&[REGISTER,Union(&[DataType::Register, DataType::Device, DataType::Number]),LOGIC_TYPE]),
     "lr" => InstructionSignature(&[REGISTER,Union(&[DataType::Register, DataType::Device, DataType::Number]),REAGENT_MODE,VALUE]),
     "ls" => InstructionSignature(&[REGISTER,Union(&[DataType::Register, DataType::Device, DataType::Number]),VALUE,SLOT_LOGIC_TYPE]),
-    "s" => InstructionSignature(&[DEVICE,LOGIC_TYPE,VALUE]),
+    "s" => InstructionSignature(&[Union(&[DataType::Register, DataType::Device, DataType::Number]),LOGIC_TYPE,VALUE]),
     "sb" => InstructionSignature(&[VALUE,LOGIC_TYPE,VALUE]),
     "bap" => InstructionSignature(&[VALUE,VALUE,VALUE,VALUE]),
     "bapal" => InstructionSignature(&[VALUE,VALUE,VALUE,VALUE]),
@@ -961,6 +961,13 @@ pub fn logic_type_name(value: i32) -> Option<&'static str> {
         }
     }
     None
+}
+
+/// Check if an identifier without a dot is a member of the _unnamed enum.
+/// Returns Some(value) if found, where value is the numeric constant.
+pub fn resolve_unnamed_enum_member(member: &str) -> Option<i32> {
+    let qualified = format!("_unnamed.{}", member);
+    ENUM_VALUE_BY_NAME.get(qualified.as_str()).copied()
 }
 
 /// Return iterator of (family, member_simple, qualified, value, description, deprecated)

@@ -1,0 +1,17 @@
+alias hash r1 
+
+alias cookie r1
+alias LED.Color r3
+alias hash $6A1AB
+move r2 3 
+move r3 3
+
+s $8f9dsf Color LED.Color
+
+
+
+sll r0 noteq
+
+
+alias LED.Color r3
+

@@ -753,6 +753,10 @@
     "named": true
   },
   {
+    "type": "rgas",
+    "named": false
+  },
+  {
     "type": "rmap",
     "named": false
   },
@@ -910,6 +914,10 @@
   },
   {
     "type": "tan",
+    "named": false
+  },
+  {
+    "type": "tau",
     "named": false
   },
   {
