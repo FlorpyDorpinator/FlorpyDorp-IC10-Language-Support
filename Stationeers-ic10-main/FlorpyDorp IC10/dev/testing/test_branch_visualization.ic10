@@ -1,0 +1,22 @@
+# Branch Visualization Test File
+# Press Ctrl+Alt+B to toggle branch visualization
+
+alias battery d0
+alias furnace d1
+
+start:
+l r0 battery Charge
+brgtz r0 3              # Forward branch: skip to charge_ok
+s furnace On 0          # Turn off if no charge
+s furnace Setting 0
+jr 5                    # Skip to end
+
+charge_ok:
+s furnace On 1          # Turn on with charge
+l r1 battery Ratio
+mul r2 r1 100           # Calculate percentage
+s furnace Setting r2
+
+end:
+yield
+jr -13                  # Loop back to start

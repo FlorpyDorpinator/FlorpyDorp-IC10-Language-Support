@@ -65,6 +65,36 @@ Completions prioritize items you've already used:
 
 ---
 
+## 🎯 Branch Visualization
+
+![Branch Visualization Demo](images/branch-visualization-demo.gif)
+
+Visualize control flow with color-coded branch indicators:
+
+**Visual Indicators:**
+- **Arrows**: ⇑ (upward) / ⇓ (downward) at branch source lines
+- **Dots**: ● marking branch target lines
+- **Color Coding**: Each branch gets a unique color (yellow, purple, cyan, orange, pink, lime)
+- **Ghost Text**: Shows target line and code preview at end of source line
+  - Example: ` ⇑ line 17: l r0 d0 On` (shows you're branching to line 17)
+
+**Smart Highlighting:**
+- **Source lines**: Lighter background (shows where branch originates)
+- **Target lines**: Darker background (shows where branch lands)
+- **Split highlights**: When multiple branches share a line, each segment shows correct opacity
+- **Depth assignment**: Shorter branches appear leftmost, longer branches rightmost
+
+**Perfect for:**
+- Understanding complex loops and conditionals
+- Debugging branch logic
+- Visualizing state machines
+- Learning IC10 control flow patterns
+
+**Toggle on/off:**  
+Press **Ctrl+Alt+B** to show/hide branch visualization anytime.
+
+---
+
 ## 💡 Inlay Hints (Shadow Text)
 
 ![Inlay Hints Demo](images/inlay-hints-demo.gif)
@@ -288,6 +318,7 @@ Press **Ctrl+Alt+T** to switch between the immersive Stationeers Editor Theme an
 - **Ctrl+Alt+I** - Suppress all register diagnostics (adds ignore comments)
 - **Ctrl+Alt+W** - Add #IgnoreRegisterWarnings directive
 - **Ctrl+Alt+T** - Toggle Stationeers theme on/off
+- **Ctrl+Alt+B** - Show/hide branch visualization anytime.
 
 ---
 
