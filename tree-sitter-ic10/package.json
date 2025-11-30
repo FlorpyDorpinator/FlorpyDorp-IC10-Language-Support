@@ -1,4 +1,9 @@
 {
+  "name": "tree-sitter-ic10",
+  "version": "0.5.2",
+  "scripts": {
+    "generate": "node generate-grammar.js && npx tree-sitter generate"
+  },
   "devDependencies": {
     "tree-sitter-cli": "^0.25.10"
   }

@@ -941,6 +941,45 @@ impl LanguageServer for Backend {
                 });
             }
         }
+
+        // Show inlay hints for _unnamed enum members (NotEquals, Equals, Greater, Less)
+        let mut cursor_ident = QueryCursor::new();
+        let ident_query = Query::new(tree_sitter_ic10::language(), "(identifier)@id").unwrap();
+
+        for (cap, _) in cursor_ident.captures(&ident_query, tree.root_node(), document.content.as_bytes()) {
+            let ident_node = cap.captures[0].node;
+            let ident_text = ident_node.utf8_text(document.content.as_bytes()).unwrap();
+            
+            // Check if this identifier is a _unnamed enum member
+            if let Some(value) = crate::instructions::resolve_unnamed_enum_member(ident_text) {
+                let Some(line_node) = ident_node.find_parent("line") else {
+                    continue;
+                };
+
+                let endpos = if let Some(newline) =
+                    line_node.query("(newline)@x", document.content.as_bytes())
+                {
+                    Position::from(newline.range().start_point)
+                } else if let Some(instruction) =
+                    line_node.query("(instruction)@x", document.content.as_bytes())
+                {
+                    Position::from(instruction.range().end_point)
+                } else {
+                    Position::from(ident_node.range().end_point)
+                };
+
+                ret.push(InlayHint {
+                    position: endpos.into(),
+                    label: InlayHintLabel::String(format!(" → {}", value)),
+                    kind: Some(InlayHintKind::TYPE),
+                    text_edits: None,
+                    tooltip: Some(tower_lsp::lsp_types::InlayHintTooltip::String(format!("Constant: {} = {}", ident_text, value))),
+                    padding_left: None,
+                    padding_right: None,
+                    data: None,
+                });
+            }
+        }
         // Persistent parameter hint: when only opcode is typed (no operands yet),
         // show the remaining signature as faint inline text after the opcode.
         // This helps the user until they type the first operand.
@@ -1197,6 +1236,9 @@ impl LanguageServer for Backend {
                         } else {
                             SemanticTokenType::VARIABLE
                         }
+                    } else if ic10lsp::instructions::resolve_unnamed_enum_member(ident_text).is_some() {
+                        // _unnamed enum members (NotEquals, Equals, Greater, Less) are numeric constants
+                        SemanticTokenType::NUMBER
                     } else {
                         SemanticTokenType::VARIABLE
                     }
@@ -1597,7 +1639,7 @@ impl LanguageServer for Backend {
             }
             let prefix_lower = prefix.trim_start().to_ascii_lowercase();
             let start_entries = completions.len();
-            for (_family, member, qualified, value, desc, deprecated) in
+            for (family, member, qualified, value, desc, deprecated) in
                 instructions::all_enum_entries()
             {
                 let q_lower = qualified.to_ascii_lowercase();
@@ -1606,8 +1648,15 @@ impl LanguageServer for Backend {
                     || q_lower.starts_with(&prefix_lower)
                     || (!prefix_lower.contains('.') && member_lower.starts_with(&prefix_lower))
                 {
+                    // For _unnamed enum members, show just the member name without the prefix
+                    let display_label = if family == "_unnamed" {
+                        member.to_string()
+                    } else {
+                        qualified.to_string()
+                    };
+                    
                     completions.push(CompletionItem {
-                        label: qualified.to_string(),
+                        label: display_label.clone(),
                         label_details: Some(CompletionItemLabelDetails {
                             detail: Some(format!("= {}", value)),
                             description: None,
@@ -1619,6 +1668,7 @@ impl LanguageServer for Backend {
                             Some(Documentation::String(desc.to_string()))
                         },
                         deprecated: Some(deprecated),
+                        insert_text: Some(display_label),
                         ..Default::default()
                     });
                 }
@@ -3114,6 +3164,23 @@ impl LanguageServer for Backend {
         let name = node.utf8_text(document.content.as_bytes()).unwrap();
         match node.kind() {
             "identifier" => {
+                // Check for _unnamed enum members first (NotEquals, Equals, Greater, Less)
+                if let Some(value) = instructions::resolve_unnamed_enum_member(name) {
+                    let mut parts: Vec<MarkedString> = Vec::new();
+                    parts.push(MarkedString::LanguageString(LanguageString {
+                        language: "ic10".to_string(),
+                        value: format!("{} = {}", name, value),
+                    }));
+                    parts.push(MarkedString::String(format!(
+                        "**Constant**\n\nNumeric value: `{}`\n\nUsed for comparison operations.",
+                        value
+                    )));
+                    return Ok(Some(Hover {
+                        contents: HoverContents::Array(parts),
+                        range: Some(Range::from(node.range()).into()),
+                    }));
+                }
+
                 // Enum hover: show value and description for fully-qualified enums
                 if name.contains('.') {
                     if let Some((canonical, value, desc, deprecated)) =
@@ -3959,6 +4026,10 @@ impl Backend {
                                 let exact_flags = classify_exact_keyword(ident);
                                 if exact_flags.any() {
                                     exact_flags.to_union()
+                                } else if let Some(_) = instructions::resolve_unnamed_enum_member(ident) {
+                                    // Identifier is a member of the _unnamed enum (like NotEquals, Equals, etc.)
+                                    // Treat it as a numeric constant
+                                    instructions::Union(&[DataType::Number])
                                 } else {
                                     let ci_flags = classify_ci_keyword(ident);
                                     if ci_flags.any() {

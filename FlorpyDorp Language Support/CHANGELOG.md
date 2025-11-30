@@ -1,6 +1,29 @@
 ### Changelog Beginning 11-01-2025
 
-## [2.1.5] - 2025-11-29
+## [2.1.6] - 2025-11-30 The "Auto-Generation" Update
+
+### 🎯 Major Infrastructure Improvements
+- **Fully Auto-Generated Grammar**: tree-sitter grammar now auto-generated from game source files
+  - Extracts **150 instructions** from ProgrammableChip.cs (50+ more than hardcoded grammar)
+  - Extracts **257 LogicTypes** + **31 SlotLogicTypes** + **4 BatchModes** from Enums.json
+  - Extracts **9 script constants** from Stationpedia.json (nan, pinf, ninf, pi, tau, deg2rad, rad2deg, epsilon, rgas)
+  - Grammar.js now regenerates automatically on build
+  - Zero maintenance burden - always in sync with game data
+
+### 🐛 Bug Fixes
+- **Fixed Missing Constants**: Added `tau` and `rgas` constants (were missing from hardcoded grammar)
+- **Fixed Missing Instructions**: Auto-generation discovered 50+ missing instructions including:
+  - Various branch instructions (bdnsal, bdseal, brdns, brdse, etc.)
+  - Label and define directives
+  - Many conditional branches and operations
+- **Fixed Missing Slot Types**: Completed SlotLogicTypes including FilterType, Quantity, Efficiency, Health, Growth, etc.
+
+### 🔧 Build System
+- Added automated grammar regeneration to build task
+- Single command now regenerates grammar + rebuilds LSP + copies binary
+- Comprehensive documentation in AUTO-GENERATION.md
+
+## [2.1.5] - 2025-11-29 The "Branch Visualizer" Update
 
 ### ✨ New Features
 - **Branch Visualization**: Visual indicators for relative branch instructions (jr, breq*, bne*, blt*, bgt*, etc.)
