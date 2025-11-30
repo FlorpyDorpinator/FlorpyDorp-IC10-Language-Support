@@ -15,10 +15,10 @@ Before you start, make sure you have:
 ### Step 1: Make Your Changes
 
 Edit any files you need to change:
-- Extension code in `Stationeers-ic10-main/FlorpyDorp IC10/FlorpyDorp Language Support/src/`
-- LSP code in `Stationeers-ic10-main/FlorpyDorp IC10/ic10lsp/src/`
-- Themes in `Stationeers-ic10-main/FlorpyDorp IC10/FlorpyDorp Language Support/themes/`
-- Grammar in `Stationeers-ic10-main/FlorpyDorp IC10/tree-sitter-ic10/grammar.js`
+- Extension code in `FlorpyDorp Language Support/src/`
+- LSP code in `ic10lsp/src/`
+- Themes in `FlorpyDorp Language Support/themes/`
+- Grammar in `tree-sitter-ic10/grammar.js`
 
 ### Step 2: Update Version Number
 
