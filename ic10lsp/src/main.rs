@@ -1428,9 +1428,7 @@ impl LanguageServer for Backend {
                     DataType::SlotLogicType => {
                         instructions::SLOT_TYPE_DOCS
                     }
-                    DataType::BatchMode => {
-                        instructions::BATCH_MODE_DOCS
-                    }
+                    // BatchMode no longer shows completions - only numeric values (0-3) are accepted
                     _ => {
                         continue;
                     }
@@ -3301,15 +3299,7 @@ impl LanguageServer for Backend {
                         range: Some(Range::from(node.range()).into()),
                     }));
                 }
-                if let Some(doc) = instructions::BATCH_MODE_DOCS.get(name) {
-                    return Ok(Some(Hover {
-                        contents: HoverContents::Array(vec![MarkedString::String(format!(
-                            "# `{}` (`batchMode`)\n{}",
-                            name, doc
-                        ))]),
-                        range: Some(Range::from(node.range()).into()),
-                    }));
-                }
+                // BatchMode no longer supports named strings - only numeric values (0-3)
                 if let Some(definition_data) = type_data.aliases.get(name) {
                     // Check if this is a register alias and provide value tracking info
                     if let AliasValue::Register(_) = &definition_data.value {
@@ -3470,7 +3460,7 @@ impl LanguageServer for Backend {
                             match typ {
                                 DataType::LogicType => instructions::LOGIC_TYPE_DOCS.get(name),
                                 DataType::SlotLogicType => instructions::SLOT_TYPE_DOCS.get(name),
-                                DataType::BatchMode => instructions::BATCH_MODE_DOCS.get(name),
+                                // BatchMode no longer supports named strings - only numeric values (0-3)
                                 _ => None,
                             }
                             .unwrap_or(&"")
@@ -4645,7 +4635,8 @@ fn classify_exact_keyword(ident: &str) -> KeywordFlags {
     KeywordFlags::from_bools(
         instructions::LOGIC_TYPES.contains(ident),
         instructions::SLOT_LOGIC_TYPES.contains(ident),
-        instructions::BATCH_MODES.contains(ident),
+        // BatchMode no longer accepts named strings - only numeric values (0-3)
+        false,
         instructions::REAGENT_MODES.contains(ident),
     )
 }
@@ -4658,9 +4649,8 @@ fn classify_ci_keyword(ident: &str) -> KeywordFlags {
         instructions::SLOT_LOGIC_TYPES
             .iter()
             .any(|x| x.eq_ignore_ascii_case(ident)),
-        instructions::BATCH_MODES
-            .iter()
-            .any(|x| x.eq_ignore_ascii_case(ident)),
+        // BatchMode no longer accepts named strings - only numeric values (0-3)
+        false,
         instructions::REAGENT_MODES
             .iter()
             .any(|x| x.eq_ignore_ascii_case(ident)),

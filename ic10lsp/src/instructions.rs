@@ -30,8 +30,8 @@ const DEVICE: Union = Union(&[DataType::Device]);
 const VALUE: Union = Union(&[DataType::Register, DataType::Number]);
 const LOGIC_TYPE: Union = Union(&[DataType::LogicType]);
 const SLOT_LOGIC_TYPE: Union = Union(&[DataType::SlotLogicType]);
-const BATCH_MODE: Union = Union(&[DataType::BatchMode, DataType::Number, DataType::Register]);
-const BATCH_MODE_ONLY: Union = Union(&[DataType::BatchMode]);
+const BATCH_MODE: Union = Union(&[DataType::Number, DataType::Register]);
+const BATCH_MODE_ONLY: Union = Union(&[DataType::Number, DataType::Register]);
 const REAGENT_MODE: Union = Union(&[DataType::ReagentMode, DataType::Number, DataType::Register]);
 
 pub const INSTRUCTIONS: phf::Map<&'static str, InstructionSignature> = phf_map! {
@@ -528,9 +528,7 @@ pub fn logictype_candidates(text: &str) -> Vec<DataType> {
     if SLOT_LOGIC_TYPES.contains(text) {
         ret.push(DataType::SlotLogicType);
     }
-    if BATCH_MODES.contains(text) {
-        ret.push(DataType::BatchMode);
-    }
+    // BatchMode no longer accepts named strings - only numeric values (0-3)
     if REAGENT_MODES.contains(text) {
         ret.push(DataType::ReagentMode);
     }
@@ -541,7 +539,7 @@ pub fn logictype_candidates(text: &str) -> Vec<DataType> {
 #[allow(dead_code)]
 pub const INSTRUCTION_DOCS: phf::Map<&'static str, &'static str> = phf_map! {
     "l" => "Loads device var to register.",
-    "lb" => "Loads var from all output network devices with provided type hash using the provide batch mode. Average (0), Sum (1), Minimum (2), Maximum (3). Can use either the word, or the number.",
+    "lb" => "Loads var from all output network devices with provided type hash using the provided batch mode. Use numeric value: 0 (Average), 1 (Sum), 2 (Minimum), 3 (Maximum).",
     "s" => "Stores register value to var on device.",
     "sb" => "Stores register value to var on all output network devices with provided type hash.",
     "ls" => "Loads slot var on device to register.",
@@ -673,10 +671,10 @@ pub const INSTRUCTION_DOCS: phf::Map<&'static str, &'static str> = phf_map! {
     "ss" => "Stores register value to device stored in a slot LogicSlotType on device.",
     "rmap" => "Given a reagent hash, store the corresponding prefab hash that the device expects to fulfill the reagent requirement. For example, on an autolathe, the hash for Iron will store the hash for ItemIronIngot.",
     "sbs" => "Stores register value to LogicSlotType on all output network devices with provided type hash in the provided slot.",
-    "lbn" => "Loads var from all output network devices with provided type hash using the provide batch mode. Average (0), Sum (1), Minimum (2), Maximum (3). Can use either the word, or the number.",
+    "lbn" => "Loads var from all output network devices with provided type hash using the provided batch mode. Use numeric value: 0 (Average), 1 (Sum), 2 (Minimum), 3 (Maximum).",
     "sbn" => "Stores register value to var on all output network devices with provided type hash.",
-    "lbns" => "Loads slot var from all output network devices with provided type hash using the provided batch mode, with specific slot filtering. Average (0), Sum (1), Minimum (2), Maximum (3). Can use either the word, or the number.",
-    "lbs" => "Loads slot var from all output network devices with provided type hash in the provided slot using the provided batch mode. Average (0), Sum (1), Minimum (2), Maximum (3). Can use either the word, or the number.",
+    "lbns" => "Loads slot var from all output network devices with provided type hash using the provided batch mode, with specific slot filtering. Use numeric value: 0 (Average), 1 (Sum), 2 (Minimum), 3 (Maximum).",
+    "lbs" => "Loads slot var from all output network devices with provided type hash in the provided slot using the provided batch mode. Use numeric value: 0 (Average), 1 (Sum), 2 (Minimum), 3 (Maximum).",
     "not" => "Register = 1 if a is zero, otherwise 0 (logical NOT operation)",
     "sla" => "Register = a shifted left by b bits (arithmetic shift, maintains sign)",
     "sll" => "Register = a shifted left by b bits (logical shift, fills with zeros)",
