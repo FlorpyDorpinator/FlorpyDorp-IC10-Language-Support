@@ -1,0 +1,57 @@
+# v2.1.0 Feature Test Script
+# Test all new features before release
+
+# ===== TEST 1: SlotLogicType Completions (31 types) =====
+# Type "ls r0 d0 0 " and verify you see all 31 SlotLogicTypes:
+# Occupant, OccupantHash, Charge, ChargeRatio, etc.
+ls r0 d0 0 
+
+# ===== TEST 2: Label Completions (only labels, no defines/aliases) =====
+# Type "j " and verify ONLY labels appear (start, loop, end)
+# Should NOT show defines like Furnace or aliases like temp
+define Furnace HASH("StructureFurnace")
+alias temp r0
+start:
+move r1 5
+loop:
+sub r1 r1 1
+bgtz r1 
+# ^ Type "loop" after "bgtz r1 " - should complete to loop
+
+# ===== TEST 3: HASH(" Suggestions =====
+# Type "lbn r0 " - should see HASH(" at top of completions
+lbn r0 
+
+# Type HASH(" and start typing "furn" - should see device completions
+# lbn r1 HASH("
+
+# ===== TEST 4: BatchMode Strict (4 modes only) =====
+# Type "lbn r2 HASH("StructureFurnace") HASH("StructureFurnace") Combustion "
+# Should see ONLY: Average, Sum, Minimum, Maximum (4 items)
+lbn r2 HASH("StructureFurnace") HASH("StructureFurnace") Combustion 
+
+# ===== TEST 5: Signature Hover Parameter Highlighting =====
+# LINE 0: Type the full instruction and watch blue highlight move through params
+lbn r3 HASH("Fertilizer") HASH("Fertilizer") Acceleration Average
+
+# LINE 1: Same test - verify highlighting works correctly on line 2+
+lbn r4 HASH("Fertilizer") HASH("Fertilizer") Acceleration Sum
+
+# LINE 2: Third line test
+lbn r5 HASH("Fertilizer") HASH("Fertilizer") Acceleration Minimum
+
+# ===== TEST 6: All Features Together =====
+# Complex instruction with signature hover, completions, and strict modes
+lbns r6 HASH("Fertilizer") HASH("CustomName") 0 Charge Average
+
+end:
+# Type "j " here and verify only labels (start, loop, end) appear
+j 
+
+# ===== EXPECTED RESULTS =====
+# ✅ TEST 1: 31 SlotLogicType completions (not 18)
+# ✅ TEST 2: Branch instructions show ONLY labels
+# ✅ TEST 3: HASH(" appears for batch instructions
+# ✅ TEST 4: BatchMode shows ONLY 4 modes (no registers)
+# ✅ TEST 5: Blue highlight tracks current parameter on ALL lines
+# ✅ TEST 6: All features work together seamlessly
