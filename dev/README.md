@@ -6,73 +6,42 @@ This directory contains development tools and test files for the IC10 Language S
 
 ```
 dev/
-├── executables/          # Platform-specific binaries (ignored by git)
-│   ├── *.exe            # Windows executables
-│   └── *.pdb            # Debug symbols
-├── src-utilities/        # Rust source files for utility programs
-│   ├── parse_stationpedia.rs
-│   └── generate_comprehensive_mappings.rs
-├── data/                 # Data files and resources
-│   └── stationpedia_correct_hashes.txt
-├── testing/             # Test files and test modules
-│   ├── *.ic10           # IC10 test scripts
-│   └── *.rs             # Rust test modules
-└── gamedata-mods/       # BepInEx mods for Stationeers integration
-    ├── IC10-Extender/   # IC10 language extensions
-    └── xml-generator/   # Game data extraction utilities
+├── extractor/                # Python utilities for extracting game data
+│   └── StationeersDataExtractor/
+│       ├── generate_hashes.py    # Extracts device hashes from game files
+│       ├── input/                # Place english.xml here
+│       └── output/
+│           └── stationpedia.txt  # Generated device hash mappings
+├── testing/                      # Test files and test modules
+│   ├── *.ic10                    # IC10 test scripts
+│   └── *.rs                      # Rust test modules
+└── requirements.txt              # Python dependencies for extractor
 ```
 
-## Data Processing Utilities
+## Data Processing Pipeline
 
-### What These Utilities Do
+### How Device Data is Generated
 
-#### `parse_stationpedia.rs`
-- **Input**: `stationpedia.txt` (format: `hash_value device_name`)
-- **Output**: Rust PHF maps for device hash lookups
-- **Purpose**: Generates complete device mappings for the language server
-- **Usage**: Run after Stationeers game updates to refresh all device hashes
+1. **Extract from Game**: Run `generate_hashes.py` to extract device hashes from Stationeers' `english.xml`
+2. **Generate Code**: The `ic10lsp/build.rs` script automatically reads `stationpedia.txt` and generates Rust code
+3. **Compile LSP**: Device mappings are compiled directly into the language server
 
-#### `generate_comprehensive_mappings.rs`
-- **Input**: `stationpedia.txt`
-- **Output**: Curated Structure* name mappings with comments
-- **Purpose**: Maps user-friendly names to internal Structure* identifiers
-- **Usage**: Manual curation of ~60 common devices for better UX
+**Data Pipeline**: `english.xml` → `generate_hashes.py` → `stationpedia.txt` → `build.rs` → LSP binary
 
-**Data Pipeline**: `stationpedia.txt` → utilities → `device_hashes.rs` → LSP server
+### Updating Device Hashes
 
-## Building Development Tools
-
-The executables in the `executables/` directory are built from Rust source files located in the `src-utilities/` directory.
-
-### Prerequisites
-
-- Rust toolchain (install from [rustup.rs](https://rustup.rs/))
-- Cargo (included with Rust)
-
-### Build Instructions
-
-#### 1. Build parse_stationpedia.exe
-```bash
-# From repository root
-cd anex-ic10/dev/src-utilities/
-rustc parse_stationpedia.rs -o ../executables/parse_stationpedia.exe
-```
-
-#### 2. Build generate_comprehensive_mappings.exe
-```bash
-# From repository root
-cd anex-ic10/dev/src-utilities/
-rustc generate_comprehensive_mappings.rs -o ../executables/generate_comprehensive_mappings.exe
-```
-
-### Alternative: Using Cargo
-If you prefer using Cargo, you can create a temporary `Cargo.toml` file:
+When Stationeers releases new devices:
 
 ```bash
-# From src-utilities/ directory
-cargo init --name dev_tools
-# Move .rs files to src/
-# Build with: cargo build --release
+# 1. Navigate to extractor directory
+cd dev/extractor/StationeersDataExtractor
+
+# 2. Run the Python script (will prompt to copy game files)
+python generate_hashes.py
+
+# 3. Rebuild the language server (automatic via build.rs)
+cd ../../../ic10lsp
+cargo build
 ```
 
 ## Test Files
@@ -113,10 +82,10 @@ npm test                     # Run VS Code extension tests (from anex-ic10-langu
 
 ## Development Workflow
 
-1. **Add new test cases**: Create `.ic10` files demonstrating features
-2. **Test manually**: Use VS Code to verify language server behavior
-3. **Build tools**: Rebuild executables when source files change
-4. **Update tests**: Keep test files synchronized with new features
+1. **Update game data**: Run `generate_hashes.py` after Stationeers updates
+2. **Rebuild LSP**: Changes to `stationpedia.txt` trigger automatic rebuild via `build.rs`
+3. **Add test cases**: Create `.ic10` files demonstrating features
+4. **Test manually**: Use VS Code to verify language server behavior
 
 ## Contributing
 
@@ -129,12 +98,12 @@ When adding new features:
 
 ## Notes
 
-- **Executables are ignored**: Only source files are version controlled
-- **Platform-specific**: Built executables work only on the target platform
-- **Rebuild required**: Regenerate executables after source changes
+- **Automatic code generation**: Device mappings are generated at compile-time by `build.rs`
+- **Python required**: Install dependencies with `pip install -r requirements.txt`
+- **Game file access**: `generate_hashes.py` can auto-copy from Stationeers install directory
 - **Test coverage**: Aim for comprehensive test coverage of language server features
 
 ---
 
-**Last Updated**: 2025-01-25
+**Last Updated**: 2025-11-29
 **Maintained By**: IC10 Language Server Development Team
