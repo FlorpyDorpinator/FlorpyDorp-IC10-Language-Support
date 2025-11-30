@@ -88,7 +88,7 @@ When Stationeers releases an update with new logic types or instructions:
 
 Copy the new files to the LSP data folder:
 ```bash
-cd Stationeers-ic10-main/FlorpyDorp IC10/ic10lsp/data/game-sources/
+cd ic10lsp/data/game-sources/
 
 # Replace with new versions
 cp /path/to/new/Enums.json .
