@@ -1498,8 +1498,8 @@ export function activate(context: vscode.ExtensionContext) {
         // All decorations use same width for consistent alignment
         
         branches.forEach((branch, branchIndex) => {
-            const depth = branchDepths.get(branchIndex) || 0;
-            const color = branchColors[depth % branchColors.length];
+            // Use branchIndex for color (not depth) - colors match the highlight colors
+            const color = branchColors[branchIndex % branchColors.length];
             const isUpward = branch.offset < 0;
             
             // Arrow at source line (in before decoration) - using double-line arrows
