@@ -2,7 +2,7 @@
 ================================
 
 ## Advanced IC10 editing, documentation, device hashing, and completion tools for Stationeers. 
-###Code in STYLE!
+### Code in STYLE!
 
  ### FlorpyDorp IC10 L.S. is a complete and actively maintained IC10 extension for VS Code. It provides deep IC10 language intelligence, rich hover documentation, expanded tokens, code diagnostics, device hashing tools, and quality-of-life enhancements built on years of community work.
 
