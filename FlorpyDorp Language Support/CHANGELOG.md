@@ -1,5 +1,13 @@
 ### Changelog Beginning 11-01-2025
 
+## [2.1.8] - 2025-11-30 The "Branch Color Fix" Update
+
+### 🐛 Bug Fixes
+- **Fixed Branch Visualization Colors**: Arrows (⇑/⇓) and dots (●) now correctly match their corresponding branch highlight colors
+  - Previously used depth-based colors instead of branch-specific colors
+  - Each branch's arrow, dot, and highlight now use the same color from the palette
+  - Improves visual clarity when identifying which branches connect to which targets
+
 ## [2.1.7] - 2025-11-30 The "BatchMode Validation" Update
 
 ### 🐛 Bug Fixes

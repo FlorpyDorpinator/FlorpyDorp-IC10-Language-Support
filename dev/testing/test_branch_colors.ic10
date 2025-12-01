@@ -1,0 +1,135 @@
+# Branch Color Visualization Test
+# This file tests the branch visualization with many overlapping branches
+# Use Ctrl+Alt+B to toggle visualization
+
+alias sensor d0
+alias display d1
+
+# Test 1: Short upward branch (Gold - color 0)
+move r0 10
+breq r0 1 -1
+
+# Test 2: Medium downward branch (Purple - color 1)
+move r1 20
+bne r1 5 3
+add r1 r1 1
+mul r1 r1 2
+# Target for Test 2
+
+# Test 3: Long upward branch (Sky Blue - color 2)
+move r2 30
+blt r2 100 -5
+
+# Test 4: Very short forward branch (Hot Pink - color 3)
+move r3 40
+bgtz r3 1
+# Target for Test 4
+
+# Test 5: Overlapping backward branch (Lime Green - color 4)
+move r4 50
+brgez r4 -3
+
+# Test 6: Multiple branches to same target
+move r5 60
+breqz r5 5    # Branch forward 5 lines
+move r6 70
+brnez r6 4    # Branch forward 4 lines
+move r7 80
+brlt r7 100 3 # Branch forward 3 lines
+sub r8 r7 r6
+add r9 r8 r5
+# Shared target for branches 6, 7, 8
+
+# Test 7: Long backward branch (Dark Orange - color 5)
+l r10 sensor Temperature
+bge r10 500 -20
+
+# Test 8: Nested branches
+move r11 100
+breq r11 100 2  # Skip the inner branch
+bne r11 200 -1  # Inner loop
+# Continue after nested
+
+# Test 9: Complex overlapping pattern
+move r12 1
+move r13 2
+move r14 3
+breq r12 1 5    # Jump to marker A
+brne r13 2 4    # Jump near marker A
+blt r14 10 3    # Jump before marker A
+add r15 r12 r13
+mul r15 r15 r14
+# Marker A - multiple branches converge here
+
+# Test 10: Chain of forward branches
+bgtz r0 2
+j 1
+# First target
+blez r1 2
+j 1
+# Second target
+breqz r2 2
+j 1
+# Third target
+
+# Test 11: Backward branches with different spans
+move r0 0
+move r1 1
+move r2 2
+# Loop start
+add r0 r0 1
+blt r0 10 -1   # Tiny loop
+add r1 r1 r0
+blt r1 50 -3   # Small loop
+mul r2 r2 2
+blt r2 1000 -5 # Medium loop
+
+# Test 12: Forward and backward from same line
+l r3 sensor Pressure
+blt r3 50 -2    # Jump back
+bgt r3 200 2    # Jump forward
+move r4 100
+# Forward target
+
+# Test 13: Many branches to single point
+move r5 1
+move r6 2
+move r7 3
+move r8 4
+breq r5 1 6
+breq r6 2 5
+breq r7 3 4
+breq r8 4 3
+move r9 999
+s display Setting r9
+# Convergence point - all 4 branches land here
+
+# Test 14: Alternating up/down pattern
+yield
+breq r0 0 2
+jr -2
+yield
+bne r1 1 2
+jr -2
+yield
+blt r2 10 2
+jr -2
+yield
+
+# Test 15: Branch over branch
+move r10 42
+bge r10 50 8   # Long jump over everything
+move r11 1
+breq r11 1 4   # Medium jump
+move r12 2
+bne r12 3 2    # Short jump
+move r13 3
+# Short target
+add r14 r12 r13
+# Medium target
+mul r15 r11 r14
+# Long target
+
+# End marker
+s display Setting 0
+hcf
