@@ -1,6 +1,14 @@
 ### Changelog Beginning 11-01-2025
 
-## [2.1.9] - 2025-12-1
+## [2.1.10] - 2025-12-02
+### 🐛 Bug Fixes
+- **Fixed README Image Display**: All images now use absolute GitHub raw URLs for proper VS Code Marketplace display
+  - Converted 9 image references from relative paths to `https://raw.githubusercontent.com/.../images/filename`
+  - Fixed device-hash-hints.png reference to use device-hash-demo.gif (original file didn't exist)
+  - Images now display correctly in VS Code Marketplace listings
+
+
+## [2.1.9] - 2025-12-01
 ### 🐛 Bug Fixes
 - **Fixed ReadMe image display issue
 
