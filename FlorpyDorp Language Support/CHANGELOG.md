@@ -1,5 +1,10 @@
 ### Changelog Beginning 11-01-2025
 
+## [2.1.9] - 2025-12-1
+### 🐛 Bug Fixes
+- **Fixed ReadMe image display issue
+
+
 ## [2.1.8] - 2025-11-30 The "Branch Color Fix" Update
 
 ### 🐛 Bug Fixes
