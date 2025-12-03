@@ -4,3 +4,8 @@ define Test3 HASH("Volume Pump")
 define Test4 HASH("Daylight Sensor")
 define Test5 -321403609
 define Test6 1076425094
+
+define LogicMemory -851746783
+
+define SolarSensor 1076425094
+define SolarSensor 1076425094

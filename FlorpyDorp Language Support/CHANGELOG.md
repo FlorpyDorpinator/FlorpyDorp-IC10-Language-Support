@@ -1,5 +1,14 @@
 ### Changelog Beginning 11-01-2025
 
+## [2.1.11] - 2025-12-02
+### 🐛 Bug Fixes
+- **Fixed Inlay Hints Auto-Refresh**: Numeric device hash inlay hints now update automatically
+  - Inlay hints refresh immediately when typing or editing documents
+  - Inlay hints appear instantly when opening files from explorer
+  - No longer requires window reload to see device name hints for numeric hashes
+  - Improves real-time feedback for device hash recognition
+
+
 ## [2.1.10] - 2025-12-02
 ### 🐛 Bug Fixes
 - **Fixed README Image Display**: All images now use absolute GitHub raw URLs for proper VS Code Marketplace display
