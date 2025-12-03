@@ -648,6 +648,9 @@ impl LanguageServer for Backend {
         self.update_content(params.text_document.uri.clone(), params.text_document.text)
             .await;
         
+        // Request inlay hint refresh to show device hashes in newly opened file
+        let _ = self.client.send_request::<tower_lsp::lsp_types::request::InlayHintRefreshRequest>(()).await;
+        
         // Check if we have too many files open and warn once
         {
             let files = self.files.read().await;
@@ -677,6 +680,9 @@ impl LanguageServer for Backend {
             self.update_content(params.text_document.uri.clone(), change.text)
                 .await;
         }
+        
+        // Request inlay hint refresh to show updated device hashes
+        let _ = self.client.send_request::<tower_lsp::lsp_types::request::InlayHintRefreshRequest>(()).await;
         
         // Debounce diagnostics on change - only run if enough time has passed
         let should_run = {
