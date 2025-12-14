@@ -1,0 +1,5 @@
+move r0 LogicType.RatioOxygen
+l r1 d0 r0
+
+bdns d0 ra 
+
