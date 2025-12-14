@@ -117,6 +117,16 @@
                 "command": "ic10.toggleBranchVisualization",
                 "title": "IC10: Toggle Branch Visualization",
                 "description": "Show/hide visual indicators for relative branch targets"
+            },
+            {
+                "command": "ic10.toggleBenchmarking",
+                "title": "IC10: Toggle Performance Benchmarking",
+                "description": "Enable/disable performance statistics collection"
+            },
+            {
+                "command": "ic10.showBenchmarkStats",
+                "title": "IC10: Show Performance Stats",
+                "description": "Display collected performance benchmarking statistics"
             }
         ],
         "keybindings": [

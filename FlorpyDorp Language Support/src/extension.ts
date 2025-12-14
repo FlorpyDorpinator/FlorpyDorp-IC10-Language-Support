@@ -1073,6 +1073,60 @@ export function activate(context: vscode.ExtensionContext) {
     const branchDecorations: vscode.TextEditorDecorationType[] = [];
     let svgTempDir: string | undefined;
     
+    // Performance optimization: debouncing and caching
+    let updateTimeout: NodeJS.Timeout | undefined;
+    let lastDocumentVersion: number | undefined;
+    let cachedDocumentContent: string | undefined;
+    let lastDocumentLineCount: number | undefined;
+    const cachedBranchParseResults = new Map<string, { opcode: string, offset: number, targetLine: number } | null>();
+    
+    // Performance benchmarking
+    let benchmarkingEnabled = false;
+    
+    class PerformanceStats {
+        private times: number[] = [];
+        private count = 0;
+        
+        record(ms: number) {
+            this.times.push(ms);
+            this.count++;
+            // Keep only last 100 measurements
+            if (this.times.length > 100) {
+                this.times.shift();
+            }
+        }
+        
+        getStats() {
+            if (this.times.length === 0) {
+                return { count: 0, avg: 0, min: 0, max: 0, total: 0 };
+            }
+            const total = this.times.reduce((a, b) => a + b, 0);
+            return {
+                count: this.count,
+                avg: total / this.times.length,
+                min: Math.min(...this.times),
+                max: Math.max(...this.times),
+                total: total
+            };
+        }
+        
+        reset() {
+            this.times = [];
+            this.count = 0;
+        }
+    }
+    
+    const perfStats = {
+        parseRelativeBranch: new PerformanceStats(),
+        applyBranchVisualization: new PerformanceStats(),
+        hasRelevantChanges: new PerformanceStats(),
+        cacheHits: 0,
+        cacheMisses: 0,
+        updatesCancelled: 0,
+        updatesExecuted: 0,
+        updatesSkipped: 0
+    };
+    
     // Create SVG icons for branch visualization
     function createBranchSVGIcons() {
         if (!svgTempDir) {
@@ -1138,18 +1192,117 @@ export function activate(context: vscode.ExtensionContext) {
     
     /**
      * Identifies relative branch instructions (jr, br*, bnan, brnan)
+     * Note: j and jal can be both relative (with numbers) and absolute (with labels)
      */
     const relativeBranchOpcodes = new Set([
-        'jr', 'brdse', 'brdns', 'brlt', 'brgt', 'brle', 'brge', 
+        'jr', 'j', 'jal', // j and jal can take numeric offsets
+        'brdse', 'brdns', 'brlt', 'brgt', 'brle', 'brge', 
         'breq', 'brne', 'brap', 'brna', 'brltz', 'brgez', 'brlez', 
         'brgtz', 'breqz', 'brnez', 'brapz', 'brnaz', 'brnan', 'brnaz'
     ]);
     
     /**
-     * Parse a line to extract relative branch information
+     * Identifies absolute branch instructions (j, jal when used with labels)
+     */
+    const absoluteBranchOpcodes = new Set(['j', 'jal']);
+    
+    /**
+     * Parse all label definitions in the document
+     * Returns a map of label name -> line number
+     */
+    function parseLabels(document: vscode.TextDocument): Map<string, number> {
+        const labels = new Map<string, number>();
+        
+        for (let line = 0; line < document.lineCount; line++) {
+            const lineText = document.lineAt(line).text;
+            // Match label definitions: word followed by colon at start of line (ignore whitespace)
+            const match = lineText.match(/^\s*([a-zA-Z_][a-zA-Z0-9_]*)\s*:/);
+            if (match) {
+                const labelName = match[1].toLowerCase(); // Case insensitive
+                labels.set(labelName, line);
+            }
+        }
+        
+        return labels;
+    }
+    
+    /**
+     * Parse a line to extract absolute branch information
+     * Returns: { opcode: string, label: string, targetLine: number } or null
+     */
+    function parseAbsoluteBranch(lineText: string, currentLine: number, labels: Map<string, number>): { opcode: string, label: string, targetLine: number } | null {
+        // Match instruction pattern: opcode label
+        const match = lineText.match(/^\s*([a-z]+)\s+([a-zA-Z_][a-zA-Z0-9_]*)(?:\s|#|$)/i);
+        if (!match) return null;
+        
+        const opcode = match[1].toLowerCase();
+        if (!absoluteBranchOpcodes.has(opcode)) return null;
+        
+        const label = match[2].toLowerCase(); // Case insensitive
+        const targetLine = labels.get(label);
+        
+        if (targetLine === undefined) return null; // Label not found
+        
+        return { opcode, label, targetLine };
+    }
+    
+    /**
+     * Check if document content has changed in a way that affects branches
+     */
+    function hasRelevantChanges(document: vscode.TextDocument): boolean {
+        const startTime = benchmarkingEnabled ? performance.now() : 0;
+        
+        const currentContent = document.getText();
+        
+        // First run or version changed
+        if (lastDocumentVersion !== document.version) {
+            const contentChanged = cachedDocumentContent !== currentContent;
+            if (contentChanged) {
+                cachedDocumentContent = currentContent;
+                lastDocumentVersion = document.version;
+                
+                if (benchmarkingEnabled) {
+                    perfStats.hasRelevantChanges.record(performance.now() - startTime);
+                }
+                return true;
+            }
+        }
+        
+        if (benchmarkingEnabled) {
+            perfStats.hasRelevantChanges.record(performance.now() - startTime);
+        }
+        return false;
+    }
+    
+    /**
+     * Parse a line to extract relative branch information (with caching)
      * Returns: { opcode: string, offset: number, targetLine: number } or null
      */
     function parseRelativeBranch(lineText: string, currentLine: number): { opcode: string, offset: number, targetLine: number } | null {
+        const startTime = benchmarkingEnabled ? performance.now() : 0;
+        
+        // Check cache first
+        const cacheKey = `${currentLine}:${lineText}`;
+        if (cachedBranchParseResults.has(cacheKey)) {
+            if (benchmarkingEnabled) {
+                perfStats.cacheHits++;
+                perfStats.parseRelativeBranch.record(performance.now() - startTime);
+            }
+            const cached = cachedBranchParseResults.get(cacheKey)!;
+            // If cached result has targetLine, recalculate it relative to currentLine
+            if (cached && cached.offset !== undefined) {
+                return {
+                    opcode: cached.opcode,
+                    offset: cached.offset,
+                    targetLine: currentLine + cached.offset
+                };
+            }
+            return cached;
+        }
+        
+        if (benchmarkingEnabled) {
+            perfStats.cacheMisses++;
+        }
         // Match instruction pattern: opcode [operands...] offset
         const match = lineText.match(/^\s*([a-z]+)\s+(.+)$/i);
         if (!match) return null;
@@ -1168,12 +1321,21 @@ export function activate(context: vscode.ExtensionContext) {
         const offsetStr = operands[operands.length - 1];
         const offset = parseInt(offsetStr, 10);
         
-        if (isNaN(offset)) return null;
+        if (isNaN(offset)) {
+            cachedBranchParseResults.set(cacheKey, null);
+            return null;
+        }
         
         // Calculate target line (current line + offset, 0-indexed)
         const targetLine = currentLine + offset;
+        const result = { opcode, offset, targetLine };
+        cachedBranchParseResults.set(cacheKey, result);
         
-        return { opcode, offset, targetLine };
+        if (benchmarkingEnabled) {
+            perfStats.parseRelativeBranch.record(performance.now() - startTime);
+        }
+        
+        return result;
     }
     
     /**
@@ -1357,26 +1519,106 @@ export function activate(context: vscode.ExtensionContext) {
      * Apply branch visualization to the active editor
      */
     function applyBranchVisualization(editor: vscode.TextEditor) {
-        // Clear existing decorations - UPDATED
+        const startTime = benchmarkingEnabled ? performance.now() : 0;
+        
+        // Check if content actually changed
+        if (!hasRelevantChanges(editor.document)) {
+            if (benchmarkingEnabled) {
+                perfStats.updatesSkipped++;
+            }
+            return; // Skip if no relevant changes
+        }
+        
+        if (benchmarkingEnabled) {
+            perfStats.updatesExecuted++;
+        }
+        
+        // Clear existing decorations
         clearBranchDecorations();
         
+        // Only clear cache if line count changed (lines added/removed invalidates line-based cache)
+        // For edits within existing lines, cache remains valid and improves performance
         const document = editor.document;
-        const branches: Array<{ sourceLine: number, targetLine: number, offset: number, opcode: string }> = [];
-        
-        // Find all relative branches in the document
-        for (let line = 0; line < document.lineCount; line++) {
-            const lineText = document.lineAt(line).text;
-            const branchInfo = parseRelativeBranch(lineText, line);
-            
-            if (branchInfo && branchInfo.targetLine >= 0 && branchInfo.targetLine < document.lineCount) {
-                branches.push({
-                    sourceLine: line,
-                    targetLine: branchInfo.targetLine,
-                    offset: branchInfo.offset,
-                    opcode: branchInfo.opcode
-                });
+        if (lastDocumentLineCount !== undefined && lastDocumentLineCount !== document.lineCount) {
+            cachedBranchParseResults.clear();
+            if (benchmarkingEnabled) {
+                console.log(`[Perf] Cache cleared due to line count change: ${lastDocumentLineCount} -> ${document.lineCount}`);
             }
         }
+        lastDocumentLineCount = document.lineCount;
+        
+        const branches: Array<{ sourceLine: number, targetLine: number, offset: number, opcode: string }> = [];
+        
+        // First, parse all labels in the document
+        const labels = parseLabels(document);
+        
+        // Track invalid branches for warnings
+        const invalidBranches: Array<{ line: number, targetLine: number, reason: string }> = [];
+        
+        // Find all branches (both relative and absolute) in the document
+        for (let line = 0; line < document.lineCount; line++) {
+            const lineText = document.lineAt(line).text;
+            
+            // Try parsing as relative branch
+            const relativeBranch = parseRelativeBranch(lineText, line);
+            if (relativeBranch) {
+                if (relativeBranch.targetLine >= 0 && relativeBranch.targetLine < document.lineCount) {
+                    branches.push({
+                        sourceLine: line,
+                        targetLine: relativeBranch.targetLine,
+                        offset: relativeBranch.offset,
+                        opcode: relativeBranch.opcode
+                    });
+                } else {
+                    // Invalid target - out of bounds
+                    invalidBranches.push({
+                        line: line,
+                        targetLine: relativeBranch.targetLine,
+                        reason: relativeBranch.targetLine < 0 
+                            ? `Target line ${relativeBranch.targetLine} is before start of file`
+                            : `Target line ${relativeBranch.targetLine} is beyond end of file (${document.lineCount - 1})`
+                    });
+                }
+            }
+            
+            // Try parsing as absolute branch
+            const absoluteBranch = parseAbsoluteBranch(lineText, line, labels);
+            if (absoluteBranch) {
+                if (absoluteBranch.targetLine >= 0 && absoluteBranch.targetLine < document.lineCount) {
+                    branches.push({
+                        sourceLine: line,
+                        targetLine: absoluteBranch.targetLine,
+                        offset: absoluteBranch.targetLine - line, // Calculate offset for visualization
+                        opcode: absoluteBranch.opcode
+                    });
+                } else {
+                    // Invalid target - out of bounds
+                    invalidBranches.push({
+                        line: line,
+                        targetLine: absoluteBranch.targetLine,
+                        reason: absoluteBranch.targetLine < 0 
+                            ? `Target line ${absoluteBranch.targetLine} is before start of file`
+                            : `Target line ${absoluteBranch.targetLine} is beyond end of file (${document.lineCount - 1})`
+                    });
+                }
+            }
+        }
+        
+        // Add red warning decorations for invalid branches
+        invalidBranches.forEach(invalid => {
+            const warningDecoration = vscode.window.createTextEditorDecorationType({
+                after: {
+                    contentText: ` ⚠ ${invalid.reason}`,
+                    color: 'rgba(255, 50, 50, 0.8)', // Red warning text
+                    fontStyle: 'italic'
+                }
+            });
+            
+            branchDecorations.push(warningDecoration);
+            editor.setDecorations(warningDecoration, [
+                new vscode.Range(invalid.line, 0, invalid.line, 999)
+            ]);
+        });
         
         if (branches.length === 0) {
             vscode.window.showInformationMessage('No relative branch instructions found in this file');
@@ -1620,6 +1862,10 @@ export function activate(context: vscode.ExtensionContext) {
             }
         });
         
+        if (benchmarkingEnabled) {
+            perfStats.applyBranchVisualization.record(performance.now() - startTime);
+        }
+        
         vscode.window.showInformationMessage(`Branch visualization active (${branches.length} branch${branches.length === 1 ? '' : 'es'} found)`);
     }
     
@@ -1648,6 +1894,78 @@ export function activate(context: vscode.ExtensionContext) {
     /**
      * Toggle branch visualization on/off
      */
+    // Toggle benchmarking
+    context.subscriptions.push(vscode.commands.registerCommand('ic10.toggleBenchmarking', () => {
+        benchmarkingEnabled = !benchmarkingEnabled;
+        
+        if (benchmarkingEnabled) {
+            // Reset stats when enabling
+            perfStats.parseRelativeBranch.reset();
+            perfStats.applyBranchVisualization.reset();
+            perfStats.hasRelevantChanges.reset();
+            perfStats.cacheHits = 0;
+            perfStats.cacheMisses = 0;
+            perfStats.updatesCancelled = 0;
+            perfStats.updatesExecuted = 0;
+            perfStats.updatesSkipped = 0;
+            vscode.window.showInformationMessage('Branch visualization benchmarking enabled. Stats will be collected.');
+        } else {
+            vscode.window.showInformationMessage('Benchmarking disabled.');
+        }
+    }));
+    
+    // Show benchmark stats
+    context.subscriptions.push(vscode.commands.registerCommand('ic10.showBenchmarkStats', () => {
+        const parseStats = perfStats.parseRelativeBranch.getStats();
+        const applyStats = perfStats.applyBranchVisualization.getStats();
+        const changeStats = perfStats.hasRelevantChanges.getStats();
+        const cacheHitRate = perfStats.cacheHits + perfStats.cacheMisses > 0
+            ? ((perfStats.cacheHits / (perfStats.cacheHits + perfStats.cacheMisses)) * 100).toFixed(1)
+            : '0';
+        
+        const report = [
+            '=== Branch Visualization Performance Stats ===',
+            '',
+            'parseRelativeBranch:',
+            `  Calls: ${parseStats.count}`,
+            `  Avg: ${parseStats.avg.toFixed(2)}ms`,
+            `  Min: ${parseStats.min.toFixed(2)}ms`,
+            `  Max: ${parseStats.max.toFixed(2)}ms`,
+            `  Total: ${parseStats.total.toFixed(2)}ms`,
+            '',
+            'applyBranchVisualization:',
+            `  Calls: ${applyStats.count}`,
+            `  Avg: ${applyStats.avg.toFixed(2)}ms`,
+            `  Min: ${applyStats.min.toFixed(2)}ms`,
+            `  Max: ${applyStats.max.toFixed(2)}ms`,
+            `  Total: ${applyStats.total.toFixed(2)}ms`,
+            '',
+            'hasRelevantChanges:',
+            `  Calls: ${changeStats.count}`,
+            `  Avg: ${changeStats.avg.toFixed(2)}ms`,
+            '',
+            'Cache Performance:',
+            `  Hits: ${perfStats.cacheHits}`,
+            `  Misses: ${perfStats.cacheMisses}`,
+            `  Hit Rate: ${cacheHitRate}%`,
+            '',
+            'Update Events:',
+            `  Executed: ${perfStats.updatesExecuted}`,
+            `  Skipped (no changes): ${perfStats.updatesSkipped}`,
+            `  Cancelled (debounced): ${perfStats.updatesCancelled}`,
+            '',
+            'Benchmarking: ' + (benchmarkingEnabled ? 'ENABLED' : 'DISABLED')
+        ].join('\n');
+        
+        console.log('\n' + report + '\n');
+        
+        vscode.window.showInformationMessage('Benchmark stats logged to console (View → Output → select "Log (Window)")');
+        
+        // Also create a document with the stats
+        vscode.workspace.openTextDocument({ content: report, language: 'plaintext' })
+            .then(doc => vscode.window.showTextDocument(doc));
+    }));
+    
     context.subscriptions.push(vscode.commands.registerCommand('ic10.toggleBranchVisualization', () => {
         const editor = vscode.window.activeTextEditor;
         
@@ -1659,24 +1977,78 @@ export function activate(context: vscode.ExtensionContext) {
         branchVisualizationActive = !branchVisualizationActive;
         
         if (branchVisualizationActive) {
+            // Clear caches to ensure fresh analysis
+            cachedDocumentContent = undefined;
+            lastDocumentVersion = undefined;
+            lastDocumentLineCount = undefined;
+            cachedBranchParseResults.clear();
             applyBranchVisualization(editor);
         } else {
             clearBranchDecorations();
+            // Clear all caches when disabling
+            cachedDocumentContent = undefined;
+            lastDocumentVersion = undefined;
+            lastDocumentLineCount = undefined;
+            cachedBranchParseResults.clear();
             vscode.window.showInformationMessage('Branch visualization disabled');
+        }
+    }));
+    
+    // Update branch visualization when document changes (with proper debouncing)
+    context.subscriptions.push(vscode.workspace.onDidChangeTextDocument((event) => {
+        const editor = vscode.window.activeTextEditor;
+        if (branchVisualizationActive && 
+            editor && 
+            event.document === editor.document && 
+            editor.document.languageId === 'ic10') {
+            
+            // Cancel any pending update
+            if (updateTimeout) {
+                clearTimeout(updateTimeout);
+                if (benchmarkingEnabled) {
+                    perfStats.updatesCancelled++;
+                }
+            }
+            
+            // Schedule a new update with debouncing
+            updateTimeout = setTimeout(() => {
+                updateTimeout = undefined;
+                if (branchVisualizationActive && vscode.window.activeTextEditor === editor) {
+                    applyBranchVisualization(editor);
+                }
+            }, 500); // Increased to 500ms for better performance
         }
     }));
     
     // Clear decorations when switching files or closing editor
     context.subscriptions.push(vscode.window.onDidChangeActiveTextEditor(() => {
+        // Cancel any pending updates
+        if (updateTimeout) {
+            clearTimeout(updateTimeout);
+            updateTimeout = undefined;
+        }
+        
         if (branchVisualizationActive) {
             clearBranchDecorations();
             branchVisualizationActive = false;
+            // Clear caches
+            cachedBranchParseResults.clear();
+            cachedDocumentContent = undefined;
+            lastDocumentVersion = undefined;
+            lastDocumentLineCount = undefined;
         }
     }));
     
     // Clear decorations on deactivation
     context.subscriptions.push({
-        dispose: () => clearBranchDecorations()
+        dispose: () => {
+            if (updateTimeout) {
+                clearTimeout(updateTimeout);
+                updateTimeout = undefined;
+            }
+            clearBranchDecorations();
+            cachedBranchParseResults.clear();
+        }
     });
 
 }

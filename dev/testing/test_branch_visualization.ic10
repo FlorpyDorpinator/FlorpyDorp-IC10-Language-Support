@@ -20,3 +20,8 @@ s furnace Setting r2
 end:
 yield
 jr -13                  # Loop back to start
+
+
+move r0 LogicType.RatioOxygen
+l r1 d0 r0
+
