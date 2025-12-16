@@ -2155,6 +2155,10 @@
             },
             {
               "type": "STRING",
+              "value": "NextWeatherHash"
+            },
+            {
+              "type": "STRING",
               "value": "None"
             },
             {
@@ -2276,6 +2280,14 @@
             {
               "type": "STRING",
               "value": "SeedingRatio"
+            },
+            {
+              "type": "STRING",
+              "value": "FreeSlots"
+            },
+            {
+              "type": "STRING",
+              "value": "TotalSlots"
             },
             {
               "type": "STRING",

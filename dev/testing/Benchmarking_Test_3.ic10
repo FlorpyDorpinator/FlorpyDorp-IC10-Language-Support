@@ -1,0 +1,130 @@
+# Benchmarking Test 3: Advanced Features and Edge Cases
+# Tests: Complex expressions, nested branches, register usage patterns
+
+alias sensor1 d0
+alias sensor2 d1
+alias actuator d2
+alias display d3
+
+define PI 3.14159
+define E 2.71828
+define GOLDEN_RATIO 1.618
+define MAX_ITERATIONS 50
+
+initialize:
+    # Initialize registers
+    move r0 0
+    move r1 1
+    move r2 2
+    move r3 3
+    move r4 10
+    move r5 20
+    move r6 30
+    move r7 100
+    
+calculation_test:
+    # Complex arithmetic chains
+    add r8 r0 r1
+    mul r8 r8 r2
+    sub r8 r8 r3
+    div r8 r8 r4
+    
+    # Trigonometric operations
+    sin r9 PI
+    cos r10 PI
+    tan r11 PI
+    asin r12 0.5
+    acos r13 0.5
+    atan r14 1
+    
+    # More math functions
+    exp r0 E
+    log r1 r7
+    sqrt r2 r4
+    
+    # Chain comparisons
+    slt r3 r0 r1
+    sgt r4 r2 r3
+    sge r5 r4 r5
+    sle r6 r6 r7
+    
+nested_branch_test:
+    # Deep nesting test
+    l r0 sensor1 Temperature
+    l r1 sensor2 Pressure
+    
+    bgtz r0 branch_a
+    j branch_b
+    
+branch_a:
+    bgt r0 100 branch_a1
+    bgt r0 50 branch_a2
+    j branch_a3
+    
+branch_a1:
+    s display Setting 1
+    bgtz r1 branch_a1_sub
+    j merge
+    
+branch_a1_sub:
+    s actuator On 1
+    j merge
+    
+branch_a2:
+    s display Setting 2
+    bltz r1 branch_a2_sub
+    j merge
+    
+branch_a2_sub:
+    s actuator On 0
+    j merge
+    
+branch_a3:
+    s display Setting 3
+    j merge
+    
+branch_b:
+    bltz r0 branch_b1
+    j branch_b2
+    
+branch_b1:
+    s display Color 1
+    bne r1 0 branch_b1_sub
+    j merge
+    
+branch_b1_sub:
+    s actuator Mode 1
+    j merge
+    
+branch_b2:
+    s display Color 2
+    seq r15 r1 0
+    beqz r15 merge
+    s actuator Mode 2
+    
+merge:
+    # Register stress test
+    add r0 r1 r2
+    sub r3 r4 r5
+    mul r6 r7 r8
+    div r9 r10 r11
+    mod r12 r13 r14
+    
+    # All registers used
+    move r15 r0
+    add r14 r1 r2
+    sub r13 r3 r4
+    mul r12 r5 r6
+    div r11 r7 r8
+    add r10 r9 r15
+    
+iteration_counter:
+    # Loop control
+    add r15 r15 1
+    blt r15 MAX_ITERATIONS calculation_test
+    
+cleanup:
+    # Reset and halt
+    s display Setting 0
+    s actuator On 0
+    j cleanup

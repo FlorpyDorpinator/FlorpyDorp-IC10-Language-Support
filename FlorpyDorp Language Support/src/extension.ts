@@ -37,6 +37,7 @@ import {
     StreamInfo,
     ExecuteCommandParams
 } from 'vscode-languageclient/node';
+import { getGlobalTracker, resetGlobalTracker } from './benchmarking';
 
 // ============================================================================
 // Helper Functions
@@ -148,6 +149,10 @@ function resolveVariables(str: string, context: vscode.ExtensionContext): string
 }
 
 export function activate(context: vscode.ExtensionContext) {
+    
+    // Global benchmarking state
+    let globalBenchmarkingEnabled = false;
+    const perfTracker = getGlobalTracker();
 
     // Activate Notification through VSCode Notifications
     vscode.window.showInformationMessage('IC10 Language Server is now active!');
@@ -288,12 +293,28 @@ export function activate(context: vscode.ExtensionContext) {
         },
         middleware: {
             provideHover: async (document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken, next: any) => {
+                if (globalBenchmarkingEnabled) {
+                    perfTracker.start('lsp.hover.total');
+                    perfTracker.increment('lsp.hover.calls');
+                }
+                
                 const useGameStyle = vscode.workspace.getConfiguration().get('ic10.hover.useGameStyle') as boolean;
                 if (!useGameStyle) {
-                    return next(document, position, token);
+                    const result = await next(document, position, token);
+                    if (globalBenchmarkingEnabled) {
+                        perfTracker.end('lsp.hover.total');
+                    }
+                    return result;
                 }
 
+                if (globalBenchmarkingEnabled) {
+                    perfTracker.start('lsp.hover.serverCall');
+                }
                 const hover = await next(document, position, token);
+                if (globalBenchmarkingEnabled) {
+                    perfTracker.end('lsp.hover.serverCall');
+                    perfTracker.start('lsp.hover.clientProcessing');
+                }
                 if (!hover) return hover;
 
                 // If the server already provides an IC10 code block (game-style signature), keep it.
@@ -472,16 +493,34 @@ export function activate(context: vscode.ExtensionContext) {
                     }
                 }
 
+                if (globalBenchmarkingEnabled) {
+                    perfTracker.end('lsp.hover.clientProcessing');
+                    perfTracker.end('lsp.hover.total');
+                }
+                
                 return new vscode.Hover(newContents, hover.range ?? range);
             },
             handleDiagnostics: (uri: vscode.Uri, diagnostics: vscode.Diagnostic[], next: (uri: vscode.Uri, diagnostics: vscode.Diagnostic[]) => void) => {
+                if (globalBenchmarkingEnabled) {
+                    perfTracker.start('lsp.diagnostics.handle');
+                    perfTracker.increment('lsp.diagnostics.calls');
+                    perfTracker.increment('lsp.diagnostics.count', diagnostics.length);
+                }
+                
                 const enabled = vscode.workspace.getConfiguration().get('ic10.diagnostics.enabled') as boolean;
                 if (!enabled) {
                     // Suppress diagnostics when disabled
                     next(uri, []);
+                    if (globalBenchmarkingEnabled) {
+                        perfTracker.end('lsp.diagnostics.handle');
+                    }
                     return;
                 }
                 next(uri, diagnostics);
+                
+                if (globalBenchmarkingEnabled) {
+                    perfTracker.end('lsp.diagnostics.handle');
+                }
             }
             ,
             // Ensure opcode completion inserts only the mnemonic (plus a space), preventing any ghost-signature text
@@ -492,7 +531,16 @@ export function activate(context: vscode.ExtensionContext) {
                 token: vscode.CancellationToken,
                 next: any
             ) => {
+                if (globalBenchmarkingEnabled) {
+                    perfTracker.start('lsp.completion.total');
+                    perfTracker.increment('lsp.completion.calls');
+                }
+                
                 const result = await next(document, position, context, token);
+                
+                if (globalBenchmarkingEnabled) {
+                    perfTracker.end('lsp.completion.total');
+                }
                 const normalize = (item: vscode.CompletionItem): vscode.CompletionItem => {
                     // Only adjust likely opcodes (function kind and simple word labels)
                     const isWord = typeof item.label === 'string' && /^[a-z][a-z0-9]*$/.test(item.label as string);
@@ -582,16 +630,23 @@ export function activate(context: vscode.ExtensionContext) {
     };
 
     const startClient = async () => {
+        console.log('[IC10] Starting language client...');
         if (!clientRegisteredWithContext) {
             context.subscriptions.push(lc);
             clientRegisteredWithContext = true;
         }
         try {
+            console.log('[IC10] Calling lc.start()...');
             await lc.start();
+            console.log('[IC10] Language client started successfully');
             clientRunning = true;
             // Give server a moment to fully initialize before sending commands
-            setTimeout(() => flushPendingServerState(), 100);
+            setTimeout(() => {
+                console.log('[IC10] Flushing pending server state...');
+                flushPendingServerState();
+            }, 100);
         } catch (err) {
+            console.error('[IC10] Failed to start language client:', err);
             vscode.window.showErrorMessage(`IC10 Language Server failed to start: ${err instanceof Error ? err.message : String(err)}`);
         }
     };
@@ -604,11 +659,17 @@ export function activate(context: vscode.ExtensionContext) {
             return;
         }
         clientRunning = false;
-        stopInFlight = lc
-            .stop()
+        console.log('[IC10] Stopping language client...');
+        stopInFlight = Promise.race([
+            lc.stop(),
+            new Promise((_, reject) => setTimeout(() => reject(new Error('Stop timeout after 5 seconds')), 5000))
+        ])
+            .then(() => console.log('[IC10] Language client stopped'))
             .catch((err: unknown) => {
-                vscode.window.showErrorMessage(`Failed to stop IC10 Language Server: ${err instanceof Error ? err.message : String(err)}`);
-                throw err;
+                console.error('[IC10] Failed to stop language client:', err);
+                vscode.window.showWarningMessage(`IC10 Language Server stop ${err instanceof Error && err.message.includes('timeout') ? 'timed out' : 'failed'} - forcing restart`);
+                // Force kill any stuck processes
+                clientRunning = false;
             })
             .finally(() => {
                 stopInFlight = undefined;
@@ -657,6 +718,63 @@ export function activate(context: vscode.ExtensionContext) {
 
         lc.sendRequest('workspace/executeCommand', options);
     }   ));
+
+    // Register global benchmarking commands
+    context.subscriptions.push(vscode.commands.registerCommand('ic10.toggleGlobalBenchmarking', () => {
+        globalBenchmarkingEnabled = !globalBenchmarkingEnabled;
+        
+        if (globalBenchmarkingEnabled) {
+            resetGlobalTracker();
+            vscode.window.showInformationMessage('IC10 Extension benchmarking enabled. Metrics will be collected for LSP operations.');
+            
+            // Also enable server-side benchmarking
+            lc.sendRequest('workspace/executeCommand', {
+                command: 'ic10.server.enableBenchmarking',
+                arguments: [true]
+            }).catch(err => {
+                console.error('Failed to enable server benchmarking:', err);
+            });
+        } else {
+            vscode.window.showInformationMessage('IC10 Extension benchmarking disabled.');
+            
+            // Also disable server-side benchmarking
+            lc.sendRequest('workspace/executeCommand', {
+                command: 'ic10.server.enableBenchmarking',
+                arguments: [false]
+            }).catch(err => {
+                console.error('Failed to disable server benchmarking:', err);
+            });
+        }
+    }));
+    
+    context.subscriptions.push(vscode.commands.registerCommand('ic10.showGlobalBenchmarkStats', async () => {
+        const clientReport = perfTracker.generateReport();
+        
+        // Get server report if benchmarking is enabled
+        let serverReport = '';
+        try {
+            const result = await lc.sendRequest('workspace/executeCommand', {
+                command: 'ic10.server.getBenchmarkReport',
+                arguments: []
+            }) as string;
+            if (result) {
+                serverReport = '\n' + result;
+            }
+        } catch (err) {
+            // Server benchmarking might not be enabled
+        }
+        
+        const fullReport = clientReport + serverReport;
+        
+        console.log('\n' + fullReport + '\n');
+        
+        vscode.window.showInformationMessage('Benchmark stats logged to console (View → Output → select "Log (Window)")',  'View Report').then(selection => {
+            if (selection === 'View Report') {
+                vscode.workspace.openTextDocument({ content: fullReport, language: 'plaintext' })
+                    .then(doc => vscode.window.showTextDocument(doc));
+            }
+        });
+    }));
 
     // Register ic10.showRelated command
     context.subscriptions.push(vscode.commands.registerCommand('ic10.showRelated', async (instruction?: string) => {

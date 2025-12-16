@@ -1,0 +1,108 @@
+# Benchmarking Test 4: Comprehensive Diagnostic Triggers
+# Tests: All diagnostic conditions including errors, warnings, and edge cases
+
+alias device d0
+alias backup d1
+
+# Valid defines
+define VALID_CONSTANT 42
+define ANOTHER_CONST 100
+define STRING_TEST "hello"
+
+# Valid aliases
+alias reg r10
+alias computed r11
+
+start:
+    # Normal operations
+    move r0 1
+    add r1 r0 1
+    sub r2 r1 1
+    mul r3 r2 2
+    div r4 r3 2
+    
+    # Device operations
+    l r5 device Temperature
+    s device On 1
+    
+    # Batch operations
+    lb r6 HASH("StructureGasTank") Pressure Maximum
+    sb HASH("StructureFurnace") On 1
+    
+    # Slot operations  
+    ls r7 device 0 Quantity
+    ss device 0 Occupied 1
+    
+    # All comparison types
+    seq r0 r1 r2
+    sne r0 r1 r2
+    slt r0 r1 r2
+    sle r0 r1 r2
+    sgt r0 r1 r2
+    sge r0 r1 r2
+    sap r0 r1 r2 0.1
+    sna r0 r1 r2 0.1
+    sdse r0 device
+    sdns r0 device
+    
+    # Math operations
+    abs r0 r1
+    sqrt r0 r1
+    ceil r0 r1
+    floor r0 r1
+    trunc r0 r1
+    round r0 r1
+    min r0 r1 r2
+    max r0 r1 r2
+    
+    # Trigonometry
+    sin r0 r1
+    cos r0 r1
+    tan r0 r1
+    asin r0 r1
+    acos r0 r1
+    atan r0 r1
+    atan2 r0 r1 r2
+    
+    # Advanced math
+    exp r0 r1
+    log r0 r1
+    
+    # Logic operations
+    and r0 r1 r2
+    or r0 r1 r2
+    xor r0 r1 r2
+    nor r0 r1 r2
+    
+    # Bit shifts
+    sll r0 r1 4
+    srl r0 r1 4
+    sra r0 r1 4
+    
+    # Stack operations
+    push r0
+    pop r1
+    peek r2
+    
+    # Special operations
+    select r0 r1 r2 r3
+    rand r0 100
+    
+    # Branches (relative)
+    beqz r0 2
+    bnez r1 2
+    bgtz r2 2
+    bltz r3 2
+    bgez r4 2
+    blez r5 2
+    
+    # Jumps (absolute)
+    j end_label
+    
+end_label:
+    # Sleep and yield
+    sleep 1
+    yield
+    
+    # Halt
+    j end_label

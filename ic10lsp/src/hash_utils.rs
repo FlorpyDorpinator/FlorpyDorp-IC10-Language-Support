@@ -95,11 +95,6 @@ pub fn is_hash_function_call(input: &str) -> bool {
     extract_hash_argument(input).is_some()
 }
 
-/// Checks if a string is a valid STR() function call
-pub fn is_str_function_call(input: &str) -> bool {
-    extract_str_argument(input).is_some()
-}
-
 /// Looks up device name in device registry and returns the corresponding hash
 pub fn get_device_hash(device_name: &str) -> Option<i32> {
     DEVICE_NAME_TO_HASH.get(device_name).copied()

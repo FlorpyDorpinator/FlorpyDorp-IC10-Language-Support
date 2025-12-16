@@ -1,0 +1,111 @@
+# Benchmarking Test 1: Core Instructions and Control Flow
+# Tests: Basic arithmetic, logic, branching, labels, and aliases
+
+alias sensor d0
+alias display d1
+alias memory d2
+
+define TEMP_THRESHOLD 300
+define PRESSURE_MAX 10000
+define LOOP_COUNT 100
+
+start:
+    # Basic arithmetic operations
+    add r0 r1 r2
+    sub r3 r4 r5
+    mul r6 r7 r8
+    div r9 r10 r11
+    mod r12 r13 r14
+    
+    # Logical operations
+    and r0 r1 r2
+    or r3 r4 r5
+    xor r6 r7 r8
+    nor r9 r10 r11
+    
+    # Comparison operations
+    slt r0 r1 r2
+    sle r3 r4 r5
+    sgt r6 r7 r8
+    sge r9 r10 r11
+    seq r12 r13 r14
+    sne r15 r0 r1
+    
+    # Device reads
+    l r0 sensor Temperature
+    l r1 sensor Pressure
+    l r2 memory Setting
+    
+    # Conditional branching
+    bgt r0 TEMP_THRESHOLD temp_high
+    blt r1 PRESSURE_MAX pressure_ok
+    j normal_operation
+    
+temp_high:
+    # Handle high temperature
+    s display Setting 1
+    s sensor On 0
+    j check_pressure
+    
+pressure_ok:
+    # Handle pressure
+    s display Color 2
+    j normal_operation
+    
+check_pressure:
+    bgtz r1 pressure_active
+    j normal_operation
+    
+pressure_active:
+    s memory Setting r1
+    
+normal_operation:
+    # More complex operations
+    sqrt r0 r1
+    abs r2 r3
+    ceil r4 r5
+    floor r6 r7
+    trunc r8 r9
+    round r10 r11
+    
+    # Bit operations
+    sll r0 r1 4
+    srl r2 r3 2
+    sra r4 r5 1
+    
+    # Stack operations
+    push r0
+    push r1
+    push r2
+    pop r3
+    pop r4
+    peek r5
+    
+    # Select operations
+    select r0 r1 r2 r3
+    
+    # Approximate comparisons
+    sap r0 r1 r2 0.1
+    sna r3 r4 r5 0.5
+    
+    # Relative jumps
+    beqz r0 5
+    bnez r1 3
+    bgez r2 2
+    bltz r3 1
+    
+    # Register-to-register operations
+    move r0 r1
+    
+    # Sleep and yield
+    sleep 1
+    yield
+    
+    # Increment counter
+    add r15 r15 1
+    blt r15 LOOP_COUNT start
+    
+end:
+    # Halt execution
+    s display Setting 0
+    j end

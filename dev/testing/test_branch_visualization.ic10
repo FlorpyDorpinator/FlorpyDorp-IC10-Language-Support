@@ -25,3 +25,8 @@ jr -13                  # Loop back to start
 move r0 LogicType.RatioOxygen
 l r1 d0 r0
 
+l r10 d0 On # Hover over "On"
+l r11 d0 Open # Hover over "Open"
+l r12 d0 Activate # Hover over "Activate"
+l r13 d0 Power # Hover over "Power"
+l r14 d0 Maximum
