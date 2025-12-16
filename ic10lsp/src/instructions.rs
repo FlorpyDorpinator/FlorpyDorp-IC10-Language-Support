@@ -30,7 +30,6 @@ const DEVICE: Union = Union(&[DataType::Device]);
 const VALUE: Union = Union(&[DataType::Register, DataType::Number]);
 const LOGIC_TYPE: Union = Union(&[DataType::LogicType]);
 const SLOT_LOGIC_TYPE: Union = Union(&[DataType::SlotLogicType]);
-const BATCH_MODE: Union = Union(&[DataType::BatchMode, DataType::Number, DataType::Register]);
 const BATCH_MODE_ONLY: Union = Union(&[DataType::BatchMode, DataType::Number]);
 const REAGENT_MODE: Union = Union(&[DataType::ReagentMode, DataType::Number, DataType::Register]);
 

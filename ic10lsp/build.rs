@@ -8,6 +8,8 @@ use std::{
     io::Write,
     path::Path,
 };
+use quick_xml::events::Event;
+use quick_xml::Reader;
 
 // BUILD SCRIPT - Auto-generates code from game source files
 //
@@ -423,6 +425,7 @@ fn main() {
     
     // Write instruction signatures
     writeln!(&mut inst_writer, "// Instruction signatures").unwrap();
+    writeln!(&mut inst_writer, "#[allow(dead_code)]").unwrap();
     writeln!(&mut inst_writer, "pub(crate) const INSTRUCTION_SIGNATURES: &[(&str, &[&[&str]])] = &[").unwrap();
     for (cmd, params) in instruction_sigs.iter() {
         write!(&mut inst_writer, "    (\"{}\", &[", cmd).unwrap();
@@ -445,6 +448,43 @@ fn main() {
     
     println!("cargo:rerun-if-changed=../data/game-sources/ProgrammableChip.cs");
     println!("cargo:rerun-if-changed=../data/game-sources/Stationpedia.json");
+    
+    // =========================
+    // Generate device descriptions from English.xml
+    // =========================
+    let descriptions_out_path = Path::new(&out_dir).join("descriptions_generated.rs");
+    
+    let english_xml_file = Path::new("../data/game-sources/english.xml");
+    let descriptions = parse_english_xml(english_xml_file);
+    
+    // Build PHF map: prefab_name -> (display_name, description)
+    let mut device_descriptions_builder = ::phf_codegen::Map::new();
+    
+    for (prefab_name, (display_name, description)) in descriptions.iter() {
+        // Escape the description and display name for Rust strings
+        let escaped_display = escape_str(display_name);
+        let escaped_desc = escape_str(description);
+        device_descriptions_builder.entry(
+            prefab_name,
+            &format!("(\"{}\", \"{}\")", escaped_display, escaped_desc)
+        );
+    }
+    
+    let mut desc_writer = BufWriter::new(
+        File::create(descriptions_out_path).expect("Failed to create descriptions_generated.rs")
+    );
+    
+    writeln!(&mut desc_writer, "// Auto-generated from English.xml - DO NOT EDIT").unwrap();
+    writeln!(&mut desc_writer, "// Device descriptions from game localization files").unwrap();
+    writeln!(&mut desc_writer, "").unwrap();
+    
+    writeln!(
+        &mut desc_writer,
+        "pub(crate) const DEVICE_DESCRIPTIONS: phf::Map<&'static str, (&'static str, &'static str)> = {};",
+        device_descriptions_builder.build()
+    ).unwrap();
+    
+    println!("cargo:rerun-if-changed=../data/game-sources/english.xml");
 }
 
 // Parse instruction signatures from ProgrammableChip.cs GetCommandExample method
@@ -570,4 +610,134 @@ fn map_helpstring_to_datatype(helpstring: &str) -> &str {
         "REF_ID" => "Number",
         _ => "Number",
     }
+}
+
+// Parse English.xml to extract device names and descriptions
+fn parse_english_xml(xml_path: &Path) -> Vec<(String, (String, String))> {
+    let xml_content = fs::read_to_string(xml_path)
+        .expect("Failed to read english.xml");
+    
+    let mut reader = Reader::from_str(&xml_content);
+    reader.trim_text(true);
+    
+    let mut results = Vec::new();
+    let mut buf = Vec::new();
+    
+    let mut current_key = String::new();
+    let mut current_value = String::new();
+    let mut current_description = String::new();
+    let mut in_things_section = false;
+    let mut in_record_thing = false;
+    let mut in_key = false;
+    let mut in_value = false;
+    let mut in_description = false;
+    
+    loop {
+        match reader.read_event_into(&mut buf) {
+            Ok(Event::Start(ref e)) => {
+                match e.name().as_ref() {
+                    b"Things" => in_things_section = true,
+                    b"RecordThing" => {
+                        if in_things_section {
+                            in_record_thing = true;
+                            current_key.clear();
+                            current_value.clear();
+                            current_description.clear();
+                        }
+                    }
+                    b"Key" => {
+                        if in_record_thing {
+                            in_key = true;
+                        }
+                    }
+                    b"Value" => {
+                        if in_record_thing {
+                            in_value = true;
+                        }
+                    }
+                    b"Description" => {
+                        if in_record_thing {
+                            in_description = true;
+                        }
+                    }
+                    _ => {}
+                }
+            }
+            Ok(Event::Text(e)) => {
+                let text = e.unescape().unwrap_or_default().to_string();
+                if in_key {
+                    current_key.push_str(&text);
+                } else if in_value {
+                    current_value.push_str(&text);
+                } else if in_description {
+                    current_description.push_str(&text);
+                }
+            }
+            Ok(Event::End(ref e)) => {
+                match e.name().as_ref() {
+                    b"Things" => in_things_section = false,
+                    b"RecordThing" => {
+                        if in_record_thing && !current_key.is_empty() {
+                            // Only store if we have a description
+                            if !current_description.is_empty() {
+                                // Clean up description: remove LINK and other formatting tags
+                                let cleaned_desc = clean_description(&current_description);
+                                results.push((
+                                    current_key.clone(),
+                                    (current_value.clone(), cleaned_desc)
+                                ));
+                            }
+                        }
+                        in_record_thing = false;
+                    }
+                    b"Key" => in_key = false,
+                    b"Value" => in_value = false,
+                    b"Description" => in_description = false,
+                    _ => {}
+                }
+            }
+            Ok(Event::Eof) => break,
+            Err(e) => {
+                eprintln!("Error parsing English.xml at position {}: {:?}", reader.buffer_position(), e);
+                break;
+            }
+            _ => {}
+        }
+        buf.clear();
+    }
+    
+    results
+}
+
+// Clean up description text by removing game-specific formatting tags
+fn clean_description(desc: &str) -> String {
+    let mut result = desc.to_string();
+    
+    // Remove {LINK:text;display} tags - keep the display part
+    let link_regex = Regex::new(r"\{LINK:([^;]+);([^}]+)\}").unwrap();
+    result = link_regex.replace_all(&result, "$2").to_string();
+    
+    // Remove {THING:prefab} tags - keep the prefab name
+    let thing_regex = Regex::new(r"\{THING:([^}]+)\}").unwrap();
+    result = thing_regex.replace_all(&result, "$1").to_string();
+    
+    // Remove {GAS:name} tags - keep the gas name
+    let gas_regex = Regex::new(r"\{GAS:([^}]+)\}").unwrap();
+    result = gas_regex.replace_all(&result, "$1").to_string();
+    
+    // Remove {HEADER:text} tags - keep the text in uppercase
+    let header_regex = Regex::new(r"\{HEADER:([^}]+)\}").unwrap();
+    result = header_regex.replace_all(&result, |caps: &regex::Captures| {
+        caps[1].to_uppercase()
+    }).to_string();
+    
+    // Remove any remaining curly brace tags
+    let generic_regex = Regex::new(r"\{[^}]+\}").unwrap();
+    result = generic_regex.replace_all(&result, "").to_string();
+    
+    // Clean up excessive whitespace
+    let whitespace_regex = Regex::new(r"\s+").unwrap();
+    result = whitespace_regex.replace_all(&result.trim(), " ").to_string();
+    
+    result
 }

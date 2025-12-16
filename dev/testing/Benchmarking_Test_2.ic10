@@ -1,0 +1,111 @@
+# Benchmarking Test 2: Device Operations and Batch Processing
+# Tests: Device I/O, batch operations, slot access, and HASH functions
+
+alias furnace d0
+alias sorter d1
+alias ledDisplay d2
+alias storage d3
+alias console d4
+
+define MAX_SLOTS 6
+define TARGET_TEMP 1200
+define COAL_HASH 1058547521
+
+main_loop:
+    # Batch device operations
+    lb r0 HASH("StructureGasTank") Pressure Maximum
+    lb r1 HASH("StructureGasTank") Pressure Minimum
+    lb r2 HASH("StructureGasTank") Pressure Average
+    lb r3 HASH("StructureGasTank") Pressure Sum
+    
+    # Single device reads
+    l r4 furnace Temperature
+    l r5 furnace Pressure
+    l r6 furnace On
+    l r7 furnace Combustion
+    
+    # Slot operations
+    ls r8 storage 0 Quantity
+    ls r9 storage 1 OccupantHash
+    ls r10 storage 2 Occupied
+    
+    # Device writes
+    s furnace SettingInput r4
+    s furnace SettingOutput r5
+    s sorter Mode 1
+    s ledDisplay Setting r0
+    
+    # Complex batch with logic types
+    lb r0 HASH("StructureFurnace") Temperature Maximum
+    lb r1 HASH("StructureFurnace") Pressure Average
+    lb r2 HASH("StructureAirConditioner") Power Sum
+    
+    # Conditional device control
+    bgt r4 TARGET_TEMP furnace_hot
+    blt r4 100 furnace_cold
+    j furnace_normal
+    
+furnace_hot:
+    s furnace On 0
+    s console Setting 1
+    j check_slots
+    
+furnace_cold:
+    s furnace On 1
+    s console Setting 2
+    j check_slots
+    
+furnace_normal:
+    s console Setting 0
+    
+check_slots:
+    # Iterate through slots
+    move r11 0
+    
+slot_loop:
+    ls r12 storage r11 OccupantHash
+    beq r12 COAL_HASH found_coal
+    
+    add r11 r11 1
+    blt r11 MAX_SLOTS slot_loop
+    j no_coal_found
+    
+found_coal:
+    s ledDisplay Color 4
+    s ledDisplay Setting r11
+    j process_item
+    
+no_coal_found:
+    s ledDisplay Color 1
+    
+process_item:
+    # More device operations
+    l r0 sorter Output
+    l r1 sorter Lock
+    s sorter Lock 1
+    
+    # Reagent mode operations (for completeness)
+    l r2 furnace RatioOxygen
+    l r3 furnace RatioCarbonDioxide
+    
+    # Network operations
+    lb r4 HASH("StructureConveyor") On Average
+    sb HASH("StructureConveyor") On 1
+    
+    # Indexed slot writes
+    move r13 0
+update_slots:
+    ss storage r13 Occupied 0
+    add r13 r13 1
+    blt r13 3 update_slots
+    
+    # More logic type reads
+    l r0 furnace Open
+    l r1 furnace Error
+    l r2 furnace Idle
+    l r3 furnace Activate
+    
+    # Sleep and continue
+    sleep 2
+    yield
+    j main_loop

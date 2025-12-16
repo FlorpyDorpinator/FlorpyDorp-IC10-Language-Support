@@ -1402,6 +1402,11 @@
           "value": 280,
           "deprecated": false,
           "description": "Returns the stack size of the devices internal memory."
+        },
+        "NextWeatherHash": {
+          "value": 281,
+          "deprecated": false,
+          "description": "NextWeatherHash provides the hash value for the name of the next weather event as a 32 bit integer."
         }
       }
     },
@@ -1562,6 +1567,16 @@
           "value": 30,
           "deprecated": false,
           "description": "How far the plant is towards seeding represented as a fraction between 0 and 1, with 1 being seeding and will supply seeds when harvested."
+        },
+        "FreeSlots": {
+          "value": 31,
+          "deprecated": false,
+          "description": "The number of free slots available in this object."
+        },
+        "TotalSlots": {
+          "value": 32,
+          "deprecated": false,
+          "description": "The total number of slots available in this object."
         }
       }
     },
@@ -3019,6 +3034,11 @@
           "value": 280,
           "deprecated": false,
           "description": "Returns the stack size of the devices internal memory."
+        },
+        "NextWeatherHash": {
+          "value": 281,
+          "deprecated": false,
+          "description": "NextWeatherHash provides the hash value for the name of the next weather event as a 32 bit integer."
         }
       }
     },
@@ -3179,6 +3199,16 @@
           "value": 30,
           "deprecated": false,
           "description": "How far the plant is towards seeding represented as a fraction between 0 and 1, with 1 being seeding and will supply seeds when harvested."
+        },
+        "FreeSlots": {
+          "value": 31,
+          "deprecated": false,
+          "description": "The number of free slots available in this object."
+        },
+        "TotalSlots": {
+          "value": 32,
+          "deprecated": false,
+          "description": "The total number of slots available in this object."
         }
       }
     },

@@ -33,6 +33,7 @@ use std::{
     net::Ipv4Addr,
     sync::Arc,
 };
+use sha2::{Sha256, Digest};
 use tower_lsp::lsp_types::SemanticTokenType;
 use tower_lsp::lsp_types::{Position as LspPosition, Range as LspRange};
 use tower_lsp::{LanguageServer, LspService, Server};
@@ -49,8 +50,14 @@ mod additional_features;
 /// Command-line interface handling
 mod cli;
 
+/// Performance benchmarking and tracking
+mod performance;
+
 /// Device hash mappings and resolution (HASH() function support)
 mod device_hashes;
+
+/// Device descriptions from English.xml
+mod descriptions;
 
 /// Utility functions for hash computation and parsing
 mod hash_utils;
@@ -137,8 +144,8 @@ const LOGIC_SLOT_BATCH_REAGENT: [DataType; 4] = [
 
 use phf::phf_set;
 use crate::hash_utils::{
-    compute_crc32, extract_hash_argument, extract_str_argument, get_device_hash,
-    is_hash_function_call, is_str_function_call,
+    compute_crc32, extract_hash_argument, get_device_hash,
+    is_hash_function_call,
 };
 use serde_json::Value;
 use tokio::{
@@ -335,11 +342,18 @@ struct Backend {
     diagnostics_enabled: Arc<RwLock<bool>>,
     // Track when we've warned about too many files
     warned_about_file_count: Arc<tokio::sync::Mutex<bool>>,
+    // Performance tracking
+    perf_tracker: Arc<performance::PerformanceTracker>,
+    // Debounce: Store pending diagnostic tasks per file
+    pending_diagnostics: Arc<tokio::sync::Mutex<HashMap<Url, tokio::task::JoinHandle<()>>>>,
+    // Cache: Store diagnostics by content hash (DashMap is lock-free concurrent)
+    diagnostic_cache: Arc<dashmap::DashMap<String, Vec<Diagnostic>>>,
 }
 
 // Constants for performance tuning
 const MAX_RECOMMENDED_FILES: usize = 50;
-const DIAGNOSTIC_DEBOUNCE_MS: u64 = 150;
+const DIAGNOSTIC_DEBOUNCE_MS: u64 = 250; // Increased from 150ms for better batching with cache
+const DIAGNOSTIC_DEBOUNCE_LARGE_FILE_MS: u64 = 400; // For files >500 lines
 
 #[async_trait]
 impl LanguageServer for Backend {
@@ -537,6 +551,22 @@ impl LanguageServer for Backend {
                     }
                 }
             }
+            "ic10.server.enableBenchmarking" => {
+                if let Some(enabled) = params.arguments.get(0).and_then(Value::as_bool) {
+                    self.perf_tracker.set_enabled(enabled);
+                    let message = if enabled {
+                        "IC10 LSP Server benchmarking enabled. Collecting performance data..."
+                    } else {
+                        "IC10 LSP Server benchmarking disabled."
+                    };
+                    self.client.show_message(MessageType::INFO, message).await;
+                }
+            }
+            "ic10.server.getBenchmarkReport" => {
+                let report = self.perf_tracker.generate_report();
+                self.client.log_message(MessageType::INFO, report.clone()).await;
+                return Ok(Some(Value::String(report)));
+            }
             "ic10.suppressAllRegisterDiagnostics" => {
                 // Get the document URI from the arguments
                 if let Some(uri_value) = params.arguments.get(0) {
@@ -684,23 +714,53 @@ impl LanguageServer for Backend {
         // Request inlay hint refresh to show updated device hashes
         let _ = self.client.send_request::<tower_lsp::lsp_types::request::InlayHintRefreshRequest>(()).await;
         
-        // Debounce diagnostics on change - only run if enough time has passed
-        let should_run = {
+        // Proper debouncing: Cancel any pending diagnostic task and schedule a new one
+        // This ensures diagnostics run X ms after the LAST keystroke, not just throttling
+        let uri = params.text_document.uri.clone();
+        let debounce_ms = {
             let files = self.files.read().await;
-            if let Some(file_data) = files.get(&params.text_document.uri) {
-                if let Some(last_run) = file_data.last_diagnostic_run {
-                    last_run.elapsed() > Duration::from_millis(DIAGNOSTIC_DEBOUNCE_MS)
+            if let Some(file_data) = files.get(&uri) {
+                let line_count = file_data.document_data.content.lines().count();
+                if line_count > 500 {
+                    DIAGNOSTIC_DEBOUNCE_LARGE_FILE_MS
                 } else {
-                    true
+                    DIAGNOSTIC_DEBOUNCE_MS
                 }
             } else {
-                true
+                DIAGNOSTIC_DEBOUNCE_MS
             }
         };
         
-        if should_run {
-            self.run_diagnostics(&params.text_document.uri).await;
+        // Cancel any existing pending diagnostic task for this file
+        {
+            let mut pending = self.pending_diagnostics.lock().await;
+            if let Some(handle) = pending.remove(&uri) {
+                handle.abort(); // Cancel the old task
+            }
         }
+        
+        // Schedule new diagnostic task
+        let uri_for_task = uri.clone();
+        let backend = Self {
+            client: self.client.clone(),
+            files: self.files.clone(),
+            config: self.config.clone(),
+            diagnostics_enabled: self.diagnostics_enabled.clone(),
+            warned_about_file_count: self.warned_about_file_count.clone(),
+            perf_tracker: self.perf_tracker.clone(),
+            pending_diagnostics: self.pending_diagnostics.clone(),
+            diagnostic_cache: self.diagnostic_cache.clone(),
+        };
+        
+        let handle = tokio::spawn(async move {
+            tokio::time::sleep(Duration::from_millis(debounce_ms)).await;
+            backend.run_diagnostics(&uri_for_task).await;
+            // Remove self from pending map after completion
+            backend.pending_diagnostics.lock().await.remove(&uri_for_task);
+        });
+        
+        // Store the new task handle
+        self.pending_diagnostics.lock().await.insert(uri, handle);
     }
 
     async fn did_change_configuration(&self, params: DidChangeConfigurationParams) {
@@ -1369,6 +1429,8 @@ impl LanguageServer for Backend {
     }
 
     async fn completion(&self, params: CompletionParams) -> Result<Option<CompletionResponse>> {
+        let _timer = performance::TimingGuard::new(&self.perf_tracker, "lsp.server.completion");
+        self.perf_tracker.increment("lsp.server.completion.calls", 1);
         
         fn instruction_completions(prefix: &str, completions: &mut Vec<CompletionItem>) {
             let start_entries = completions.len();
@@ -1466,25 +1528,6 @@ impl LanguageServer for Backend {
             }
             let length = completions.len();
             completions[start_entries..length].sort_by(|x, y| x.label.cmp(&y.label));
-        }
-
-        fn sort_completions_by_usage(
-            completions: &mut Vec<CompletionItem>,
-            start_idx: usize,
-            used_items: &std::collections::HashSet<String>,
-        ) {
-            // Sort so that used items come first (alphabetically), then unused items (alphabetically)
-            let end_idx = completions.len();
-            completions[start_idx..end_idx].sort_by(|a, b| {
-                let a_used = used_items.contains(&a.label);
-                let b_used = used_items.contains(&b.label);
-                
-                match (a_used, b_used) {
-                    (true, false) => std::cmp::Ordering::Less,   // a used, b not used -> a first
-                    (false, true) => std::cmp::Ordering::Greater, // b used, a not used -> b first
-                    _ => a.label.cmp(&b.label),                   // both used or both unused -> alphabetical
-                }
-            });
         }
 
         fn param_completions_builtin(
@@ -1874,6 +1917,7 @@ impl LanguageServer for Backend {
                     } else {
                     
                         // Provide device name completions
+                        #[allow(unused_variables)]
                         let mut match_count = 0;
                         for hash_name in crate::device_hashes::DEVICE_NAME_TO_HASH.keys() {
                             let hash_value = crate::device_hashes::DEVICE_NAME_TO_HASH[hash_name];
@@ -3146,6 +3190,9 @@ impl LanguageServer for Backend {
     }
 
     async fn hover(&self, params: HoverParams) -> Result<Option<Hover>> {
+        let _timer = performance::TimingGuard::new(&self.perf_tracker, "lsp.server.hover");
+        self.perf_tracker.increment("lsp.server.hover.calls", 1);
+        
         let files = self.files.read().await;
         let Some(file_data) = files.get(&params.text_document_position_params.text_document.uri)
         else {
@@ -3441,34 +3488,37 @@ impl LanguageServer for Backend {
                 }
             }
             "logictype" => {
-                let Some(instruction_node) = node.find_parent("instruction") else {
-                    return Ok(None);
-                };
+                // Try to get contextual information if available
+                let candidates = if let Some(instruction_node) = node.find_parent("instruction") {
+                    if let Some(operation_node) = instruction_node.child_by_field_name("operation") {
+                        let operation = operation_node
+                            .utf8_text(document.content.as_bytes())
+                            .unwrap();
 
-                let Some(operation_node) = instruction_node.child_by_field_name("operation") else {
-                    return Ok(None);
-                };
+                        let (current_param, _) =
+                            get_current_parameter(instruction_node, position.character as usize, document.content.as_bytes());
 
-                let operation = operation_node
-                    .utf8_text(document.content.as_bytes())
-                    .unwrap();
+                        let candidates = instructions::logictype_candidates(name);
 
-                let (current_param, _) =
-                    get_current_parameter(instruction_node, position.character as usize, document.content.as_bytes());
-
-                let candidates = instructions::logictype_candidates(name);
-
-                let types = if let Some(signature) = instructions::INSTRUCTIONS.get(operation) {
-                    if let Some(param_type) = signature.0.get(current_param) {
-                        param_type.intersection(&candidates)
+                        if let Some(signature) = instructions::INSTRUCTIONS.get(operation) {
+                            if let Some(param_type) = signature.0.get(current_param) {
+                                param_type.intersection(&candidates)
+                            } else {
+                                candidates
+                            }
+                        } else {
+                            candidates
+                        }
                     } else {
-                        candidates
+                        // No operation node, use all candidates
+                        instructions::logictype_candidates(name)
                     }
                 } else {
-                    candidates
+                    // No instruction context, use all candidates
+                    instructions::logictype_candidates(name)
                 };
 
-                let strings = types
+                let strings: Vec<MarkedString> = candidates
                     .iter()
                     .map(|typ| {
                         MarkedString::String(format!("# `{}` (`{}`)\n{}", name, typ, {
@@ -3484,22 +3534,82 @@ impl LanguageServer for Backend {
                     })
                     .collect();
 
-                return Ok(Some(Hover {
-                    contents: HoverContents::Array(strings),
-                    range: Some(Range::from(node.range()).into()),
-                }));
+                // If no candidates matched but we have documentation, show it anyway
+                if strings.is_empty() {
+                    let mut fallback_parts: Vec<MarkedString> = Vec::new();
+                    
+                    if let Some(doc) = instructions::LOGIC_TYPE_DOCS.get(name) {
+                        fallback_parts.push(MarkedString::String(format!(
+                            "# `{}` (`logicType`)\n{}",
+                            name, doc
+                        )));
+                    }
+                    if let Some(doc) = instructions::SLOT_TYPE_DOCS.get(name) {
+                        fallback_parts.push(MarkedString::String(format!(
+                            "# `{}` (`logicSlotType`)\n{}",
+                            name, doc
+                        )));
+                    }
+                    if let Some(doc) = instructions::BATCH_MODE_DOCS.get(name) {
+                        fallback_parts.push(MarkedString::String(format!(
+                            "# `{}` (`batchMode`)\n{}",
+                            name, doc
+                        )));
+                    }
+                    
+                    if !fallback_parts.is_empty() {
+                        return Ok(Some(Hover {
+                            contents: HoverContents::Array(fallback_parts),
+                            range: Some(Range::from(node.range()).into()),
+                        }));
+                    }
+                }
+
+                if !strings.is_empty() {
+                    return Ok(Some(Hover {
+                        contents: HoverContents::Array(strings),
+                        range: Some(Range::from(node.range()).into()),
+                    }));
+                }
             }
-            "function_call" => {
-                let text = node.utf8_text(document.content.as_bytes()).unwrap();
-                if let Some(device_name) = crate::hash_utils::extract_hash_argument(text) {
-                    if let Some(device_hash) = crate::hash_utils::get_device_hash(&device_name) {
-                        if let Some(device_display_name) =
-                            crate::hash_utils::get_device_name_for_hash(device_hash)
-                        {
+            "hash_function" | "function_call" | "hash_string" | "hash_keyword" => {
+                // For hash_string or hash_keyword, try to get the parent hash_function
+                let hash_node = if matches!(node.kind(), "hash_string" | "hash_keyword") {
+                    node.parent()
+                } else {
+                    Some(node)
+                };
+                
+                if let Some(hash_node) = hash_node {
+                    let text = hash_node.utf8_text(document.content.as_bytes()).unwrap();
+                    if let Some(device_name) = crate::hash_utils::extract_hash_argument(text) {
+                        if let Some(device_hash) = crate::hash_utils::get_device_hash(&device_name) {
+                            let mut parts: Vec<MarkedString> = Vec::new();
+                            
+                            // Show the hash function and value
+                            parts.push(MarkedString::LanguageString(LanguageString {
+                                language: "ic10".to_string(),
+                                value: format!("HASH(\"{}\") = {}", device_name, device_hash),
+                            }));
+                            
+                            // Add device display name and description if available
+                            if let Some((display_name, description)) = 
+                                crate::descriptions::get_device_description(&device_name) 
+                            {
+                                let mut md_text = format!("**{}**", display_name);
+                                if !description.is_empty() {
+                                    md_text.push_str(&format!("\n\n{}", description));
+                                }
+                                parts.push(MarkedString::String(md_text));
+                            } else if let Some(device_display_name) =
+                                crate::hash_utils::get_device_name_for_hash(device_hash)
+                            {
+                                // Fallback to display name only if no description available
+                                parts.push(MarkedString::String(device_display_name.to_string()));
+                            }
+                            
                             return Ok(Some(Hover {
-                                contents: HoverContents::Scalar(MarkedString::String(
-                                    device_display_name.to_string(),
-                                )),
+                                contents: HoverContents::Array(parts),
                                 range: Some(Range::from(node.range()).into()),
                             }));
                         }
@@ -3585,6 +3695,58 @@ impl LanguageServer for Backend {
                     }
                 }
             }
+            "number" => {
+                // Check if this number is a known device hash
+                if let Ok(hash_value) = name.parse::<i32>() {
+                    if let Some(device_display_name) = crate::hash_utils::get_device_name_for_hash(hash_value) {
+                        // Try to find the prefab name from the hash value
+                        let mut prefab_name_opt = None;
+                        for (prefab, &hash) in crate::device_hashes::DEVICE_NAME_TO_HASH.entries() {
+                            if hash == hash_value {
+                                prefab_name_opt = Some(*prefab);
+                                break;
+                            }
+                        }
+                        
+                        let mut parts: Vec<MarkedString> = Vec::new();
+                        parts.push(MarkedString::LanguageString(LanguageString {
+                            language: "ic10".to_string(),
+                            value: format!("Device Hash: {}", hash_value),
+                        }));
+                        
+                        // Try to get description from English.xml
+                        if let Some(prefab_name) = prefab_name_opt {
+                            if let Some((display_name, description)) = 
+                                crate::descriptions::get_device_description(prefab_name) 
+                            {
+                                let mut md_text = format!("**{}**", display_name);
+                                if !description.is_empty() {
+                                    md_text.push_str(&format!("\n\n{}", description));
+                                }
+                                md_text.push_str(&format!("\n\n_Prefab: `{}`_", prefab_name));
+                                parts.push(MarkedString::String(md_text));
+                            } else {
+                                // Fallback if no description available
+                                parts.push(MarkedString::String(format!(
+                                    "**{}**\n\nThis is the hash value for the `{}` device/prefab.",
+                                    device_display_name, prefab_name
+                                )));
+                            }
+                        } else {
+                            // Fallback if prefab name not found
+                            parts.push(MarkedString::String(format!(
+                                "**{}**\n\nDevice hash value.",
+                                device_display_name
+                            )));
+                        }
+                        
+                        return Ok(Some(Hover {
+                            contents: HoverContents::Array(parts),
+                            range: Some(Range::from(node.range()).into()),
+                        }));
+                    }
+                }
+            }
             _ => {}
         }
         Ok(None)
@@ -3622,20 +3784,6 @@ impl Backend {
         false
     }
 
-    fn should_ignore_register_warnings(content: &str) -> bool {
-        // Check for #IgnoreRegisterWarnings directive in comments (case-insensitive)
-        for line in content.lines() {
-            let trimmed = line.trim();
-            if let Some(comment_start) = trimmed.find('#') {
-                let comment = trimmed[comment_start + 1..].trim().to_lowercase();
-                if comment.starts_with("ignoreregisterwarnings") {
-                    return true;
-                }
-            }
-        }
-        false
-    }
-
     async fn update_content(&self, uri: Url, mut text: String) {
         let mut files = self.files.write().await;
 
@@ -3649,10 +3797,15 @@ impl Backend {
                     .set_language(tree_sitter_ic10::language())
                     .expect("Could not set language");
                 let key = entry.key().clone();
+                let tree = {
+                    let _timer = performance::TimingGuard::new(&self.perf_tracker, "lsp.server.parsing");
+                    self.perf_tracker.increment("lsp.server.parsing.calls", 1);
+                    parser.parse(&text, None)
+                };
                 entry.insert(FileData {
                     document_data: DocumentData {
                         url: key,
-                        tree: parser.parse(&text, None),
+                        tree,
                         content: text,
                         parser,
                     },
@@ -3662,7 +3815,12 @@ impl Backend {
             }
             std::collections::hash_map::Entry::Occupied(mut entry) => {
                 let entry = entry.get_mut();
-                entry.document_data.tree = entry.document_data.parser.parse(&text, None); // TODO
+                let tree = {
+                    let _timer = performance::TimingGuard::new(&self.perf_tracker, "lsp.server.parsing");
+                    self.perf_tracker.increment("lsp.server.parsing.calls", 1);
+                    entry.document_data.parser.parse(&text, None)
+                };
+                entry.document_data.tree = tree; // TODO
                 entry.document_data.content = text;
                 // Don't reset last_diagnostic_run here - it will be updated when diagnostics actually run
             }
@@ -4203,6 +4361,9 @@ impl Backend {
     }
 
     async fn run_diagnostics(&self, uri: &Url) {
+        let _timer = performance::TimingGuard::new(&self.perf_tracker, "lsp.server.diagnostics");
+        self.perf_tracker.increment("lsp.server.diagnostics.calls", 1);
+        
         // If diagnostics disabled, clear and bail
         if !*self.diagnostics_enabled.read().await {
             self.client
@@ -4210,6 +4371,37 @@ impl Backend {
                 .await;
             return;
         }
+        
+        // Check cache first (content hash to detect changes)
+        let content_hash = {
+            let files = self.files.read().await;
+            if let Some(file_data) = files.get(uri) {
+                let mut hasher = Sha256::new();
+                hasher.update(file_data.document_data.content.as_bytes());
+                format!("{:x}", hasher.finalize())
+            } else {
+                return; // File not found
+            }
+        };
+        
+        // Try to get cached diagnostics (DashMap is lock-free)
+        if let Some(cached_diagnostics) = self.diagnostic_cache.get(&content_hash) {
+            self.perf_tracker.increment("lsp.server.diagnostics.cache_hits", 1);
+            self.client
+                .publish_diagnostics(uri.clone(), cached_diagnostics.clone(), None)
+                .await;
+            
+            // Update the last diagnostic run time
+            {
+                let mut files = self.files.write().await;
+                if let Some(file_data) = files.get_mut(uri) {
+                    file_data.last_diagnostic_run = Some(Instant::now());
+                }
+            }
+            return; // Cache hit!
+        }
+        
+        self.perf_tracker.increment("lsp.server.diagnostics.cache_misses", 1);
         
         // Update the last diagnostic run time
         {
@@ -4621,6 +4813,20 @@ impl Backend {
             let mut seen: HashSet<(u32, u32, u32, u32, String)> = HashSet::new();
             diagnostics.retain(|d| seen.insert(diagnostic_identity(d)));
         }
+
+        // Store in cache (DashMap is lock-free)
+        // Limit cache size to prevent memory bloat
+        if self.diagnostic_cache.len() > 100 {
+            // Clear oldest entries (simple strategy: clear half when limit reached)
+            let keys_to_remove: Vec<_> = self.diagnostic_cache.iter()
+                .take(50)
+                .map(|entry| entry.key().clone())
+                .collect();
+            for key in keys_to_remove {
+                self.diagnostic_cache.remove(&key);
+            }
+        }
+        self.diagnostic_cache.insert(content_hash, diagnostics.clone());
 
         self.client
             .publish_diagnostics(uri.to_owned(), diagnostics, None)
@@ -5307,6 +5513,9 @@ async fn main() {
         config: Arc::new(RwLock::new(Configuration::default())),
         diagnostics_enabled: Arc::new(RwLock::new(true)),
         warned_about_file_count: Arc::new(tokio::sync::Mutex::new(false)),
+        perf_tracker: Arc::new(performance::PerformanceTracker::new()),
+        pending_diagnostics: Arc::new(tokio::sync::Mutex::new(HashMap::new())),
+        diagnostic_cache: Arc::new(dashmap::DashMap::new()),
     });
 
     if !cli.listen && cli.host.is_none() {

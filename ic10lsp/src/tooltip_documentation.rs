@@ -438,7 +438,6 @@ pub(crate) fn get_instruction_syntax(instruction: &str) -> String {
             // - Subsequent VALUEs => a, b, c in order
             // - Preserve well-known typed names for logicType, slotLogicType, batchMode, reagentMode, device
             use crate::instructions::DataType;
-            static ABLIST: [&str; 3] = ["a", "b", "c"]; // extended below if needed
             let mut dyn_labels: Vec<&'static str> = Vec::with_capacity(params.len());
             let mut next_ab = 0usize;
             for (idx, u) in params.iter().enumerate() {
