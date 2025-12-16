@@ -1,6 +1,6 @@
 ### Changelog Beginning 11-01-2025
 
-## [2.1.12] - 2025-12-16 The "Performance Optimization" Update
+## [2.2.0] - 2025-12-16 The "Performance Optimization" Update
 
 ### ⚡ Major Performance Improvements
 - **Diagnostic Performance**: 86% faster diagnostics (27.77ms → 3.87ms average)
@@ -96,7 +96,7 @@
   - Server commands: `ic10.server.enableBenchmarking`, `ic10.server.getBenchmarkReport`
   - Maintains last 1000 measurements for accurate percentile calculations
 
-### 🔧 Technical Details (LSP v0.9.1)
+### 🔧 Technical Details (LSP v0.10.0)
 - **Dependencies Added**:
   - `sha2 = "0.10"` - Content hashing for cache keys
   - `parking_lot = "0.12"` - Initially attempted, replaced with DashMap

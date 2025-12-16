@@ -22,6 +22,7 @@
 - **Device completions in HASH()**: All 1709 devices with fuzzy search
 - **Usage-based sorting**: Frequently-used registers/devices prioritized
 - **Blazing fast performance**: 86% faster diagnostics with intelligent caching
+- **Device descriptions**: Hover over device hashes to see names and descriptions extracted from game files
 - Multi-example hover documentation for 80+ instructions
 - Expanded instruction descriptions and category grouping
 - Instant diagnostics toggle (Ctrl+Alt+D)
