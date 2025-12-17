@@ -4,7 +4,7 @@
 //! including node navigation, querying, and parameter position detection.
 
 use tree_sitter::{Node, Query, QueryCursor};
-use crate::types::Position;
+
 
 /// Extension trait for tree-sitter Node providing convenience methods
 pub trait NodeEx: Sized {

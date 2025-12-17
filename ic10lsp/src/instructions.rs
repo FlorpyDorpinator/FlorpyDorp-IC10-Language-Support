@@ -1,6 +1,6 @@
 use std::fmt::Display;
 
-use phf::{phf_map, phf_set};
+use phf::phf_map;
 
 // Auto-generated types from build.rs (game-sources/)
 // This include happens BEFORE manual definitions, but manual pub const takes precedence

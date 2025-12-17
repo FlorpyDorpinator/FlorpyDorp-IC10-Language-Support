@@ -8,7 +8,7 @@
 //! - HASH() function completions for device names
 //! - Context-aware completions based on parameter types
 
-use crate::document::{DefinitionData, FileData, HasType};
+use crate::document::{DefinitionData, HasType};
 use crate::instructions::{self, DataType};
 use crate::performance;
 use crate::tree_utils::{get_current_parameter, NodeEx};
@@ -1030,7 +1030,7 @@ pub async fn handle_completion(
 /// Provides instruction completions based on prefix matching
 fn instruction_completions(prefix: &str, completions: &mut Vec<CompletionItem>) {
     let start_entries = completions.len();
-    for (instruction, signature) in instructions::INSTRUCTIONS.entries() {
+    for (instruction, _signature) in instructions::INSTRUCTIONS.entries() {
         if instruction.starts_with(prefix) {
             // Use labeled syntax but only show the operand suffix in the detail
             let full_syntax = crate::tooltip_documentation::get_instruction_syntax(instruction);
