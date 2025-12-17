@@ -1345,18 +1345,29 @@ export function activate(context: vscode.ExtensionContext) {
     }
     
     /**
-     * Parse a line to extract absolute branch information
+     * Parse a line to extract absolute branch information (label or direct line number)
      * Returns: { opcode: string, label: string, targetLine: number } or null
      */
     function parseAbsoluteBranch(lineText: string, currentLine: number, labels: Map<string, number>): { opcode: string, label: string, targetLine: number } | null {
-        // Match instruction pattern: opcode label
-        const match = lineText.match(/^\s*([a-z]+)\s+([a-zA-Z_][a-zA-Z0-9_]*)(?:\s|#|$)/i);
+        // Match instruction pattern: opcode operand (label or number)
+        const match = lineText.match(/^\s*([a-z]+)\s+([a-zA-Z_0-9][a-zA-Z0-9_]*)(?:\s|#|$)/i);
         if (!match) return null;
         
         const opcode = match[1].toLowerCase();
         if (!absoluteBranchOpcodes.has(opcode)) return null;
         
-        const label = match[2].toLowerCase(); // Case insensitive
+        const operand = match[2];
+        
+        // Check if operand is a number (direct line number)
+        const numericLineNumber = parseInt(operand, 10);
+        if (!isNaN(numericLineNumber)) {
+            // Convert from 1-based (IC10 convention) to 0-based (internal indexing)
+            const targetLine = numericLineNumber - 1;
+            return { opcode, label: operand, targetLine };
+        }
+        
+        // Otherwise treat as label (case insensitive)
+        const label = operand.toLowerCase();
         const targetLine = labels.get(label);
         
         if (targetLine === undefined) return null; // Label not found
