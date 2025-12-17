@@ -1665,7 +1665,7 @@ export function activate(context: vscode.ExtensionContext) {
         }
         lastDocumentLineCount = document.lineCount;
         
-        const branches: Array<{ sourceLine: number, targetLine: number, offset: number, opcode: string }> = [];
+        const branches: Array<{ sourceLine: number, targetLine: number, offset: number, opcode: string, isRelative: boolean }> = [];
         
         // First, parse all labels in the document
         const labels = parseLabels(document);
@@ -1685,7 +1685,8 @@ export function activate(context: vscode.ExtensionContext) {
                         sourceLine: line,
                         targetLine: relativeBranch.targetLine,
                         offset: relativeBranch.offset,
-                        opcode: relativeBranch.opcode
+                        opcode: relativeBranch.opcode,
+                        isRelative: true
                     });
                 } else {
                     // Invalid target - out of bounds
@@ -1707,7 +1708,8 @@ export function activate(context: vscode.ExtensionContext) {
                         sourceLine: line,
                         targetLine: absoluteBranch.targetLine,
                         offset: absoluteBranch.targetLine - line, // Calculate offset for visualization
-                        opcode: absoluteBranch.opcode
+                        opcode: absoluteBranch.opcode,
+                        isRelative: false
                     });
                 } else {
                     // Invalid target - out of bounds
@@ -1767,7 +1769,20 @@ export function activate(context: vscode.ExtensionContext) {
                 ? targetLineText.substring(0, 50) + '...' 
                 : targetLineText;
             const direction = branch.offset < 0 ? '⇑' : '⇓';
-            ghostTextMap.set(branch.sourceLine, ` ${direction} line ${branch.targetLine + 1}: ${targetPreview}`);
+            
+            // Display differently for relative vs absolute branches
+            let ghostText: string;
+            if (branch.isRelative) {
+                // Relative branch: show offset (e.g., "⇓ +3 lines forward to line 5")
+                const offsetStr = branch.offset >= 0 ? `+${branch.offset}` : `${branch.offset}`;
+                const directionText = branch.offset < 0 ? 'backward' : 'forward';
+                ghostText = ` ${direction} ${offsetStr} lines ${directionText} to line ${branch.targetLine + 1}: ${targetPreview}`;
+            } else {
+                // Absolute branch: show only target line (e.g., "⇓ to line 5")
+                ghostText = ` ${direction} to line ${branch.targetLine + 1}: ${targetPreview}`;
+            }
+            
+            ghostTextMap.set(branch.sourceLine, ghostText);
         });
         
         // Calculate gutter line positions to avoid overlaps
