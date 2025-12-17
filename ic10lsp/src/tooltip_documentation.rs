@@ -182,7 +182,7 @@ pub(crate) fn get_related_instructions(instruction: &str) -> Option<&'static [&'
 }
 
 pub(crate) fn get_instruction_syntax(instruction: &str) -> String {
-    use crate::instructions::{DataType, InstructionSignature, INSTRUCTIONS};
+    use crate::instructions::{InstructionSignature, INSTRUCTIONS};
 
     // Explicit parameter label mapping derived from in‑game formatting conventions.
     // Only mnemonic differences are captured; first destination register (r?) usually left unlabeled.
@@ -357,7 +357,7 @@ pub(crate) fn get_instruction_syntax(instruction: &str) -> String {
 
     fn format_union_with_label(
         label: &str,
-        opcode: &str,
+        _opcode: &str,
         u: &crate::instructions::Union,
     ) -> String {
         use crate::instructions::DataType;

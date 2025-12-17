@@ -940,7 +940,7 @@ async fn main() {
             let path_ref = Path::new(path);
             let content = match fs::read_to_string(path_ref) {
                 Ok(c) => c,
-                Err(e) => {
+                Err(_e) => {
                     continue;
                 }
             };
