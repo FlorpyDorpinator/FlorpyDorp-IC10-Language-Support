@@ -1,5 +1,53 @@
 ### Changelog Beginning 11-01-2025
 
+## [2.3.0] - 2025-12-24 The "Clean Architecture" Update
+
+### 🐛 Critical Bug Fixes
+- **Fixed Semantic Tokens UTF-16 Encoding**: Resolved crash caused by position encoding mismatch
+  - Fixed "Invalid Semantic Tokens Data From Extension: end character > model.getLineLength(lineNumber)" error
+  - Root cause: Tree-sitter returns byte offsets (UTF-8) but VS Code expects UTF-16 code units
+  - Solution: Implemented proper conversion using `encode_utf16().count()` for all token positions
+  - Impact: Prevents complete LSP server crashes when files contain multi-byte Unicode characters
+  - Added boundary checking and `saturating_sub()` to prevent position underflow
+  - Removed obsolete byte-based position calculations
+
+### 🏗️ Major LSP Codebase Refactoring
+- **main.rs Modularization**: Reduced from 5,631 lines to 1,028 lines (82% reduction!)
+  - Code is now organized into focused, single-responsibility modules
+  - Dramatically improved maintainability and readability
+  - Zero functionality changes - all features work exactly as before
+
+- **New Module Structure**:
+  | Module | Lines | Purpose |
+  |--------|-------|---------|
+  | `lsp_completion.rs` | 1,308 | All completion/autocomplete handling |
+  | `lsp_diagnostics.rs` | 1,362 | Diagnostic generation and type checking |
+  | `lsp_hover.rs` | 858 | Hover documentation and inlay hints |
+  | `lsp_handlers.rs` | 816 | Semantic tokens, symbols, signature help, code actions, goto definition |
+  | `document.rs` | 201 | Document data structures and type tracking |
+  | `types.rs` | 75 | Position/Range type conversions |
+  | `tree_utils.rs` | 87 | Tree-sitter node utilities |
+  | `type_classification.rs` | 123 | Parameter type classification helpers |
+  | `diagnostic_helpers.rs` | 36 | Diagnostic utility functions |
+
+- **Cleanup**: Removed debug utilities and build artifacts
+  - Deleted `debug_crc32.rs`, `debug_tree_structure.rs`
+  - Removed temporary `.txt` files from source directory
+  - Clean build with zero compiler warnings
+
+### 🎯 Branch Visualizer Fixes
+- **Fixed Absolute vs Relative Branch Display**: 
+  - `j 3` now correctly shows "⇓ to line 3" instead of "⇓ +3 lines forward"
+  - Absolute branches (j, beq, bne, etc.) display destination only
+  - Relative branches (jr, brgt, brle, etc.) continue showing offset info
+  
+- **Fixed Numeric Line Number Support**:
+  - `j 3` now correctly recognized as "jump to line 3"
+  - Previously, numeric operands were incorrectly parsed as relative offsets
+  - Proper 1-based to 0-based line number conversion
+
+---
+
 ## [2.2.0] - 2025-12-16 The "Performance Optimization" Update
 
 ### ⚡ Major Performance Improvements
