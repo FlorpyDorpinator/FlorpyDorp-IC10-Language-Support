@@ -62,7 +62,7 @@ git push origin main
 
 ### Step 5: Wait for GitHub Actions to Build
 
-1. Go to: https://github.com/FlorpyDorpinator/IC10-Code-Extension/actions
+1. Go to: https://github.com/FlorpyDorpinator/FlorpyDorp-IC10-Language-Support/actions
 2. Wait for the "Build IC10 LSP Cross-Platform" workflow to complete (usually 5-10 minutes)
 3. All 4 platform builds should show green checkmarks ✅
 

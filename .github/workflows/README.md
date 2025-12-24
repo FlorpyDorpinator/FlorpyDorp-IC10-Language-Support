@@ -57,7 +57,7 @@ This directory contains automated workflows for the IC10 Extension.
 5. **Wait for the workflow to complete** (~10-15 minutes)
 
 6. **Check results:**
-   - GitHub Release: https://github.com/FlorpyDorpinator/IC10-Code-Extension/releases
+   - GitHub Release: https://github.com/FlorpyDorpinator/FlorpyDorp-IC10-Language-Support/releases
    - VS Code Marketplace: https://marketplace.visualstudio.com/manage (if published)
 
 ---
@@ -92,7 +92,7 @@ To enable automatic publishing to the VS Code Marketplace:
    - **Copy the token immediately** (you won't see it again!)
 
 2. **Add the token to GitHub Secrets:**
-   - Go to https://github.com/FlorpyDorpinator/IC10-Code-Extension/settings/secrets/actions
+   - Go to https://github.com/FlorpyDorpinator/FlorpyDorp-IC10-Language-Support/settings/secrets/actions
    - Click **New repository secret**
    - Name: `VSCE_PAT`
    - Value: Paste your PAT
@@ -105,7 +105,7 @@ To enable automatic publishing to the VS Code Marketplace:
 ## Workflow Status
 
 Check workflow runs at:
-https://github.com/FlorpyDorpinator/IC10-Code-Extension/actions
+https://github.com/FlorpyDorpinator/FlorpyDorp-IC10-Language-Support/actions
 
 Green checkmark ✅ = Success
 Red X ❌ = Failed (click for details)

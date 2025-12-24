@@ -38,8 +38,8 @@ git push origin v1.2.11
 - ✅ Publish to VS Code Marketplace (if token is configured)
 
 **Monitor progress:**
-- Workflow: https://github.com/FlorpyDorpinator/IC10-Code-Extension/actions
-- Releases: https://github.com/FlorpyDorpinator/IC10-Code-Extension/releases
+- Workflow: https://github.com/FlorpyDorpinator/FlorpyDorp-IC10-Language-Support/actions
+- Releases: https://github.com/FlorpyDorpinator/FlorpyDorp-IC10-Language-Support/releases
 
 **Time:** ~10-15 minutes for complete build and release
 
@@ -50,7 +50,7 @@ git push origin v1.2.11
 If you prefer to do it manually or the automation fails:
 
 ### Step 1: Download LSP Binaries
-1. Go to https://github.com/FlorpyDorpinator/IC10-Code-Extension/actions
+1. Go to https://github.com/FlorpyDorpinator/FlorpyDorp-IC10-Language-Support/actions
 2. Find the latest "Build and Release Extension" or "Build IC10 LSP Cross-Platform" run
 3. Scroll to **Artifacts** section
 4. Download all 4 binary artifacts:
@@ -125,7 +125,7 @@ To enable automatic publishing, you need a Personal Access Token (PAT):
 - **COPY THE TOKEN IMMEDIATELY** (you won't see it again!)
 
 ### 2. Add Token to GitHub Secrets
-- Go to https://github.com/FlorpyDorpinator/IC10-Code-Extension/settings/secrets/actions
+- Go to https://github.com/FlorpyDorpinator/FlorpyDorp-IC10-Language-Support/settings/secrets/actions
 - Click **New repository secret**
 - **Name:** `VSCE_PAT`
 - **Value:** Paste your PAT
@@ -149,7 +149,7 @@ Each release includes:
 ## 🐛 Troubleshooting
 
 ### "Workflow failed" - Check the logs
-1. Go to https://github.com/FlorpyDorpinator/IC10-Code-Extension/actions
+1. Go to https://github.com/FlorpyDorpinator/FlorpyDorp-IC10-Language-Support/actions
 2. Click the failed run
 3. Click the failing job to see error details
 4. Common fixes:
@@ -224,7 +224,7 @@ git push origin :refs/tags/v1.2.11
 ---
 
 **Need help?** Check the workflow logs at:
-https://github.com/FlorpyDorpinator/IC10-Code-Extension/actions
+https://github.com/FlorpyDorpinator/FlorpyDorp-IC10-Language-Support/actions
 
 **Questions?** Open an issue at:
-https://github.com/FlorpyDorpinator/IC10-Code-Extension/issues
+https://github.com/FlorpyDorpinator/FlorpyDorp-IC10-Language-Support/issues
