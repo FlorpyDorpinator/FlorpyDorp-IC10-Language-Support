@@ -76,13 +76,6 @@ pub async fn handle_semantic_tokens_full(
         let idx = capture.captures[0].index;
         let start = node.range().start_point;
 
-        let delta_line = start.row as u32 - previous_line;
-        let delta_start = if delta_line == 0 {
-            start.column as u32 - previous_col
-        } else {
-            start.column as u32
-        };
-
         let tokentype = {
             if idx == comment_idx {
                 SemanticTokenType::COMMENT
@@ -221,29 +214,46 @@ pub async fn handle_semantic_tokens_full(
             }
         };
 
-        // Calculate token length and clamp to line bounds to prevent "end character > line length" errors
-        let calculated_length = node.range().end_point.column as u32 - start.column as u32;
+        // Convert byte positions to UTF-16 code units (required by VS Code)
+        // Tree-sitter gives us byte offsets, but LSP uses UTF-16
+        let line_text = document.content.lines().nth(start.row).unwrap_or("");
         
-        // Get the actual line length from the document to ensure we don't exceed it
-        let line_length = document.content.lines().nth(start.row).map(|line| line.len() as u32).unwrap_or(0);
-        let max_allowed_length = if line_length > start.column as u32 {
-            line_length - start.column as u32
+        // Calculate UTF-16 column for the start position
+        let byte_start = start.column;
+        let utf16_start = if byte_start <= line_text.len() {
+            line_text[..byte_start].encode_utf16().count() as u32
         } else {
-            0
+            line_text.encode_utf16().count() as u32
         };
         
-        // Use the minimum of calculated length and max allowed length
-        let safe_length = calculated_length.min(max_allowed_length);
+        // Calculate UTF-16 column for the end position
+        let byte_end = node.range().end_point.column;
+        let utf16_end = if byte_end <= line_text.len() {
+            line_text[..byte_end].encode_utf16().count() as u32
+        } else {
+            line_text.encode_utf16().count() as u32
+        };
+        
+        // Calculate token length in UTF-16 code units
+        let utf16_length = utf16_end.saturating_sub(utf16_start);
         
         // Skip tokens with zero length (defensive)
-        if safe_length == 0 {
+        if utf16_length == 0 {
             continue;
         }
+        
+        // Calculate delta for LSP semantic tokens format
+        let utf16_delta_line = start.row as u32 - previous_line;
+        let utf16_delta_start = if utf16_delta_line == 0 {
+            utf16_start - previous_col
+        } else {
+            utf16_start
+        };
 
         ret.push(SemanticToken {
-            delta_line,
-            delta_start,
-            length: safe_length,
+            delta_line: utf16_delta_line,
+            delta_start: utf16_delta_start,
+            length: utf16_length,
             token_type: SEMANTIC_SYMBOL_LEGEND
                 .iter()
                 .position(|x| *x == tokentype)
@@ -252,7 +262,7 @@ pub async fn handle_semantic_tokens_full(
         });
 
         previous_line = start.row as u32;
-        previous_col = start.column as u32;
+        previous_col = utf16_start;
     }
     Ok(Some(SemanticTokensResult::Tokens(SemanticTokens {
         result_id: None,
