@@ -65,3 +65,6 @@ anex-ic10/dev/gamedata-mods/xml-generator
 
 # Deprecated files
 anex-ic10/dev/extractor/StationeersDataExtractor-BepInEx
+
+# Spec Story
+.specstory/
