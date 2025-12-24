@@ -36,7 +36,7 @@
 
 ## 🚀 Intelligent Completions
 
-![Auto-completion Demo](https://raw.githubusercontent.com/FlorpyDorpinator/IC10-Code-Extension/main/FlorpyDorp%20Language%20Support/images/completion-demo.gif)
+![Auto-completion Demo](https://raw.githubusercontent.com/FlorpyDorpinator/FlorpyDorp-IC10-Language-Support/main/FlorpyDorp%20Language%20Support/images/completion-demo.gif)
 
 The extension provides context-aware completions that understand what you're typing:
 
@@ -69,7 +69,7 @@ Completions prioritize items you've already used:
 
 ## 🎯 Branch Visualization
 
-![Branch Visualization Demo](https://raw.githubusercontent.com/FlorpyDorpinator/IC10-Code-Extension/main/FlorpyDorp%20Language%20Support/images/branch-visualization-demo.gif)
+![Branch Visualization Demo](https://raw.githubusercontent.com/FlorpyDorpinator/FlorpyDorp-IC10-Language-Support/main/FlorpyDorp%20Language%20Support/images/branch-visualization-demo.gif)
 
 Visualize control flow with color-coded branch indicators:
 
@@ -99,7 +99,7 @@ Press **Ctrl+Alt+B** to show/hide branch visualization anytime.
 
 ## 💡 Inlay Hints (Shadow Text)
 
-![Inlay Hints Demo](https://raw.githubusercontent.com/FlorpyDorpinator/IC10-Code-Extension/main/FlorpyDorp%20Language%20Support/images/inlay-hints-demo.gif)
+![Inlay Hints Demo](https://raw.githubusercontent.com/FlorpyDorpinator/FlorpyDorp-IC10-Language-Support/main/FlorpyDorp%20Language%20Support/images/inlay-hints-demo.gif)
 
 See helpful context as you code without obscuring your text:
 
@@ -111,7 +111,7 @@ See helpful context as you code without obscuring your text:
 
 **Device Name Hints:**
 
-![Device Hash Hints](https://raw.githubusercontent.com/FlorpyDorpinator/IC10-Code-Extension/main/FlorpyDorp%20Language%20Support/images/device-hash-demo.gif)
+![Device Hash Hints](https://raw.githubusercontent.com/FlorpyDorpinator/FlorpyDorp-IC10-Language-Support/main/FlorpyDorp%20Language%20Support/images/device-hash-demo.gif)
 
 - HASH() calls show device display name and hash value at end of line
 - Example: `HASH("StructureVolumePump")` → shows ` → Volume Pump (-1258351925)`
@@ -129,7 +129,7 @@ See helpful context as you code without obscuring your text:
 
 ## 🩺 Error Detection & Diagnostics
 
-![Error Detection Demo](https://raw.githubusercontent.com/FlorpyDorpinator/IC10-Code-Extension/main/FlorpyDorp%20Language%20Support/images/diagnostics-demo.gif)
+![Error Detection Demo](https://raw.githubusercontent.com/FlorpyDorpinator/FlorpyDorp-IC10-Language-Support/main/FlorpyDorp%20Language%20Support/images/diagnostics-demo.gif)
 
 The extension catches common mistakes:
 
@@ -152,7 +152,7 @@ The extension catches common mistakes:
 
 ## ⚡ Quick Actions & Refactoring
 
-![Code Actions Demo](https://raw.githubusercontent.com/FlorpyDorpinator/IC10-Code-Extension/main/FlorpyDorp%20Language%20Support/images/code-actions-demo.gif)
+![Code Actions Demo](https://raw.githubusercontent.com/FlorpyDorpinator/FlorpyDorp-IC10-Language-Support/main/FlorpyDorp%20Language%20Support/images/code-actions-demo.gif)
 
 The extension provides intelligent code actions to improve your workflow:
 
@@ -177,7 +177,7 @@ The extension provides intelligent code actions to improve your workflow:
 
 ## 📚 Hover Documentation
 
-![Hover Documentation Demo](https://raw.githubusercontent.com/FlorpyDorpinator/IC10-Code-Extension/main/FlorpyDorp%20Language%20Support/images/hover-demo.gif)
+![Hover Documentation Demo](https://raw.githubusercontent.com/FlorpyDorpinator/FlorpyDorp-IC10-Language-Support/main/FlorpyDorp%20Language%20Support/images/hover-demo.gif)
 
 Hover over any instruction to see:
 
@@ -194,7 +194,7 @@ This turns the editor into a live IC10 reference.
 
 ## 🔢 Device Hash Support
 
-![Device Hash Support](https://raw.githubusercontent.com/FlorpyDorpinator/IC10-Code-Extension/main/FlorpyDorp%20Language%20Support/images/hash-example.png)
+![Device Hash Support](https://raw.githubusercontent.com/FlorpyDorpinator/FlorpyDorp-IC10-Language-Support/main/FlorpyDorp%20Language%20Support/images/hash-example.png)
 
 The extension understands both string-based and numeric hash values for **1709+ devices** including the complete Modular Console Mod.
 
@@ -250,7 +250,7 @@ Choose from two custom themes designed for IC10 development:
 ### Stationeers IC10 Syntax Only
 Perfect for users who want authentic Stationeers in-game syntax colors while keeping their familiar Dark+ UI. This theme only changes code colors, leaving the rest of VS Code untouched.
 
-![IC10 Syntax Only Theme](https://raw.githubusercontent.com/FlorpyDorpinator/IC10-Code-Extension/main/FlorpyDorp%20Language%20Support/images/theme-syntax-only.png)
+![IC10 Syntax Only Theme](https://raw.githubusercontent.com/FlorpyDorpinator/FlorpyDorp-IC10-Language-Support/main/FlorpyDorp%20Language%20Support/images/theme-syntax-only.png)
 
 **Features:**
 - Dark+ base UI (familiar and clean)
@@ -261,7 +261,7 @@ Perfect for users who want authentic Stationeers in-game syntax colors while kee
 ### Stationeers Full Color Theme
 A complete immersive theme that transforms your entire VS Code interface with Stationeers-inspired colors throughout - code like you're in the game!
 
-![Stationeers Full Color Theme](https://raw.githubusercontent.com/FlorpyDorpinator/IC10-Code-Extension/main/FlorpyDorp%20Language%20Support/images/theme-full.png)
+![Stationeers Full Color Theme](https://raw.githubusercontent.com/FlorpyDorpinator/FlorpyDorp-IC10-Language-Support/main/FlorpyDorp%20Language%20Support/images/theme-full.png)
 
 **Features:**
 - Full custom UI colors inspired by Stationeers
