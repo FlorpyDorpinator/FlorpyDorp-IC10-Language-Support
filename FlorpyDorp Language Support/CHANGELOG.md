@@ -46,7 +46,7 @@
   - Previously, numeric operands were incorrectly parsed as relative offsets
   - Proper 1-based to 0-based line number conversion
 
-### 🎨 Theme Improvements
+  ### 🎨 Theme Improvements
 - **Stationeers Dark Theme Color Adjustments**:
   - Enum/Logic types: Changed from `#ff6516` to `#FF8000` (brighter orange)
   - Registers: Changed from `#5599FF` to `#0080FF` (more saturated blue)
