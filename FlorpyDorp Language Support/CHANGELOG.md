@@ -1,5 +1,16 @@
 ### Changelog Beginning 11-01-2025
 
+## [2.3.2] - 2025-01-04
+
+### 🐛 Bug Fixes
+- **Fixed Label Highlighting on Paste**: Labels now immediately appear in purple when pasting code
+  - Previously, labels would only highlight after pressing Enter or making an edit
+  - Root cause: TextMate grammar used `^` anchor which behaves unreliably during multi-line paste
+  - Solution: Removed line-start anchor and moved label pattern before instruction pattern
+  - Both label name and colon now captured separately for consistent highlighting
+
+---
+
 ## [2.3.1] - 2025-01-03 The "Instant Inlay Hints" Update
 
 ### ⚡ Performance Improvements

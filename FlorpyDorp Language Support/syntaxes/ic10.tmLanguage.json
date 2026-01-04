@@ -5,10 +5,10 @@
     "fileTypes": ["ic10"],
     "patterns": [
       {
-        "include": "#instruction"
+        "include": "#label"
       },
       {
-        "include": "#label"
+        "include": "#instruction"
       },
       {
         "include": "#comment"
@@ -44,8 +44,11 @@
       "label": {
         "patterns": [
           {
-            "name": "entity.name.label.ic10",
-            "match": "^\\s*[a-zA-Z_.][a-zA-Z0-9_.]*:"
+            "match": "([a-zA-Z_.][a-zA-Z0-9_.]*)(:)",
+            "captures": {
+              "1": { "name": "entity.name.label.ic10" },
+              "2": { "name": "punctuation.separator.label.ic10" }
+            }
           }
         ]
       },
