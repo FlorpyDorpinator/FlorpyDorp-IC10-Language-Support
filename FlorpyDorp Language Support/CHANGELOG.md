@@ -1,5 +1,37 @@
 ### Changelog Beginning 11-01-2025
 
+## [2.3.1] - 2025-01-03 The "Instant Inlay Hints" Update
+
+### ⚡ Performance Improvements
+- **Instant Parameter Hints**: Parameter hints now appear immediately (<50ms) instead of 1-2 seconds
+  - Root cause: LSP inlay hints were subject to VS Code's internal debouncing (~500ms+)
+  - Solution: Moved instruction parameter hints to client-side TypeScript for zero-latency display
+  - Client-side hints are synchronous and render on every keystroke instantly
+  - LSP still provides device hash hints, HASH()/STR() hints, and enum value hints
+
+- **Tree-sitter Query Caching**: All tree-sitter queries now compiled once and reused
+  - Added `OnceLock<Query>` caching for 9 frequently-used queries
+  - Eliminated repeated query compilation inside hot loops
+  - Added `find_newline()` and `find_instruction()` cached methods to `NodeEx` trait
+  - Query warmup at LSP startup via `warmup_queries()` functions
+
+### 🐛 Bug Fixes
+- **Fixed Alias Completions Not Appearing**: Aliases and defines now appear in completions
+  - Root cause: Missing `param_completions_dynamic()` call for aliases/defines in early-return path
+  - Solution: Added alias and define completions to the `!should_show_labels` branch
+
+- **Fixed `rmap` Instruction Signature**: Second parameter now correctly typed as DEVICE only
+  - Verified against game code (`ProgrammableChip.cs` line 1048)
+  - Changed from `Union([Register, Device, Number])` to `DEVICE`
+  - Completions now correctly show only d0-d5/db for second parameter
+
+### 🔧 Internal Improvements
+- Added performance timing instrumentation (`[PERF]` logs in LSP output)
+- Removed LSP-side instruction parameter hints (now client-side only)
+- Parser warmup at LSP initialization
+
+---
+
 ## [2.3.0] - 2025-12-24 The "Clean Architecture" Update
 
 ### 🐛 Critical Bug Fixes
