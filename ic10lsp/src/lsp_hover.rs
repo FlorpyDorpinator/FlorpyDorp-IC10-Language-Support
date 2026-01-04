@@ -5,6 +5,8 @@
 //! - Hover documentation for instructions, registers, defines, aliases, labels
 //! - Inlay hints for device hashes, enum values, and instruction parameters
 
+use std::sync::OnceLock;
+
 use tower_lsp::lsp_types::{
     Hover, HoverContents, HoverParams, InlayHint, InlayHintKind, InlayHintLabel,
     InlayHintParams, LanguageString, MarkedString,
@@ -19,6 +21,80 @@ use crate::document::AliasValue;
 use crate::tree_utils::{get_current_parameter, NodeEx};
 use crate::types::{Position, Range};
 use crate::Backend;
+
+// ============================================================================
+// Cached Queries (compiled once, reused for all requests)
+// ============================================================================
+
+/// Cached query for number nodes (device hash lookups)
+fn query_number() -> &'static Query {
+    static QUERY: OnceLock<Query> = OnceLock::new();
+    QUERY.get_or_init(|| {
+        Query::new(tree_sitter_ic10::language(), "(number)@x").unwrap()
+    })
+}
+
+/// Cached query for hash function calls
+fn query_hash_function() -> &'static Query {
+    static QUERY: OnceLock<Query> = OnceLock::new();
+    QUERY.get_or_init(|| {
+        Query::new(tree_sitter_ic10::language(), "(hash_function)@call").unwrap()
+    })
+}
+
+/// Cached query for enum identifiers
+fn query_enum_identifier() -> &'static Query {
+    static QUERY: OnceLock<Query> = OnceLock::new();
+    QUERY.get_or_init(|| {
+        Query::new(tree_sitter_ic10::language(), "(identifier)@x").unwrap()
+    })
+}
+
+/// Cached query for define instructions with number operands
+fn query_define_number() -> &'static Query {
+    static QUERY: OnceLock<Query> = OnceLock::new();
+    QUERY.get_or_init(|| {
+        Query::new(
+            tree_sitter_ic10::language(),
+            "(instruction (operation \"define\") (operand)@name (operand (number)@value))@inst",
+        ).unwrap()
+    })
+}
+
+/// Cached query for instruction nodes
+fn query_instruction() -> &'static Query {
+    static QUERY: OnceLock<Query> = OnceLock::new();
+    QUERY.get_or_init(|| {
+        Query::new(tree_sitter_ic10::language(), "(instruction)@i").unwrap()
+    })
+}
+
+/// Cached query for str function calls
+fn query_str_function() -> &'static Query {
+    static QUERY: OnceLock<Query> = OnceLock::new();
+    QUERY.get_or_init(|| {
+        Query::new(tree_sitter_ic10::language(), "(str_function)@call").unwrap()
+    })
+}
+
+/// Cached query for identifiers (for enum resolution)
+fn query_identifier() -> &'static Query {
+    static QUERY: OnceLock<Query> = OnceLock::new();
+    QUERY.get_or_init(|| {
+        Query::new(tree_sitter_ic10::language(), "(identifier)@id").unwrap()
+    })
+}
+
+/// Warm up all cached queries at startup to eliminate first-request latency
+pub fn warmup_queries() {
+    let _ = query_number();
+    let _ = query_hash_function();
+    let _ = query_enum_identifier();
+    let _ = query_define_number();
+    let _ = query_instruction();
+    let _ = query_str_function();
+    let _ = query_identifier();
+}
 
 /// Handle hover requests - delegates to internal implementation
 pub async fn handle_hover(backend: &Backend, params: HoverParams) -> Result<Option<Hover>> {
@@ -586,9 +662,13 @@ pub async fn handle_hover(backend: &Backend, params: HoverParams) -> Result<Opti
 
 /// Handle inlay hint requests
 pub async fn handle_inlay_hint(backend: &Backend, params: InlayHintParams) -> Result<Option<Vec<InlayHint>>> {
+    let start_total = std::time::Instant::now();
     let mut ret = Vec::new();
 
+    let start_lock = std::time::Instant::now();
     let files = backend.files.read().await;
+    eprintln!("[PERF] files.read() lock: {:?}", start_lock.elapsed());
+    
     let uri = params.text_document.uri;
     let Some(file_data) = files.get(&uri) else {
         return Err(tower_lsp::jsonrpc::Error::invalid_request());
@@ -600,11 +680,12 @@ pub async fn handle_inlay_hint(backend: &Backend, params: InlayHintParams) -> Re
         return Err(tower_lsp::jsonrpc::Error::internal_error());
     };
 
+    // Use cached queries for better performance
     let mut cursor = QueryCursor::new();
-    let query = Query::new(tree_sitter_ic10::language(), "(number)@x").unwrap();
 
+    let start_numbers = std::time::Instant::now();
     // Process all number nodes (direct numeric hashes)
-    for (capture, _) in cursor.captures(&query, tree.root_node(), document.content.as_bytes()) {
+    for (capture, _) in cursor.captures(query_number(), tree.root_node(), document.content.as_bytes()) {
         let node = capture.captures[0].node;
 
         let range = Range::from(node.range());
@@ -623,11 +704,11 @@ pub async fn handle_inlay_hint(backend: &Backend, params: InlayHintParams) -> Re
                     continue;
                 };
                 let endpos = if let Some(newline) =
-                    line_node.query("(newline)@x", document.content.as_bytes())
+                    line_node.find_newline(document.content.as_bytes())
                 {
                     Position::from(newline.range().start_point)
                 } else if let Some(instruction) =
-                    line_node.query("(instruction)@x", document.content.as_bytes())
+                    line_node.find_instruction(document.content.as_bytes())
                 {
                     Position::from(instruction.range().end_point)
                 } else {
@@ -646,12 +727,13 @@ pub async fn handle_inlay_hint(backend: &Backend, params: InlayHintParams) -> Re
             }
         }
     }
+    eprintln!("[PERF] number queries: {:?}", start_numbers.elapsed());
 
     // Also show inlays for HASH("...") functions (hash_function in the grammar)
+    let start_hash = std::time::Instant::now();
     let mut cursor_hash = QueryCursor::new();
-    let hash_query = Query::new(tree_sitter_ic10::language(), "(hash_function)@call").unwrap();
 
-    for (cap, _) in cursor_hash.captures(&hash_query, tree.root_node(), document.content.as_bytes()) {
+    for (cap, _) in cursor_hash.captures(query_hash_function(), tree.root_node(), document.content.as_bytes()) {
         let call_node = cap.captures[0].node;
         
         // Skip incomplete HASH() calls - check if node has errors or is missing closing paren
@@ -679,11 +761,11 @@ pub async fn handle_inlay_hint(backend: &Backend, params: InlayHintParams) -> Re
                 };
 
                 let endpos = if let Some(newline) =
-                    line_node.query("(newline)@x", document.content.as_bytes())
+                    line_node.find_newline(document.content.as_bytes())
                 {
                     Position::from(newline.range().start_point)
                 } else if let Some(instruction) =
-                    line_node.query("(instruction)@x", document.content.as_bytes())
+                    line_node.find_instruction(document.content.as_bytes())
                 {
                     Position::from(instruction.range().end_point)
                 } else {
@@ -703,12 +785,13 @@ pub async fn handle_inlay_hint(backend: &Backend, params: InlayHintParams) -> Re
             }
         }
     }
+    eprintln!("[PERF] hash_function queries: {:?}", start_hash.elapsed());
     
     // Also show inlays for STR("...") functions (str_function in the grammar)
+    let start_str = std::time::Instant::now();
     let mut cursor_str = QueryCursor::new();
-    let str_query = Query::new(tree_sitter_ic10::language(), "(str_function)@call").unwrap();
 
-    for (cap, _) in cursor_str.captures(&str_query, tree.root_node(), document.content.as_bytes()) {
+    for (cap, _) in cursor_str.captures(query_str_function(), tree.root_node(), document.content.as_bytes()) {
         let call_node = cap.captures[0].node;
         let call_text = call_node.utf8_text(document.content.as_bytes()).unwrap();
         if let Some(string_content) = crate::hash_utils::extract_str_argument(call_text) {
@@ -720,11 +803,11 @@ pub async fn handle_inlay_hint(backend: &Backend, params: InlayHintParams) -> Re
             };
 
             let endpos = if let Some(newline) =
-                line_node.query("(newline)@x", document.content.as_bytes())
+                line_node.find_newline(document.content.as_bytes())
             {
                 Position::from(newline.range().start_point)
             } else if let Some(instruction) =
-                line_node.query("(instruction)@x", document.content.as_bytes())
+                line_node.find_instruction(document.content.as_bytes())
             {
                 Position::from(instruction.range().end_point)
             } else {
@@ -743,12 +826,13 @@ pub async fn handle_inlay_hint(backend: &Backend, params: InlayHintParams) -> Re
             });
         }
     }
+    eprintln!("[PERF] str_function queries: {:?}", start_str.elapsed());
 
     // Show inlay hints for _unnamed enum members (NotEquals, Equals, Greater, Less)
+    let start_ident = std::time::Instant::now();
     let mut cursor_ident = QueryCursor::new();
-    let ident_query = Query::new(tree_sitter_ic10::language(), "(identifier)@id").unwrap();
 
-    for (cap, _) in cursor_ident.captures(&ident_query, tree.root_node(), document.content.as_bytes()) {
+    for (cap, _) in cursor_ident.captures(query_identifier(), tree.root_node(), document.content.as_bytes()) {
         let ident_node = cap.captures[0].node;
         let ident_text = ident_node.utf8_text(document.content.as_bytes()).unwrap();
         
@@ -759,11 +843,11 @@ pub async fn handle_inlay_hint(backend: &Backend, params: InlayHintParams) -> Re
             };
 
             let endpos = if let Some(newline) =
-                line_node.query("(newline)@x", document.content.as_bytes())
+                line_node.find_newline(document.content.as_bytes())
             {
                 Position::from(newline.range().start_point)
             } else if let Some(instruction) =
-                line_node.query("(instruction)@x", document.content.as_bytes())
+                line_node.find_instruction(document.content.as_bytes())
             {
                 Position::from(instruction.range().end_point)
             } else {
@@ -782,77 +866,11 @@ pub async fn handle_inlay_hint(backend: &Backend, params: InlayHintParams) -> Re
             });
         }
     }
-    // Persistent parameter hint: when only opcode is typed (no operands yet),
-    // show the remaining signature as faint inline text after the opcode.
-    // This helps the user until they type the first operand.
-    let mut cursor2 = QueryCursor::new();
-    let instr_query = Query::new(tree_sitter_ic10::language(), "(instruction)@i").unwrap();
-    for (cap, _) in
-        cursor2.captures(&instr_query, tree.root_node(), document.content.as_bytes())
-    {
-        let instr_node = cap.captures[0].node;
-        // Get operation node and count operands
-        let Some(op_node) = instr_node.child_by_field_name("operation") else {
-            continue;
-        };
-        let mut w = instr_node.walk();
-        let operand_count = instr_node.children_by_field_name("operand", &mut w).count();
-        if operand_count != 0 {
-            continue;
-        }
+    eprintln!("[PERF] identifier queries: {:?}", start_ident.elapsed());
+    
+    // NOTE: Instruction parameter hints are handled client-side for instant display.
+    // The LSP only provides device hash hints and enum value hints.
 
-        // Also skip if there's any text after the opcode (even whitespace indicates typing)
-        // This prevents the hint from being "accepted" when user presses space/tab
-        let opcode_raw = match op_node.utf8_text(document.content.as_bytes()) {
-            Ok(t) => t,
-            Err(_) => continue,
-        };
-        
-        // Check if there's anything after the opcode on the same line
-        let line_text = match instr_node.find_parent("line") {
-            Some(line_node) => line_node.utf8_text(document.content.as_bytes()).unwrap_or(""),
-            None => continue,
-        };
-        
-        // Get the position where opcode ends
-        let opcode_end_byte = op_node.range().end_byte - instr_node.range().start_byte;
-        if opcode_end_byte < line_text.len() {
-            let after_opcode = &line_text[opcode_end_byte..];
-            // If there's ANY character after opcode (including space), skip hint
-            // This prevents cursor jumping when space is pressed
-            if !after_opcode.is_empty() && !after_opcode.starts_with('\n') && !after_opcode.starts_with('\r') {
-                continue;
-            }
-        }
-
-        // Build syntax and take the suffix (parameters part) after opcode
-        let lowered;
-        let opcode: &str = if instructions::INSTRUCTIONS.contains_key(opcode_raw) {
-            opcode_raw
-        } else {
-            lowered = opcode_raw.to_ascii_lowercase();
-            lowered.as_str()
-        };
-        let syntax = crate::tooltip_documentation::get_instruction_syntax(opcode);
-        // If there are no parameters (syntax has no space), skip
-        if let Some(space_idx) = syntax.find(' ') {
-            let params_suffix = syntax[space_idx + 1..].to_string();
-            if !params_suffix.is_empty() {
-                let pos = Position::from(op_node.range().end_point);
-                ret.push(InlayHint {
-                    position: pos.into(),
-                    label: InlayHintLabel::String(params_suffix),
-                    kind: Some(InlayHintKind::PARAMETER),
-                    text_edits: None,
-                    tooltip: None,
-                    // add a space between opcode and hint for readability
-                    padding_left: Some(true),
-                    padding_right: None,
-                    data: None,
-                });
-            }
-        }
-    }
-
+    eprintln!("[PERF] TOTAL inlay_hint: {:?} (hints: {})", start_total.elapsed(), ret.len());
     Ok(Some(ret))
 }

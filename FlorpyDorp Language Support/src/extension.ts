@@ -902,12 +902,8 @@ export function activate(context: vscode.ExtensionContext) {
                         const typedTokens = beforeComment.trim().length === 0 ? [] : beforeComment.trim().split(/\s+/);
                         const parts = sig.split(/\s+/);
 
-                        // Let the LSP show the very first suffix after the opcode when nothing typed yet to avoid duplicate hints
-                        if (typedTokens.length === 0) {
-                            continue;
-                        }
-
-                        // Remove the slot currently being edited and show only the remaining ones to the right
+                        // Show all remaining parameters as inline hints
+                        // Client-side hints are instant (no LSP round-trip delay)
                         const remaining = parts.slice(typedTokens.length);
                         if (remaining.length === 0) continue;
 
@@ -1321,8 +1317,18 @@ export function activate(context: vscode.ExtensionContext) {
     
     /**
      * Identifies absolute branch instructions (j, jal when used with labels)
+     * All b* instructions (but NOT br* which are relative)
      */
-    const absoluteBranchOpcodes = new Set(['j', 'jal']);
+    const absoluteBranchOpcodes = new Set([
+        'j', 'jal',
+        'bdse', 'bdns', 'bdseal', 'bdnsal',
+        'blt', 'bgt', 'ble', 'bge', 'beq', 'bne',
+        'bap', 'bna', 'bltz', 'bgez', 'blez', 'bgtz',
+        'beqz', 'bnez', 'bapz', 'bnaz', 'bnan',
+        'bltal', 'bgtal', 'bleal', 'bgeal', 'beqal', 'bneal',
+        'bapal', 'bnaal', 'bltzal', 'bgezal', 'blezal', 'bgtzal',
+        'beqzal', 'bnezal', 'bapzal', 'bnazal'
+    ]);
     
     /**
      * Parse all label definitions in the document
@@ -1349,25 +1355,34 @@ export function activate(context: vscode.ExtensionContext) {
      * Returns: { opcode: string, label: string, targetLine: number } or null
      */
     function parseAbsoluteBranch(lineText: string, currentLine: number, labels: Map<string, number>): { opcode: string, label: string, targetLine: number } | null {
-        // Match instruction pattern: opcode operand (label or number)
-        const match = lineText.match(/^\s*([a-z]+)\s+([a-zA-Z_0-9][a-zA-Z0-9_]*)(?:\s|#|$)/i);
+        // Match instruction pattern: opcode [operands...]
+        const match = lineText.match(/^\s*([a-z]+)\s+(.+)$/i);
         if (!match) return null;
         
         const opcode = match[1].toLowerCase();
         if (!absoluteBranchOpcodes.has(opcode)) return null;
         
-        const operand = match[2];
+        const operandsStr = match[2].trim();
         
-        // Check if operand is a number (direct line number)
-        const numericLineNumber = parseInt(operand, 10);
+        // Extract operands, skip comments
+        const beforeComment = operandsStr.split('#')[0].trim();
+        const operands = beforeComment.split(/\s+/);
+        
+        if (operands.length === 0) return null;
+        
+        // The target is always the last operand for branch instructions
+        const targetOperand = operands[operands.length - 1];
+        
+        // Check if target is a number (direct line number)
+        const numericLineNumber = parseInt(targetOperand, 10);
         if (!isNaN(numericLineNumber)) {
-            // Convert from 1-based (IC10 convention) to 0-based (internal indexing)
-            const targetLine = numericLineNumber - 1;
-            return { opcode, label: operand, targetLine };
+            // Direct line numbers in IC10 are 0-indexed (unlike display which is 1-indexed)
+            const targetLine = numericLineNumber;
+            return { opcode, label: targetOperand, targetLine };
         }
         
         // Otherwise treat as label (case insensitive)
-        const label = operand.toLowerCase();
+        const label = targetOperand.toLowerCase();
         const targetLine = labels.get(label);
         
         if (targetLine === undefined) return null; // Label not found

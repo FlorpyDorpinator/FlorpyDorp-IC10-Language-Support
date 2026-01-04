@@ -3,8 +3,34 @@
 //! This module provides helper functions and traits for working with tree-sitter nodes,
 //! including node navigation, querying, and parameter position detection.
 
+use std::sync::OnceLock;
 use tree_sitter::{Node, Query, QueryCursor};
 
+// ============================================================================
+// Cached Queries for common patterns used in inlay hints
+// ============================================================================
+
+/// Cached query for finding newline nodes within a line
+fn cached_query_newline() -> &'static Query {
+    static QUERY: OnceLock<Query> = OnceLock::new();
+    QUERY.get_or_init(|| {
+        Query::new(tree_sitter_ic10::language(), "(newline)@x").unwrap()
+    })
+}
+
+/// Cached query for finding instruction nodes within a line  
+fn cached_query_instruction() -> &'static Query {
+    static QUERY: OnceLock<Query> = OnceLock::new();
+    QUERY.get_or_init(|| {
+        Query::new(tree_sitter_ic10::language(), "(instruction)@x").unwrap()
+    })
+}
+
+/// Warm up all cached queries at startup to eliminate first-request latency
+pub fn warmup_queries() {
+    let _ = cached_query_newline();
+    let _ = cached_query_instruction();
+}
 
 /// Extension trait for tree-sitter Node providing convenience methods
 pub trait NodeEx: Sized {
@@ -12,7 +38,14 @@ pub trait NodeEx: Sized {
     fn find_parent(&self, kind: &str) -> Option<Self>;
     
     /// Execute a query on this node and return the first match
+    /// Note: This compiles the query each time. For hot paths, use the cached versions below.
     fn query<'a>(&'a self, query: &str, content: impl AsRef<[u8]>) -> Option<Node<'a>>;
+    
+    /// Find a child newline node (uses cached query)
+    fn find_newline<'a>(&'a self, content: impl AsRef<[u8]>) -> Option<Node<'a>>;
+    
+    /// Find a child instruction node (uses cached query)
+    fn find_instruction<'a>(&'a self, content: impl AsRef<[u8]>) -> Option<Node<'a>>;
 }
 
 impl<'a> NodeEx for Node<'a> {
@@ -24,9 +57,9 @@ impl<'a> NodeEx for Node<'a> {
         Some(cur)
     }
 
-    fn query(&self, query: &str, content: impl AsRef<[u8]>) -> Option<Node<'a>> {
+    fn query(&self, query_str: &str, content: impl AsRef<[u8]>) -> Option<Node<'a>> {
         let mut cursor = QueryCursor::new();
-        let query = match Query::new(tree_sitter_ic10::language(), query) {
+        let query = match Query::new(tree_sitter_ic10::language(), query_str) {
             Ok(q) => q,
             Err(_e) => {
                 // If the node type in the query doesn't exist in this parser build, fail gracefully
@@ -35,6 +68,28 @@ impl<'a> NodeEx for Node<'a> {
         };
 
         let mut captures = cursor.captures(&query, self.clone(), content.as_ref());
+        captures
+            .next()
+            .map(|x| x.0.captures)
+            .and_then(|x| x.get(0))
+            .map(|x| x.node)
+    }
+    
+    fn find_newline(&self, content: impl AsRef<[u8]>) -> Option<Node<'a>> {
+        let mut cursor = QueryCursor::new();
+        let query = cached_query_newline();
+        let mut captures = cursor.captures(query, self.clone(), content.as_ref());
+        captures
+            .next()
+            .map(|x| x.0.captures)
+            .and_then(|x| x.get(0))
+            .map(|x| x.node)
+    }
+    
+    fn find_instruction(&self, content: impl AsRef<[u8]>) -> Option<Node<'a>> {
+        let mut cursor = QueryCursor::new();
+        let query = cached_query_instruction();
+        let mut captures = cursor.captures(query, self.clone(), content.as_ref());
         captures
             .next()
             .map(|x| x.0.captures)

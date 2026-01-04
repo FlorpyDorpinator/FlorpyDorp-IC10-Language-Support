@@ -1,0 +1,197 @@
+# Comprehensive Test File for Bug Fixes - January 3, 2026
+# Test all reported issues and verify fixes
+#ignorelimits
+
+# ==============================================================================
+# TEST 1: Register Alias Suggestions
+# ==============================================================================
+# Instructions: Type "add " and verify that aliases appear first in completions
+# Expected: Aliases like "Cat (alias r1)" should appear at top of list
+
+alias Cat r1
+alias Dog r2
+alias Temperature r3
+alias Pressure r4
+
+# Type these and check completions show aliases first:
+add 
+sub Pressure Temperature 273.15
+mul r5 Temperature Pressure
+
+# ==============================================================================
+# TEST 2: TraderInstruction Colors  
+# ==============================================================================
+# Instructions: Verify TraderInstruction.WriteTraderData appears in teal/blue
+# Expected: Same color as other enums (currently showing orange - should be teal)
+
+put d0 TraderInstruction.WriteTraderData 100
+get r0 d0 TraderInstruction.WriteTraderData
+
+# Also test other enum types for consistency:
+s d0 Mode LogicType.Power
+lb r2 HASH("StructureBattery") Charge Average
+
+
+# ==============================================================================
+# TEST 3: Shadow Text (Inlay Hints) Persistence
+# ==============================================================================
+# Instructions: Type "put " and observe shadow text behavior
+# Expected: Shadow text should remain visible at END of line, update as you type
+# NOT EXPECTED: Shadow text should NOT disappear when you press spacebar
+
+# Type these slowly and watch for persistent parameter hints:
+put
+put d0
+put d0 5
+put d0 5 100
+
+get
+get r0
+get r0 d1
+get r0 d1 10
+
+rmap
+rmap r5
+rmap r5 d0
+rmap r5 d0 ItemIronIngot
+
+# Test with other functions:
+
+sub
+mul
+div
+l
+s
+lb
+sb
+
+# ==============================================================================
+# TEST 4: Label Coloring Persistence
+# ==============================================================================
+# Instructions: Type "cat:" and press spacebar - verify it stays purple
+# Also copy/paste labels and verify they stay purple
+# Expected: Entire "cat:" should be purple (not just the colon)
+
+cat:
+    move r0 100
+    j end
+
+loop:
+    add r1 r1 1
+    blt r1 10 loop
+
+end:
+    yield
+
+# Try pasting these labels (should stay purple):
+start:
+finish:
+error_handler:
+greg: abs
+
+sushi: abs
+
+dog:  
+
+# ==============================================================================
+# TEST 5: XML Escaping in Hover Tooltips
+# ==============================================================================
+# Instructions: Hover over these instructions and check tooltips
+# Expected: Should show < and > symbols, NOT &lt; and &gt;
+
+slt r0 r1 r2   # Hover: should show "a < b" not "a &lt; b"
+sgt r0 r1 r2   # Hover: should show "a > b" not "a &gt; b"  
+sle r0 r1 r2   # Hover: should show "a <= b" not "a &lt;= b"
+sge r0 r1 r2   # Hover: should show "a >= b" not "a &gt;= b"
+
+blt r0 100 loop    # Hover: should show "a < b"
+bgt r1 50 loop     # Hover: should show "a > b"
+ble r2 10 loop     # Hover: should show "a <= b"
+bge r3 0 loop      # Hover: should show "a >= b"
+
+rand r10           # Hover: should show "0 <= x < 1"
+
+# ==============================================================================
+# TEST 6: rmap Parameter Validation
+# ==============================================================================
+# Instructions: Test rmap with different device parameter types
+# Expected: Verify if d? parameter accepts registers or only device pins
+# Current signature allows r?/d?/id - need to verify if this is correct
+
+rmap r0 d0 ItemIronIngot      # Device pin (d0) - should work
+rmap r1 r5 ItemCopperIngot    # Register (r5) - verify if valid
+rmap r2 -1706638847 ItemGoldIngot  # Direct hash - should work
+rmap r3 db ItemSteelIngot     # Device (db) - should work
+
+# ==============================================================================
+# TEST 7: Branch Visualizer
+# ==============================================================================
+# Instructions: Enable branch visualization (Ctrl+Alt+B)
+# Expected: Should show visual lines for ALL branch types:
+#   - Relative branches (breq, bne, etc.)
+#   - Absolute branches (j, jal with labels)
+#   - Branches to labels
+
+# Relative branches (offset based):
+breq r0 r1 2       # Skip 2 lines forward
+bne r2 r3 -3       # Jump 3 lines backward
+bgt r4 100 5       # Skip 5 lines forward
+
+# Absolute branches (line numbers):
+j 50               # Jump to line 50
+jal 100            # Call line 100
+
+# Label-based branches:
+mainloop:
+    add r0 r0 1
+    blt r0 10 mainloop   # Branch to label
+    j end                # Jump to label
+
+processingloop:
+    move r5 0
+processitem:
+    add r5 r5 1
+    blt r5 5 processitem
+    j mainloop
+
+end:
+    yield
+    j mainloop
+
+# ==============================================================================
+# ADDITIONAL TESTS
+# ==============================================================================
+
+# Test hash completions:
+define BatteryHash HASH("StructureBattery")
+define SensorHash HASH("StructureGasSensor")
+
+# Test mixed operations:
+alias sensor1 d0
+alias pump1 d1
+l Temperature sensor1 Temperature
+s pump1 On 1
+lb r10 BatteryHash Charge Average
+sb BatteryHash Setting 1
+
+# Test complex branching:
+move r15 0
+checkloop:
+    l r0 sensor1 Temperature
+    bgt r0 373 overheat
+    add r15 r15 1
+    blt r15 100 checkloop
+    j finish
+
+overheat:
+    s pump1 On 0
+    yield
+    j checkloop
+
+finish:
+    yield
+    j start
+
+# ==============================================================================
+# END OF TESTS
+# ==============================================================================

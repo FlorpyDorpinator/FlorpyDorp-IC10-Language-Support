@@ -295,7 +295,18 @@ impl LanguageServer for Backend {
         })
     }
 
-    async fn initialized(&self, _params: InitializedParams) {}
+    async fn initialized(&self, _params: InitializedParams) {
+        // Warm up tree-sitter parser by parsing a minimal document
+        // This moves the initialization cost to startup rather than first user edit
+        let mut parser = Parser::new();
+        let _ = parser.set_language(tree_sitter_ic10::language());
+        let _ = parser.parse("add r0 r0 1\n", None);
+        
+        // Warm up all cached queries by calling the functions that initialize OnceLock
+        // This ensures queries are compiled at startup, not on first inlay hint request
+        crate::lsp_hover::warmup_queries();
+        crate::tree_utils::warmup_queries();
+    }
 
     async fn execute_command(&self, params: ExecuteCommandParams) -> Result<Option<Value>> {
         match params.command.as_str() {

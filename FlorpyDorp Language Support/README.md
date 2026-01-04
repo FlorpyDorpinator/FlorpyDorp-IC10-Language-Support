@@ -8,6 +8,11 @@
 
 ---
 
+## ☕Buy Me A Coffee....if you want.
+While I genuinely do this for the love of the game and to support the community, if you're feeling feisty and grateful for this or my other tools for stationeers you can support my development efforts here:
+
+☕[Buy This Man Coffee☕](https://buymeacoffee.com/florpydorp)
+
 ## ✨ Highlights
 
 - Full IC10 syntax highlighting (`.ic10`)

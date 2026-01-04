@@ -511,9 +511,27 @@ pub async fn handle_completion(
                                     }
                                 }
 
-                                // For non-label parameters, provide both builtin and static completions
+                                // For non-label parameters, provide both builtin, alias, and static completions
                                 if !should_show_labels {
                                     param_completions_builtin(prefix, param_type, &mut ret, None);
+                                    // Add alias completions - these should appear first for register/device parameters
+                                    param_completions_dynamic(
+                                        prefix,
+                                        &file_data.type_data.aliases,
+                                        " alias",
+                                        param_type,
+                                        &mut ret,
+                                        None,
+                                    );
+                                    // Add define completions for numeric parameters
+                                    param_completions_dynamic(
+                                        prefix,
+                                        &file_data.type_data.defines,
+                                        " define",
+                                        param_type,
+                                        &mut ret,
+                                        None,
+                                    );
                                     param_completions_static(prefix, "", param_type, &mut ret);
                                 }
                             }

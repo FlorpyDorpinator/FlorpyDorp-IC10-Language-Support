@@ -34,6 +34,10 @@
       "settings": { "foreground": "#ff6516" }
     },
     {
+      "scope": ["constant.language.enum.ic10"],
+      "settings": { "foreground": "#20B2AA" }
+    },
+    {
       "scope": ["comment.line.number-sign.ic10"],
       "settings": { "foreground": "#808080", "fontStyle": "italic" }
     },
