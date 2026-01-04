@@ -46,6 +46,10 @@
       "settings": { "foreground": "#800080" }
     },
     {
+      "scope": ["punctuation.separator.label.ic10"],
+      "settings": { "foreground": "#800080" }
+    },
+    {
       "scope": ["variable.other.ic10"],
       "settings": { "foreground": "#FFFFFF" }
     },
