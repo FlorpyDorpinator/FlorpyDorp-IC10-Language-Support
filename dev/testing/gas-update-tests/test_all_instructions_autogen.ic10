@@ -1,0 +1,166 @@
+# AUTO-GENERATED USAGE TEST — every IC10 instruction the LSP now knows (154 total).
+# Each line uses a VALID signature per the auto-generated INSTRUCTIONS map.
+# Expectation in the dev host: ZERO red error squiggles on any line below.
+# (Registers/values are placeholders; this checks the type-checker, not runtime logic.)
+
+start:
+abs r0 r1                         # abs
+acos r0 r1                        # acos
+add r0 r1 r2                      # add
+alias gasSensor d0                # alias
+and r0 r1 r2                      # and
+asin r0 r1                        # asin
+atan r0 r1                        # atan
+atan2 r0 r1 r2                    # atan2
+bap r0 r1 r2 r3                   # bap
+bapal r0 r1 r2 r3                 # bapal
+bapz r0 r1 r2                     # bapz
+bapzal r0 r1 r2                   # bapzal
+bdns d0 r0                        # bdns
+bdnsal d0 r0                      # bdnsal
+bdnvl d0 On r0                    # bdnvl
+bdnvs d0 On r0                    # bdnvs
+bdse d0 r0                        # bdse
+bdseal d0 r0                      # bdseal
+beq r0 r1 r2                      # beq
+beqal r0 r1 r2                    # beqal
+beqz r0 r1                        # beqz
+beqzal r0 r1                      # beqzal
+bge r0 r1 r2                      # bge
+bgeal r0 r1 r2                    # bgeal
+bgez r0 r1                        # bgez
+bgezal r0 r1                      # bgezal
+bgt r0 r1 r2                      # bgt
+bgtal r0 r1 r2                    # bgtal
+bgtz r0 r1                        # bgtz
+bgtzal r0 r1                      # bgtzal
+ble r0 r1 r2                      # ble
+bleal r0 r1 r2                    # bleal
+blez r0 r1                        # blez
+blezal r0 r1                      # blezal
+blt r0 r1 r2                      # blt
+bltal r0 r1 r2                    # bltal
+bltz r0 r1                        # bltz
+bltzal r0 r1                      # bltzal
+bna r0 r1 r2 r3                   # bna
+bnaal r0 r1 r2 r3                 # bnaal
+bnan r0 r1                        # bnan
+bnaz r0 r1 r2                     # bnaz
+bnazal r0 r1 r2                   # bnazal
+bne r0 r1 r2                      # bne
+bneal r0 r1 r2                    # bneal
+bnez r0 r1                        # bnez
+bnezal r0 r1                      # bnezal
+brap r0 r1 r2 r3                  # brap
+brapz r0 r1 r2                    # brapz
+brdns d0 r0                       # brdns
+brdse d0 r0                       # brdse
+breq r0 r1 r2                     # breq
+breqz r0 r1                       # breqz
+brge r0 r1 r2                     # brge
+brgez r0 r1                       # brgez
+brgt r0 r1 r2                     # brgt
+brgtz r0 r1                       # brgtz
+brle r0 r1 r2                     # brle
+brlez r0 r1                       # brlez
+brlt r0 r1 r2                     # brlt
+brltz r0 r1                       # brltz
+brna r0 r1 r2 r3                  # brna
+brnan r0 r1                       # brnan
+brnaz r0 r1 r2                    # brnaz
+brne r0 r1 r2                     # brne
+brnez r0 r1                       # brnez
+ceil r0 r1                        # ceil
+clamp r0 r1 r2 r3                 # clamp
+clr d0                            # clr
+clrd r0                           # clrd
+cos r0 r1                         # cos
+define MAX_PRESSURE 60000         # define
+div r0 r1 r2                      # div
+exp r0 r1                         # exp
+ext r0 r1 r2 r3                   # ext
+floor r0 r1                       # floor
+get r0 d0 r1                      # get
+getd r0 r1 r2                     # getd
+hcf                               # hcf
+ins r0 r1 r2 r3                   # ins
+j r0                              # j
+jal r0                            # jal
+jr r0                             # jr
+l r0 d0 On                        # l
+label gasSensor d0                # label
+lb r0 r1 On Average               # lb
+lbn r0 r1 r2 On Average           # lbn
+lbns r0 r1 r2 r3 Occupied Average # lbns
+lbs r0 r1 r2 Occupied Average     # lbs
+ld r0 d0 On                       # ld
+lerp r0 r1 r2 r3                  # lerp
+log r0 r1                         # log
+lr r0 d0 Contents r1              # lr
+ls r0 d0 r1 Occupied              # ls
+max r0 r1 r2                      # max
+min r0 r1 r2                      # min
+mod r0 r1 r2                      # mod
+move r0 r1                        # move
+mul r0 r1 r2                      # mul
+nor r0 r1 r2                      # nor
+not r0 r1                         # not
+or r0 r1 r2                       # or
+peek r0                           # peek
+poke r0 r1                        # poke
+pop r0                            # pop
+pow r0 r1 r2                      # pow
+push r0                           # push
+put d0 r0 r1                      # put
+putd r0 r1 r2                     # putd
+rand r0                           # rand
+rmap r0 d0 r1                     # rmap
+rol r0 r1 r2                      # rol
+ror r0 r1 r2                      # ror
+round r0 r1                       # round
+s d0 On r0                        # s
+sap r0 r1 r2 r3                   # sap
+sapz r0 r1 r2                     # sapz
+sb r0 On r1                       # sb
+sbn r0 r1 On r2                   # sbn
+sbs r0 r1 Occupied r2             # sbs
+sd d0 On r0                       # sd
+sdns r0 d0                        # sdns
+sdse r0 d0                        # sdse
+select r0 r1 r2 r3                # select
+seq r0 r1 r2                      # seq
+seqz r0 r1                        # seqz
+sge r0 r1 r2                      # sge
+sgez r0 r1                        # sgez
+sgn r0 r1                         # sgn
+sgt r0 r1 r2                      # sgt
+sgtz r0 r1                        # sgtz
+sin r0 r1                         # sin
+sla r0 r1 r2                      # sla
+sle r0 r1 r2                      # sle
+sleep r0                          # sleep
+slez r0 r1                        # slez
+sll r0 r1 r2                      # sll
+slt r0 r1 r2                      # slt
+sltz r0 r1                        # sltz
+sna r0 r1 r2 r3                   # sna
+snan r0 r1                        # snan
+snanz r0 r1                       # snanz
+snaz r0 r1 r2                     # snaz
+sne r0 r1 r2                      # sne
+snez r0 r1                        # snez
+sqrt r0 r1                        # sqrt
+sra r0 r1 r2                      # sra
+srl r0 r1 r2                      # srl
+ss d0 r0 Occupied r1              # ss
+sub r0 r1 r2                      # sub
+tan r0 r1                         # tan
+trunc r0 r1                       # trunc
+xor r0 r1 r2                      # xor
+yield                             # yield
+
+# new instructions added by the gas update (should all be valid):
+clamp r0 r1 r2 r3                 # clamp (NEW)
+rol r0 r1 r2                      # rol (NEW)
+ror r0 r1 r2                      # ror (NEW)
+sgn r0 r1                         # sgn (NEW)

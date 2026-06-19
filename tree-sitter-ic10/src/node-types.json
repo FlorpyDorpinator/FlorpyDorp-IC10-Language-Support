@@ -257,6 +257,938 @@
     "named": false
   },
   {
+    "type": "ACEfficiency",
+    "named": false
+  },
+  {
+    "type": "ACEnergyMoved",
+    "named": false
+  },
+  {
+    "type": "ACIsFullyConnected",
+    "named": false
+  },
+  {
+    "type": "ACPowerUsed",
+    "named": false
+  },
+  {
+    "type": "APCMaximumPower",
+    "named": false
+  },
+  {
+    "type": "ArcFurnaceActivate",
+    "named": false
+  },
+  {
+    "type": "ArcFurnaceIsSmelting",
+    "named": false
+  },
+  {
+    "type": "ArmState",
+    "named": false
+  },
+  {
+    "type": "AtmosphericPressure",
+    "named": false
+  },
+  {
+    "type": "BatteryIsCharged",
+    "named": false
+  },
+  {
+    "type": "BatteryIsEmpty",
+    "named": false
+  },
+  {
+    "type": "BatteryIsSubmerged",
+    "named": false
+  },
+  {
+    "type": "BreathingEfficiency",
+    "named": false
+  },
+  {
+    "type": "CentrifugeLidClosed",
+    "named": false
+  },
+  {
+    "type": "CentrifugeProcessing",
+    "named": false
+  },
+  {
+    "type": "CentrifugeRPM",
+    "named": false
+  },
+  {
+    "type": "CentrifugeReagentTotal",
+    "named": false
+  },
+  {
+    "type": "ChamberEnergyTransfer",
+    "named": false
+  },
+  {
+    "type": "ChamberHeatExchangeRatio",
+    "named": false
+  },
+  {
+    "type": "ChamberIsOperable",
+    "named": false
+  },
+  {
+    "type": "ChamberLiquidRatio",
+    "named": false
+  },
+  {
+    "type": "ChamberVolume",
+    "named": false
+  },
+  {
+    "type": "CleanBurnRate",
+    "named": false
+  },
+  {
+    "type": "CombustionEnergy",
+    "named": false
+  },
+  {
+    "type": "ComposterBatchProgress",
+    "named": false
+  },
+  {
+    "type": "ComposterBiomassCount",
+    "named": false
+  },
+  {
+    "type": "ComposterCanProcess",
+    "named": false
+  },
+  {
+    "type": "ComposterDecayCount",
+    "named": false
+  },
+  {
+    "type": "ComposterGrindProgress",
+    "named": false
+  },
+  {
+    "type": "ComposterIsOperable",
+    "named": false
+  },
+  {
+    "type": "ComposterNormalCount",
+    "named": false
+  },
+  {
+    "type": "ComposterPowerUsed",
+    "named": false
+  },
+  {
+    "type": "Condensation",
+    "named": false
+  },
+  {
+    "type": "ContactContacted",
+    "named": false
+  },
+  {
+    "type": "ContactCount",
+    "named": false
+  },
+  {
+    "type": "ContactDegreeOffset",
+    "named": false
+  },
+  {
+    "type": "ContactIndex",
+    "named": false
+  },
+  {
+    "type": "ContactLifetime",
+    "named": false
+  },
+  {
+    "type": "ContactMinWattsContact",
+    "named": false
+  },
+  {
+    "type": "ContactMinWattsResolve",
+    "named": false
+  },
+  {
+    "type": "ContactReferenceId",
+    "named": false
+  },
+  {
+    "type": "ContactResolutionProgress",
+    "named": false
+  },
+  {
+    "type": "ContactResolved",
+    "named": false
+  },
+  {
+    "type": "ContactSecondsToContact",
+    "named": false
+  },
+  {
+    "type": "ContactShuttleType",
+    "named": false
+  },
+  {
+    "type": "ContactTraderHash",
+    "named": false
+  },
+  {
+    "type": "CoolerEnergyMoved",
+    "named": false
+  },
+  {
+    "type": "CoolerIsEnvironmentOkay",
+    "named": false
+  },
+  {
+    "type": "CoolerIsPipeOkay",
+    "named": false
+  },
+  {
+    "type": "CoolerPowerUsed",
+    "named": false
+  },
+  {
+    "type": "CurrentOreHash",
+    "named": false
+  },
+  {
+    "type": "CurrentRecipeEnergy",
+    "named": false
+  },
+  {
+    "type": "DayLengthSeconds",
+    "named": false
+  },
+  {
+    "type": "DaysPast",
+    "named": false
+  },
+  {
+    "type": "DaysSinceLastWeatherEvent",
+    "named": false
+  },
+  {
+    "type": "DishInterrogatingId",
+    "named": false
+  },
+  {
+    "type": "DishIsInterrogating",
+    "named": false
+  },
+  {
+    "type": "DishWattageOnContact",
+    "named": false
+  },
+  {
+    "type": "DoShutdown",
+    "named": false
+  },
+  {
+    "type": "EclipseRatio",
+    "named": false
+  },
+  {
+    "type": "ElectrolyzerCodeError",
+    "named": false
+  },
+  {
+    "type": "ElectrolyzerIsOperable",
+    "named": false
+  },
+  {
+    "type": "ElectrolyzerProcessedMoles",
+    "named": false
+  },
+  {
+    "type": "ElectrolyzerUsedPower",
+    "named": false
+  },
+  {
+    "type": "EnergyConvected",
+    "named": false
+  },
+  {
+    "type": "EnergyRadiated",
+    "named": false
+  },
+  {
+    "type": "FabricatorCurrentIndex",
+    "named": false
+  },
+  {
+    "type": "FabricatorCurrentTier",
+    "named": false
+  },
+  {
+    "type": "FabricatorMakingIndex",
+    "named": false
+  },
+  {
+    "type": "FabricatorPowerUsed",
+    "named": false
+  },
+  {
+    "type": "FabricatorRecipeCount",
+    "named": false
+  },
+  {
+    "type": "FabricatorTimeMultiplier",
+    "named": false
+  },
+  {
+    "type": "FertilizerCycles",
+    "named": false
+  },
+  {
+    "type": "FertilizerGrowthSpeed",
+    "named": false
+  },
+  {
+    "type": "FertilizerHarvestBoost",
+    "named": false
+  },
+  {
+    "type": "FilterIsEmpty",
+    "named": false
+  },
+  {
+    "type": "FilterIsLow",
+    "named": false
+  },
+  {
+    "type": "FilterLife",
+    "named": false
+  },
+  {
+    "type": "FilterMaxTicks",
+    "named": false
+  },
+  {
+    "type": "FilterMode",
+    "named": false
+  },
+  {
+    "type": "FilterPowerUsed",
+    "named": false
+  },
+  {
+    "type": "FilterQuantity",
+    "named": false
+  },
+  {
+    "type": "FilterSlotCount",
+    "named": false
+  },
+  {
+    "type": "FilterSlotIndex",
+    "named": false
+  },
+  {
+    "type": "FilterTypeHash",
+    "named": false
+  },
+  {
+    "type": "FilterUsedTicks",
+    "named": false
+  },
+  {
+    "type": "FilterValue",
+    "named": false
+  },
+  {
+    "type": "FilteredCount",
+    "named": false
+  },
+  {
+    "type": "FiltrationProcessedMoles",
+    "named": false
+  },
+  {
+    "type": "FuelTicks",
+    "named": false
+  },
+  {
+    "type": "FurnaceHasBlown",
+    "named": false
+  },
+  {
+    "type": "FurnaceInflamed",
+    "named": false
+  },
+  {
+    "type": "FurnaceMaxPressure",
+    "named": false
+  },
+  {
+    "type": "FurnaceMode",
+    "named": false
+  },
+  {
+    "type": "FurnaceOverpressure",
+    "named": false
+  },
+  {
+    "type": "FurnacePressure",
+    "named": false
+  },
+  {
+    "type": "FurnaceStressed",
+    "named": false
+  },
+  {
+    "type": "FurnaceTemperature",
+    "named": false
+  },
+  {
+    "type": "FurnaceTotalMoles",
+    "named": false
+  },
+  {
+    "type": "FurnaceVolume",
+    "named": false
+  },
+  {
+    "type": "H2CombustorCodeError",
+    "named": false
+  },
+  {
+    "type": "H2CombustorIsOperable",
+    "named": false
+  },
+  {
+    "type": "H2CombustorProcessedMoles",
+    "named": false
+  },
+  {
+    "type": "H2CombustorUsedPower",
+    "named": false
+  },
+  {
+    "type": "HasEmptyFilter",
+    "named": false
+  },
+  {
+    "type": "HasFertilizer",
+    "named": false
+  },
+  {
+    "type": "HasImportPlant",
+    "named": false
+  },
+  {
+    "type": "HasTray",
+    "named": false
+  },
+  {
+    "type": "HeaterEnergyTransfer",
+    "named": false
+  },
+  {
+    "type": "HeaterIsEnvironmentOkay",
+    "named": false
+  },
+  {
+    "type": "HeaterIsPipeOkay",
+    "named": false
+  },
+  {
+    "type": "HeaterMaxTemperature",
+    "named": false
+  },
+  {
+    "type": "HeaterPowerUsed",
+    "named": false
+  },
+  {
+    "type": "HydrationEfficiency",
+    "named": false
+  },
+  {
+    "type": "ImportPlantHash",
+    "named": false
+  },
+  {
+    "type": "ImportStackSize",
+    "named": false
+  },
+  {
+    "type": "Inflamed",
+    "named": false
+  },
+  {
+    "type": "InputSubmergedTicks",
+    "named": false
+  },
+  {
+    "type": "IsAboveArmstrong",
+    "named": false
+  },
+  {
+    "type": "IsEclipse",
+    "named": false
+  },
+  {
+    "type": "IsFullyConnected",
+    "named": false
+  },
+  {
+    "type": "IsHarvesting",
+    "named": false
+  },
+  {
+    "type": "IsLitByGrowLight",
+    "named": false
+  },
+  {
+    "type": "IsPlanting",
+    "named": false
+  },
+  {
+    "type": "IsValidAtmosphere",
+    "named": false
+  },
+  {
+    "type": "Latitude",
+    "named": false
+  },
+  {
+    "type": "LightExposure",
+    "named": false
+  },
+  {
+    "type": "LiquidPressureOffset",
+    "named": false
+  },
+  {
+    "type": "LiquidVolumeRatio",
+    "named": false
+  },
+  {
+    "type": "Longitude",
+    "named": false
+  },
+  {
+    "type": "MaxPower",
+    "named": false
+  },
+  {
+    "type": "MaxSettingInput",
+    "named": false
+  },
+  {
+    "type": "MaxSettingOutput",
+    "named": false
+  },
+  {
+    "type": "MaxTemperature",
+    "named": false
+  },
+  {
+    "type": "MinPressure",
+    "named": false
+  },
+  {
+    "type": "MinSettingInput",
+    "named": false
+  },
+  {
+    "type": "MinSettingOutput",
+    "named": false
+  },
+  {
+    "type": "MinTemperature",
+    "named": false
+  },
+  {
+    "type": "MiningProgress",
+    "named": false
+  },
+  {
+    "type": "NetworkContentType",
+    "named": false
+  },
+  {
+    "type": "NetworkHasFault",
+    "named": false
+  },
+  {
+    "type": "NetworkWorstDamage",
+    "named": false
+  },
+  {
+    "type": "OgreIsReturning",
+    "named": false
+  },
+  {
+    "type": "OgreMiningComplete",
+    "named": false
+  },
+  {
+    "type": "OgreOreCount",
+    "named": false
+  },
+  {
+    "type": "OgrePosition",
+    "named": false
+  },
+  {
+    "type": "OgreQueueFull",
+    "named": false
+  },
+  {
+    "type": "OgreState",
+    "named": false
+  },
+  {
+    "type": "OutputSubmergedTicks",
+    "named": false
+  },
+  {
+    "type": "PadContactStatus",
+    "named": false
+  },
+  {
+    "type": "PadHasContact",
+    "named": false
+  },
+  {
+    "type": "PadIsLocked",
+    "named": false
+  },
+  {
+    "type": "PadIsTraderReady",
+    "named": false
+  },
+  {
+    "type": "PadWaypointHeight",
+    "named": false
+  },
+  {
+    "type": "PartialPressureCO2",
+    "named": false
+  },
+  {
+    "type": "PartialPressureH2",
+    "named": false
+  },
+  {
+    "type": "PartialPressureHumanToxins",
+    "named": false
+  },
+  {
+    "type": "PartialPressureMethane",
+    "named": false
+  },
+  {
+    "type": "PartialPressureN2",
+    "named": false
+  },
+  {
+    "type": "PartialPressureN2O",
+    "named": false
+  },
+  {
+    "type": "PartialPressureO2",
+    "named": false
+  },
+  {
+    "type": "PartialPressurePollutant",
+    "named": false
+  },
+  {
+    "type": "PartialPressureSteam",
+    "named": false
+  },
+  {
+    "type": "PartialPressureToxins",
+    "named": false
+  },
+  {
+    "type": "PartialPressureZrilianToxins",
+    "named": false
+  },
+  {
+    "type": "PipeCombustionEnergy",
+    "named": false
+  },
+  {
+    "type": "PipeDamageRatio",
+    "named": false
+  },
+  {
+    "type": "PipeDamageType",
+    "named": false
+  },
+  {
+    "type": "PipeIsBurst",
+    "named": false
+  },
+  {
+    "type": "PipeIsStressed",
+    "named": false
+  },
+  {
+    "type": "PipeMaxPressure",
+    "named": false
+  },
+  {
+    "type": "PipeStressRatio",
+    "named": false
+  },
+  {
+    "type": "PlantGrowthEfficiency",
+    "named": false
+  },
+  {
+    "type": "PlantIsFertilized",
+    "named": false
+  },
+  {
+    "type": "PlantLightEfficiency",
+    "named": false
+  },
+  {
+    "type": "PlantPressureEfficiency",
+    "named": false
+  },
+  {
+    "type": "PowerDelta",
+    "named": false
+  },
+  {
+    "type": "PressureGasses",
+    "named": false
+  },
+  {
+    "type": "QuarryDepth",
+    "named": false
+  },
+  {
+    "type": "QuarryDrillState",
+    "named": false
+  },
+  {
+    "type": "QuarryIsDelivering",
+    "named": false
+  },
+  {
+    "type": "QuarryIsDrillFinished",
+    "named": false
+  },
+  {
+    "type": "QuarryIsTransporting",
+    "named": false
+  },
+  {
+    "type": "QuarryMaxDepth",
+    "named": false
+  },
+  {
+    "type": "QuarryOreCount",
+    "named": false
+  },
+  {
+    "type": "ReagentQuantity",
+    "named": false
+  },
+  {
+    "type": "RecyclerAtCapacity",
+    "named": false
+  },
+  {
+    "type": "RecyclerIdleTicks",
+    "named": false
+  },
+  {
+    "type": "RecyclerIsExporting",
+    "named": false
+  },
+  {
+    "type": "RecyclerIsProcessing",
+    "named": false
+  },
+  {
+    "type": "RecyclerReagentTotal",
+    "named": false
+  },
+  {
+    "type": "RequestIndex",
+    "named": false
+  },
+  {
+    "type": "RobotBatteryRatio",
+    "named": false
+  },
+  {
+    "type": "RobotDamageRatio",
+    "named": false
+  },
+  {
+    "type": "RobotIsBusy",
+    "named": false
+  },
+  {
+    "type": "RobotIsOperable",
+    "named": false
+  },
+  {
+    "type": "RobotIsStorageEmpty",
+    "named": false
+  },
+  {
+    "type": "RobotIsStorageFull",
+    "named": false
+  },
+  {
+    "type": "RobotStorageCapacity",
+    "named": false
+  },
+  {
+    "type": "RobotStorageCount",
+    "named": false
+  },
+  {
+    "type": "RocketIsMining",
+    "named": false
+  },
+  {
+    "type": "RocketMiningProgress",
+    "named": false
+  },
+  {
+    "type": "RocketMiningQuantity",
+    "named": false
+  },
+  {
+    "type": "RocketNextOreHash",
+    "named": false
+  },
+  {
+    "type": "SmeltingPower",
+    "named": false
+  },
+  {
+    "type": "SolarDamageRatio",
+    "named": false
+  },
+  {
+    "type": "SolarDamageTotal",
+    "named": false
+  },
+  {
+    "type": "SolarEfficiency",
+    "named": false
+  },
+  {
+    "type": "SolarHealth",
+    "named": false
+  },
+  {
+    "type": "SolarIsBroken",
+    "named": false
+  },
+  {
+    "type": "SolarIsOperable",
+    "named": false
+  },
+  {
+    "type": "SolarMovementSpeedH",
+    "named": false
+  },
+  {
+    "type": "SolarMovementSpeedV",
+    "named": false
+  },
+  {
+    "type": "SolarVisibility",
+    "named": false
+  },
+  {
+    "type": "StirlingColdTemperature",
+    "named": false
+  },
+  {
+    "type": "StirlingEfficiency",
+    "named": false
+  },
+  {
+    "type": "StirlingHotTemperature",
+    "named": false
+  },
+  {
+    "type": "StirlingIsConnected",
+    "named": false
+  },
+  {
+    "type": "StirlingMaxPower",
+    "named": false
+  },
+  {
+    "type": "StirlingTemperatureDelta",
+    "named": false
+  },
+  {
+    "type": "Suppressed",
+    "named": false
+  },
+  {
+    "type": "TemperatureEfficiency",
+    "named": false
+  },
+  {
+    "type": "TimeOfDay",
+    "named": false
+  },
+  {
+    "type": "TotalMolesGasses",
+    "named": false
+  },
+  {
+    "type": "TotalMolesLiquids",
+    "named": false
+  },
+  {
+    "type": "TurbineSpeed",
+    "named": false
+  },
+  {
+    "type": "VentFlowStatus",
+    "named": false
+  },
+  {
+    "type": "VentIsConnected",
+    "named": false
+  },
+  {
+    "type": "VentPowerUsed",
+    "named": false
+  },
+  {
+    "type": "WaterMoles",
+    "named": false
+  },
+  {
+    "type": "WeatherSolarRatio",
+    "named": false
+  },
+  {
+    "type": "WeatherWindStrength",
+    "named": false
+  },
+  {
+    "type": "WindSpeed",
+    "named": false
+  },
+  {
     "type": "abs",
     "named": false
   },
@@ -525,6 +1457,10 @@
     "named": false
   },
   {
+    "type": "clamp",
+    "named": false
+  },
+  {
     "type": "clr",
     "named": false
   },
@@ -761,6 +1697,14 @@
     "named": false
   },
   {
+    "type": "rol",
+    "named": false
+  },
+  {
+    "type": "ror",
+    "named": false
+  },
+  {
     "type": "round",
     "named": false
   },
@@ -818,6 +1762,10 @@
   },
   {
     "type": "sgez",
+    "named": false
+  },
+  {
+    "type": "sgn",
     "named": false
   },
   {

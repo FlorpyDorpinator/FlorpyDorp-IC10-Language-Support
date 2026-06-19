@@ -1,0 +1,26 @@
+# REGRESSION TEST — alias -> DeviceId propagation through `move`.
+#
+# Bug (now fixed): when a register holding a device ReferenceId was copied into
+# another register THROUGH AN ALIAS, the destination lost its "device reference"
+# kind and became Unknown. Using it as a device could then raise a false
+# "expected a device" error.
+#
+# Expectation in the dev host: NONE of the lines below show a red error squiggle.
+
+alias deviceRef r1
+
+l r1 d0 ReferenceId      # r1 now holds a device reference (DeviceId)
+move r3 deviceRef        # r3 = deviceRef (alias of r1)  -> r3 must stay a DeviceId
+
+# use r3 AS A DEVICE — this is what used to false-error before the fix:
+l r4 r3 Temperature
+s r3 Setting 1
+
+# --- control: direct register move (always worked) ---
+move r5 r1
+l r6 r5 Pressure
+
+# --- control: alias of an alias-target still resolves ---
+alias deviceRef2 r3
+move r7 deviceRef2
+l r8 r7 Power

@@ -1,0 +1,35 @@
+# NEW GAS LogicTypes — auto-generated from data/Enums.json (gas update).
+# Expectations in the dev host:
+#   * NO red squiggles on any Ratio* logic type below
+#   * hovering a Ratio* type shows its description
+#   * typing  l r0 d0 Ratio   offers the new gases in autocomplete
+
+define Analyzer HASH("StructurePipeAnalysizer")
+alias sensor d0
+
+# --- new atmospheric gases ---
+l r0 sensor RatioHelium
+l r1 sensor RatioSilanol
+l r2 sensor RatioHydrochloricAcid
+l r3 sensor RatioOzone
+l r4 sensor RatioNitrousOxide
+
+# --- liquid variants ---
+l r5 sensor RatioLiquidHydrogen
+l r6 sensor RatioLiquidOzone
+l r7 sensor RatioLiquidSilanol
+l r8 sensor RatioSteam
+l r9 sensor RatioPollutedWater
+
+# --- input/output network variants (batch read) ---
+lb r10 Analyzer RatioHeliumInput Average
+lb r11 Analyzer RatioOzoneOutput Maximum
+lb r12 Analyzer RatioSilanolInput2 Sum
+lb r13 Analyzer RatioHydrochloricAcidOutput2 Minimum
+
+# --- store a computed ratio back ---
+s sensor RatioHelium r0
+
+# Note: GasType enum members (Helium, Ozone, Silanol, HydrochloricAcid, ...) are also
+# generated from Enums.json and resolve in hover, but GasType is not a direct IC10
+# operand, so it is intentionally not used in an instruction here.

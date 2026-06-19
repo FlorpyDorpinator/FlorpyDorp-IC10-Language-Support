@@ -295,6 +295,938 @@
       "members": [
         {
           "type": "STRING",
+          "value": "ACEfficiency"
+        },
+        {
+          "type": "STRING",
+          "value": "ACEnergyMoved"
+        },
+        {
+          "type": "STRING",
+          "value": "ACIsFullyConnected"
+        },
+        {
+          "type": "STRING",
+          "value": "ACPowerUsed"
+        },
+        {
+          "type": "STRING",
+          "value": "APCMaximumPower"
+        },
+        {
+          "type": "STRING",
+          "value": "ArcFurnaceActivate"
+        },
+        {
+          "type": "STRING",
+          "value": "ArcFurnaceIsSmelting"
+        },
+        {
+          "type": "STRING",
+          "value": "ArmState"
+        },
+        {
+          "type": "STRING",
+          "value": "AtmosphericPressure"
+        },
+        {
+          "type": "STRING",
+          "value": "BatteryIsCharged"
+        },
+        {
+          "type": "STRING",
+          "value": "BatteryIsEmpty"
+        },
+        {
+          "type": "STRING",
+          "value": "BatteryIsSubmerged"
+        },
+        {
+          "type": "STRING",
+          "value": "BreathingEfficiency"
+        },
+        {
+          "type": "STRING",
+          "value": "CentrifugeLidClosed"
+        },
+        {
+          "type": "STRING",
+          "value": "CentrifugeProcessing"
+        },
+        {
+          "type": "STRING",
+          "value": "CentrifugeRPM"
+        },
+        {
+          "type": "STRING",
+          "value": "CentrifugeReagentTotal"
+        },
+        {
+          "type": "STRING",
+          "value": "ChamberEnergyTransfer"
+        },
+        {
+          "type": "STRING",
+          "value": "ChamberHeatExchangeRatio"
+        },
+        {
+          "type": "STRING",
+          "value": "ChamberIsOperable"
+        },
+        {
+          "type": "STRING",
+          "value": "ChamberLiquidRatio"
+        },
+        {
+          "type": "STRING",
+          "value": "ChamberVolume"
+        },
+        {
+          "type": "STRING",
+          "value": "CleanBurnRate"
+        },
+        {
+          "type": "STRING",
+          "value": "CombustionEnergy"
+        },
+        {
+          "type": "STRING",
+          "value": "ComposterBatchProgress"
+        },
+        {
+          "type": "STRING",
+          "value": "ComposterBiomassCount"
+        },
+        {
+          "type": "STRING",
+          "value": "ComposterCanProcess"
+        },
+        {
+          "type": "STRING",
+          "value": "ComposterDecayCount"
+        },
+        {
+          "type": "STRING",
+          "value": "ComposterGrindProgress"
+        },
+        {
+          "type": "STRING",
+          "value": "ComposterIsOperable"
+        },
+        {
+          "type": "STRING",
+          "value": "ComposterNormalCount"
+        },
+        {
+          "type": "STRING",
+          "value": "ComposterPowerUsed"
+        },
+        {
+          "type": "STRING",
+          "value": "Condensation"
+        },
+        {
+          "type": "STRING",
+          "value": "ContactContacted"
+        },
+        {
+          "type": "STRING",
+          "value": "ContactCount"
+        },
+        {
+          "type": "STRING",
+          "value": "ContactDegreeOffset"
+        },
+        {
+          "type": "STRING",
+          "value": "ContactIndex"
+        },
+        {
+          "type": "STRING",
+          "value": "ContactLifetime"
+        },
+        {
+          "type": "STRING",
+          "value": "ContactMinWattsContact"
+        },
+        {
+          "type": "STRING",
+          "value": "ContactMinWattsResolve"
+        },
+        {
+          "type": "STRING",
+          "value": "ContactReferenceId"
+        },
+        {
+          "type": "STRING",
+          "value": "ContactResolutionProgress"
+        },
+        {
+          "type": "STRING",
+          "value": "ContactResolved"
+        },
+        {
+          "type": "STRING",
+          "value": "ContactSecondsToContact"
+        },
+        {
+          "type": "STRING",
+          "value": "ContactShuttleType"
+        },
+        {
+          "type": "STRING",
+          "value": "ContactTraderHash"
+        },
+        {
+          "type": "STRING",
+          "value": "CoolerEnergyMoved"
+        },
+        {
+          "type": "STRING",
+          "value": "CoolerIsEnvironmentOkay"
+        },
+        {
+          "type": "STRING",
+          "value": "CoolerIsPipeOkay"
+        },
+        {
+          "type": "STRING",
+          "value": "CoolerPowerUsed"
+        },
+        {
+          "type": "STRING",
+          "value": "CurrentOreHash"
+        },
+        {
+          "type": "STRING",
+          "value": "CurrentRecipeEnergy"
+        },
+        {
+          "type": "STRING",
+          "value": "DayLengthSeconds"
+        },
+        {
+          "type": "STRING",
+          "value": "DaysPast"
+        },
+        {
+          "type": "STRING",
+          "value": "DaysSinceLastWeatherEvent"
+        },
+        {
+          "type": "STRING",
+          "value": "DishInterrogatingId"
+        },
+        {
+          "type": "STRING",
+          "value": "DishIsInterrogating"
+        },
+        {
+          "type": "STRING",
+          "value": "DishWattageOnContact"
+        },
+        {
+          "type": "STRING",
+          "value": "DoShutdown"
+        },
+        {
+          "type": "STRING",
+          "value": "EclipseRatio"
+        },
+        {
+          "type": "STRING",
+          "value": "ElectrolyzerCodeError"
+        },
+        {
+          "type": "STRING",
+          "value": "ElectrolyzerIsOperable"
+        },
+        {
+          "type": "STRING",
+          "value": "ElectrolyzerProcessedMoles"
+        },
+        {
+          "type": "STRING",
+          "value": "ElectrolyzerUsedPower"
+        },
+        {
+          "type": "STRING",
+          "value": "EnergyConvected"
+        },
+        {
+          "type": "STRING",
+          "value": "EnergyRadiated"
+        },
+        {
+          "type": "STRING",
+          "value": "FabricatorCurrentIndex"
+        },
+        {
+          "type": "STRING",
+          "value": "FabricatorCurrentTier"
+        },
+        {
+          "type": "STRING",
+          "value": "FabricatorMakingIndex"
+        },
+        {
+          "type": "STRING",
+          "value": "FabricatorPowerUsed"
+        },
+        {
+          "type": "STRING",
+          "value": "FabricatorRecipeCount"
+        },
+        {
+          "type": "STRING",
+          "value": "FabricatorTimeMultiplier"
+        },
+        {
+          "type": "STRING",
+          "value": "FertilizerCycles"
+        },
+        {
+          "type": "STRING",
+          "value": "FertilizerGrowthSpeed"
+        },
+        {
+          "type": "STRING",
+          "value": "FertilizerHarvestBoost"
+        },
+        {
+          "type": "STRING",
+          "value": "FilterIsEmpty"
+        },
+        {
+          "type": "STRING",
+          "value": "FilterIsLow"
+        },
+        {
+          "type": "STRING",
+          "value": "FilterLife"
+        },
+        {
+          "type": "STRING",
+          "value": "FilterMaxTicks"
+        },
+        {
+          "type": "STRING",
+          "value": "FilterMode"
+        },
+        {
+          "type": "STRING",
+          "value": "FilterPowerUsed"
+        },
+        {
+          "type": "STRING",
+          "value": "FilterQuantity"
+        },
+        {
+          "type": "STRING",
+          "value": "FilterSlotCount"
+        },
+        {
+          "type": "STRING",
+          "value": "FilterSlotIndex"
+        },
+        {
+          "type": "STRING",
+          "value": "FilterTypeHash"
+        },
+        {
+          "type": "STRING",
+          "value": "FilterUsedTicks"
+        },
+        {
+          "type": "STRING",
+          "value": "FilterValue"
+        },
+        {
+          "type": "STRING",
+          "value": "FilteredCount"
+        },
+        {
+          "type": "STRING",
+          "value": "FiltrationProcessedMoles"
+        },
+        {
+          "type": "STRING",
+          "value": "FuelTicks"
+        },
+        {
+          "type": "STRING",
+          "value": "FurnaceHasBlown"
+        },
+        {
+          "type": "STRING",
+          "value": "FurnaceInflamed"
+        },
+        {
+          "type": "STRING",
+          "value": "FurnaceMaxPressure"
+        },
+        {
+          "type": "STRING",
+          "value": "FurnaceMode"
+        },
+        {
+          "type": "STRING",
+          "value": "FurnaceOverpressure"
+        },
+        {
+          "type": "STRING",
+          "value": "FurnacePressure"
+        },
+        {
+          "type": "STRING",
+          "value": "FurnaceStressed"
+        },
+        {
+          "type": "STRING",
+          "value": "FurnaceTemperature"
+        },
+        {
+          "type": "STRING",
+          "value": "FurnaceTotalMoles"
+        },
+        {
+          "type": "STRING",
+          "value": "FurnaceVolume"
+        },
+        {
+          "type": "STRING",
+          "value": "H2CombustorCodeError"
+        },
+        {
+          "type": "STRING",
+          "value": "H2CombustorIsOperable"
+        },
+        {
+          "type": "STRING",
+          "value": "H2CombustorProcessedMoles"
+        },
+        {
+          "type": "STRING",
+          "value": "H2CombustorUsedPower"
+        },
+        {
+          "type": "STRING",
+          "value": "HasEmptyFilter"
+        },
+        {
+          "type": "STRING",
+          "value": "HasFertilizer"
+        },
+        {
+          "type": "STRING",
+          "value": "HasImportPlant"
+        },
+        {
+          "type": "STRING",
+          "value": "HasTray"
+        },
+        {
+          "type": "STRING",
+          "value": "HeaterEnergyTransfer"
+        },
+        {
+          "type": "STRING",
+          "value": "HeaterIsEnvironmentOkay"
+        },
+        {
+          "type": "STRING",
+          "value": "HeaterIsPipeOkay"
+        },
+        {
+          "type": "STRING",
+          "value": "HeaterMaxTemperature"
+        },
+        {
+          "type": "STRING",
+          "value": "HeaterPowerUsed"
+        },
+        {
+          "type": "STRING",
+          "value": "HydrationEfficiency"
+        },
+        {
+          "type": "STRING",
+          "value": "ImportPlantHash"
+        },
+        {
+          "type": "STRING",
+          "value": "ImportStackSize"
+        },
+        {
+          "type": "STRING",
+          "value": "Inflamed"
+        },
+        {
+          "type": "STRING",
+          "value": "InputSubmergedTicks"
+        },
+        {
+          "type": "STRING",
+          "value": "IsAboveArmstrong"
+        },
+        {
+          "type": "STRING",
+          "value": "IsEclipse"
+        },
+        {
+          "type": "STRING",
+          "value": "IsFullyConnected"
+        },
+        {
+          "type": "STRING",
+          "value": "IsHarvesting"
+        },
+        {
+          "type": "STRING",
+          "value": "IsLitByGrowLight"
+        },
+        {
+          "type": "STRING",
+          "value": "IsPlanting"
+        },
+        {
+          "type": "STRING",
+          "value": "IsValidAtmosphere"
+        },
+        {
+          "type": "STRING",
+          "value": "Latitude"
+        },
+        {
+          "type": "STRING",
+          "value": "LightExposure"
+        },
+        {
+          "type": "STRING",
+          "value": "LiquidPressureOffset"
+        },
+        {
+          "type": "STRING",
+          "value": "LiquidVolumeRatio"
+        },
+        {
+          "type": "STRING",
+          "value": "Longitude"
+        },
+        {
+          "type": "STRING",
+          "value": "MaxPower"
+        },
+        {
+          "type": "STRING",
+          "value": "MaxSettingInput"
+        },
+        {
+          "type": "STRING",
+          "value": "MaxSettingOutput"
+        },
+        {
+          "type": "STRING",
+          "value": "MaxTemperature"
+        },
+        {
+          "type": "STRING",
+          "value": "MinPressure"
+        },
+        {
+          "type": "STRING",
+          "value": "MinSettingInput"
+        },
+        {
+          "type": "STRING",
+          "value": "MinSettingOutput"
+        },
+        {
+          "type": "STRING",
+          "value": "MinTemperature"
+        },
+        {
+          "type": "STRING",
+          "value": "MiningProgress"
+        },
+        {
+          "type": "STRING",
+          "value": "NetworkContentType"
+        },
+        {
+          "type": "STRING",
+          "value": "NetworkHasFault"
+        },
+        {
+          "type": "STRING",
+          "value": "NetworkWorstDamage"
+        },
+        {
+          "type": "STRING",
+          "value": "OgreIsReturning"
+        },
+        {
+          "type": "STRING",
+          "value": "OgreMiningComplete"
+        },
+        {
+          "type": "STRING",
+          "value": "OgreOreCount"
+        },
+        {
+          "type": "STRING",
+          "value": "OgrePosition"
+        },
+        {
+          "type": "STRING",
+          "value": "OgreQueueFull"
+        },
+        {
+          "type": "STRING",
+          "value": "OgreState"
+        },
+        {
+          "type": "STRING",
+          "value": "OutputSubmergedTicks"
+        },
+        {
+          "type": "STRING",
+          "value": "PadContactStatus"
+        },
+        {
+          "type": "STRING",
+          "value": "PadHasContact"
+        },
+        {
+          "type": "STRING",
+          "value": "PadIsLocked"
+        },
+        {
+          "type": "STRING",
+          "value": "PadIsTraderReady"
+        },
+        {
+          "type": "STRING",
+          "value": "PadWaypointHeight"
+        },
+        {
+          "type": "STRING",
+          "value": "PartialPressureCO2"
+        },
+        {
+          "type": "STRING",
+          "value": "PartialPressureH2"
+        },
+        {
+          "type": "STRING",
+          "value": "PartialPressureHumanToxins"
+        },
+        {
+          "type": "STRING",
+          "value": "PartialPressureMethane"
+        },
+        {
+          "type": "STRING",
+          "value": "PartialPressureN2"
+        },
+        {
+          "type": "STRING",
+          "value": "PartialPressureN2O"
+        },
+        {
+          "type": "STRING",
+          "value": "PartialPressureO2"
+        },
+        {
+          "type": "STRING",
+          "value": "PartialPressurePollutant"
+        },
+        {
+          "type": "STRING",
+          "value": "PartialPressureSteam"
+        },
+        {
+          "type": "STRING",
+          "value": "PartialPressureToxins"
+        },
+        {
+          "type": "STRING",
+          "value": "PartialPressureZrilianToxins"
+        },
+        {
+          "type": "STRING",
+          "value": "PipeCombustionEnergy"
+        },
+        {
+          "type": "STRING",
+          "value": "PipeDamageRatio"
+        },
+        {
+          "type": "STRING",
+          "value": "PipeDamageType"
+        },
+        {
+          "type": "STRING",
+          "value": "PipeIsBurst"
+        },
+        {
+          "type": "STRING",
+          "value": "PipeIsStressed"
+        },
+        {
+          "type": "STRING",
+          "value": "PipeMaxPressure"
+        },
+        {
+          "type": "STRING",
+          "value": "PipeStressRatio"
+        },
+        {
+          "type": "STRING",
+          "value": "PlantGrowthEfficiency"
+        },
+        {
+          "type": "STRING",
+          "value": "PlantIsFertilized"
+        },
+        {
+          "type": "STRING",
+          "value": "PlantLightEfficiency"
+        },
+        {
+          "type": "STRING",
+          "value": "PlantPressureEfficiency"
+        },
+        {
+          "type": "STRING",
+          "value": "PowerDelta"
+        },
+        {
+          "type": "STRING",
+          "value": "PressureGasses"
+        },
+        {
+          "type": "STRING",
+          "value": "QuarryDepth"
+        },
+        {
+          "type": "STRING",
+          "value": "QuarryDrillState"
+        },
+        {
+          "type": "STRING",
+          "value": "QuarryIsDelivering"
+        },
+        {
+          "type": "STRING",
+          "value": "QuarryIsDrillFinished"
+        },
+        {
+          "type": "STRING",
+          "value": "QuarryIsTransporting"
+        },
+        {
+          "type": "STRING",
+          "value": "QuarryMaxDepth"
+        },
+        {
+          "type": "STRING",
+          "value": "QuarryOreCount"
+        },
+        {
+          "type": "STRING",
+          "value": "ReagentQuantity"
+        },
+        {
+          "type": "STRING",
+          "value": "RecyclerAtCapacity"
+        },
+        {
+          "type": "STRING",
+          "value": "RecyclerIdleTicks"
+        },
+        {
+          "type": "STRING",
+          "value": "RecyclerIsExporting"
+        },
+        {
+          "type": "STRING",
+          "value": "RecyclerIsProcessing"
+        },
+        {
+          "type": "STRING",
+          "value": "RecyclerReagentTotal"
+        },
+        {
+          "type": "STRING",
+          "value": "RequestIndex"
+        },
+        {
+          "type": "STRING",
+          "value": "RobotBatteryRatio"
+        },
+        {
+          "type": "STRING",
+          "value": "RobotDamageRatio"
+        },
+        {
+          "type": "STRING",
+          "value": "RobotIsBusy"
+        },
+        {
+          "type": "STRING",
+          "value": "RobotIsOperable"
+        },
+        {
+          "type": "STRING",
+          "value": "RobotIsStorageEmpty"
+        },
+        {
+          "type": "STRING",
+          "value": "RobotIsStorageFull"
+        },
+        {
+          "type": "STRING",
+          "value": "RobotStorageCapacity"
+        },
+        {
+          "type": "STRING",
+          "value": "RobotStorageCount"
+        },
+        {
+          "type": "STRING",
+          "value": "RocketIsMining"
+        },
+        {
+          "type": "STRING",
+          "value": "RocketMiningProgress"
+        },
+        {
+          "type": "STRING",
+          "value": "RocketMiningQuantity"
+        },
+        {
+          "type": "STRING",
+          "value": "RocketNextOreHash"
+        },
+        {
+          "type": "STRING",
+          "value": "SmeltingPower"
+        },
+        {
+          "type": "STRING",
+          "value": "SolarDamageRatio"
+        },
+        {
+          "type": "STRING",
+          "value": "SolarDamageTotal"
+        },
+        {
+          "type": "STRING",
+          "value": "SolarEfficiency"
+        },
+        {
+          "type": "STRING",
+          "value": "SolarHealth"
+        },
+        {
+          "type": "STRING",
+          "value": "SolarIsBroken"
+        },
+        {
+          "type": "STRING",
+          "value": "SolarIsOperable"
+        },
+        {
+          "type": "STRING",
+          "value": "SolarMovementSpeedH"
+        },
+        {
+          "type": "STRING",
+          "value": "SolarMovementSpeedV"
+        },
+        {
+          "type": "STRING",
+          "value": "SolarVisibility"
+        },
+        {
+          "type": "STRING",
+          "value": "StirlingColdTemperature"
+        },
+        {
+          "type": "STRING",
+          "value": "StirlingEfficiency"
+        },
+        {
+          "type": "STRING",
+          "value": "StirlingHotTemperature"
+        },
+        {
+          "type": "STRING",
+          "value": "StirlingIsConnected"
+        },
+        {
+          "type": "STRING",
+          "value": "StirlingMaxPower"
+        },
+        {
+          "type": "STRING",
+          "value": "StirlingTemperatureDelta"
+        },
+        {
+          "type": "STRING",
+          "value": "Suppressed"
+        },
+        {
+          "type": "STRING",
+          "value": "TemperatureEfficiency"
+        },
+        {
+          "type": "STRING",
+          "value": "TimeOfDay"
+        },
+        {
+          "type": "STRING",
+          "value": "TotalMolesGasses"
+        },
+        {
+          "type": "STRING",
+          "value": "TotalMolesLiquids"
+        },
+        {
+          "type": "STRING",
+          "value": "TurbineSpeed"
+        },
+        {
+          "type": "STRING",
+          "value": "VentFlowStatus"
+        },
+        {
+          "type": "STRING",
+          "value": "VentIsConnected"
+        },
+        {
+          "type": "STRING",
+          "value": "VentPowerUsed"
+        },
+        {
+          "type": "STRING",
+          "value": "WaterMoles"
+        },
+        {
+          "type": "STRING",
+          "value": "WeatherSolarRatio"
+        },
+        {
+          "type": "STRING",
+          "value": "WeatherWindStrength"
+        },
+        {
+          "type": "STRING",
+          "value": "WindSpeed"
+        },
+        {
+          "type": "STRING",
           "value": "deg2rad"
         },
         {
@@ -785,6 +1717,10 @@
         },
         {
           "type": "STRING",
+          "value": "clamp"
+        },
+        {
+          "type": "STRING",
           "value": "clr"
         },
         {
@@ -957,6 +1893,14 @@
         },
         {
           "type": "STRING",
+          "value": "rol"
+        },
+        {
+          "type": "STRING",
+          "value": "ror"
+        },
+        {
+          "type": "STRING",
           "value": "round"
         },
         {
@@ -1014,6 +1958,10 @@
         {
           "type": "STRING",
           "value": "sgez"
+        },
+        {
+          "type": "STRING",
+          "value": "sgn"
         },
         {
           "type": "STRING",
@@ -1195,7 +2143,7 @@
             },
             {
               "type": "STRING",
-              "value": "RatioVolatiles"
+              "value": "RatioMethane"
             },
             {
               "type": "STRING",
@@ -1483,7 +2431,7 @@
             },
             {
               "type": "STRING",
-              "value": "RatioVolatilesInput"
+              "value": "RatioMethaneInput"
             },
             {
               "type": "STRING",
@@ -1523,7 +2471,7 @@
             },
             {
               "type": "STRING",
-              "value": "RatioVolatilesInput2"
+              "value": "RatioMethaneInput2"
             },
             {
               "type": "STRING",
@@ -1563,7 +2511,7 @@
             },
             {
               "type": "STRING",
-              "value": "RatioVolatilesOutput"
+              "value": "RatioMethaneOutput"
             },
             {
               "type": "STRING",
@@ -1603,7 +2551,7 @@
             },
             {
               "type": "STRING",
-              "value": "RatioVolatilesOutput2"
+              "value": "RatioMethaneOutput2"
             },
             {
               "type": "STRING",
@@ -1783,23 +2731,23 @@
             },
             {
               "type": "STRING",
-              "value": "RatioLiquidVolatiles"
+              "value": "RatioLiquidMethane"
             },
             {
               "type": "STRING",
-              "value": "RatioLiquidVolatilesInput"
+              "value": "RatioLiquidMethaneInput"
             },
             {
               "type": "STRING",
-              "value": "RatioLiquidVolatilesInput2"
+              "value": "RatioLiquidMethaneInput2"
             },
             {
               "type": "STRING",
-              "value": "RatioLiquidVolatilesOutput"
+              "value": "RatioLiquidMethaneOutput"
             },
             {
               "type": "STRING",
-              "value": "RatioLiquidVolatilesOutput2"
+              "value": "RatioLiquidMethaneOutput2"
             },
             {
               "type": "STRING",
@@ -2159,6 +3107,294 @@
             },
             {
               "type": "STRING",
+              "value": "ContactSlotIndex"
+            },
+            {
+              "type": "STRING",
+              "value": "RatioHydrazine"
+            },
+            {
+              "type": "STRING",
+              "value": "RatioLiquidHydrazine"
+            },
+            {
+              "type": "STRING",
+              "value": "RatioLiquidAlcohol"
+            },
+            {
+              "type": "STRING",
+              "value": "RatioHelium"
+            },
+            {
+              "type": "STRING",
+              "value": "RatioLiquidSodiumChloride"
+            },
+            {
+              "type": "STRING",
+              "value": "RatioSilanol"
+            },
+            {
+              "type": "STRING",
+              "value": "RatioLiquidSilanol"
+            },
+            {
+              "type": "STRING",
+              "value": "RatioHydrochloricAcid"
+            },
+            {
+              "type": "STRING",
+              "value": "RatioLiquidHydrochloricAcid"
+            },
+            {
+              "type": "STRING",
+              "value": "RatioOzone"
+            },
+            {
+              "type": "STRING",
+              "value": "RatioLiquidOzone"
+            },
+            {
+              "type": "STRING",
+              "value": "RatioHydrogenInput"
+            },
+            {
+              "type": "STRING",
+              "value": "RatioHydrogenInput2"
+            },
+            {
+              "type": "STRING",
+              "value": "RatioHydrogenOutput"
+            },
+            {
+              "type": "STRING",
+              "value": "RatioHydrogenOutput2"
+            },
+            {
+              "type": "STRING",
+              "value": "RatioLiquidHydrogenInput"
+            },
+            {
+              "type": "STRING",
+              "value": "RatioLiquidHydrogenInput2"
+            },
+            {
+              "type": "STRING",
+              "value": "RatioLiquidHydrogenOutput"
+            },
+            {
+              "type": "STRING",
+              "value": "RatioLiquidHydrogenOutput2"
+            },
+            {
+              "type": "STRING",
+              "value": "RatioPollutedWaterInput"
+            },
+            {
+              "type": "STRING",
+              "value": "RatioPollutedWaterInput2"
+            },
+            {
+              "type": "STRING",
+              "value": "RatioPollutedWaterOutput"
+            },
+            {
+              "type": "STRING",
+              "value": "RatioPollutedWaterOutput2"
+            },
+            {
+              "type": "STRING",
+              "value": "RatioHydrazineInput"
+            },
+            {
+              "type": "STRING",
+              "value": "RatioHydrazineInput2"
+            },
+            {
+              "type": "STRING",
+              "value": "RatioHydrazineOutput"
+            },
+            {
+              "type": "STRING",
+              "value": "RatioHydrazineOutput2"
+            },
+            {
+              "type": "STRING",
+              "value": "RatioLiquidHydrazineInput"
+            },
+            {
+              "type": "STRING",
+              "value": "RatioLiquidHydrazineInput2"
+            },
+            {
+              "type": "STRING",
+              "value": "RatioLiquidHydrazineOutput"
+            },
+            {
+              "type": "STRING",
+              "value": "RatioLiquidHydrazineOutput2"
+            },
+            {
+              "type": "STRING",
+              "value": "RatioLiquidAlcoholInput"
+            },
+            {
+              "type": "STRING",
+              "value": "RatioLiquidAlcoholInput2"
+            },
+            {
+              "type": "STRING",
+              "value": "RatioLiquidAlcoholOutput"
+            },
+            {
+              "type": "STRING",
+              "value": "RatioLiquidAlcoholOutput2"
+            },
+            {
+              "type": "STRING",
+              "value": "RatioHeliumInput"
+            },
+            {
+              "type": "STRING",
+              "value": "RatioHeliumInput2"
+            },
+            {
+              "type": "STRING",
+              "value": "RatioHeliumOutput"
+            },
+            {
+              "type": "STRING",
+              "value": "RatioHeliumOutput2"
+            },
+            {
+              "type": "STRING",
+              "value": "RatioLiquidSodiumChlorideInput"
+            },
+            {
+              "type": "STRING",
+              "value": "RatioLiquidSodiumChlorideInput2"
+            },
+            {
+              "type": "STRING",
+              "value": "RatioLiquidSodiumChlorideOutput"
+            },
+            {
+              "type": "STRING",
+              "value": "RatioLiquidSodiumChlorideOutput2"
+            },
+            {
+              "type": "STRING",
+              "value": "RatioSilanolInput"
+            },
+            {
+              "type": "STRING",
+              "value": "RatioSilanolInput2"
+            },
+            {
+              "type": "STRING",
+              "value": "RatioSilanolOutput"
+            },
+            {
+              "type": "STRING",
+              "value": "RatioSilanolOutput2"
+            },
+            {
+              "type": "STRING",
+              "value": "RatioLiquidSilanolInput"
+            },
+            {
+              "type": "STRING",
+              "value": "RatioLiquidSilanolInput2"
+            },
+            {
+              "type": "STRING",
+              "value": "RatioLiquidSilanolOutput"
+            },
+            {
+              "type": "STRING",
+              "value": "RatioLiquidSilanolOutput2"
+            },
+            {
+              "type": "STRING",
+              "value": "RatioHydrochloricAcidInput"
+            },
+            {
+              "type": "STRING",
+              "value": "RatioHydrochloricAcidInput2"
+            },
+            {
+              "type": "STRING",
+              "value": "RatioHydrochloricAcidOutput"
+            },
+            {
+              "type": "STRING",
+              "value": "RatioHydrochloricAcidOutput2"
+            },
+            {
+              "type": "STRING",
+              "value": "RatioLiquidHydrochloricAcidInput"
+            },
+            {
+              "type": "STRING",
+              "value": "RatioLiquidHydrochloricAcidInput2"
+            },
+            {
+              "type": "STRING",
+              "value": "RatioLiquidHydrochloricAcidOutput"
+            },
+            {
+              "type": "STRING",
+              "value": "RatioLiquidHydrochloricAcidOutput2"
+            },
+            {
+              "type": "STRING",
+              "value": "RatioOzoneInput"
+            },
+            {
+              "type": "STRING",
+              "value": "RatioOzoneInput2"
+            },
+            {
+              "type": "STRING",
+              "value": "RatioOzoneOutput"
+            },
+            {
+              "type": "STRING",
+              "value": "RatioOzoneOutput2"
+            },
+            {
+              "type": "STRING",
+              "value": "RatioLiquidOzoneInput"
+            },
+            {
+              "type": "STRING",
+              "value": "RatioLiquidOzoneInput2"
+            },
+            {
+              "type": "STRING",
+              "value": "RatioLiquidOzoneOutput"
+            },
+            {
+              "type": "STRING",
+              "value": "RatioLiquidOzoneOutput2"
+            },
+            {
+              "type": "STRING",
+              "value": "HealthDamage"
+            },
+            {
+              "type": "STRING",
+              "value": "StunDamage"
+            },
+            {
+              "type": "STRING",
+              "value": "CurrentNodeType"
+            },
+            {
+              "type": "STRING",
+              "value": "TargetNodeType"
+            },
+            {
+              "type": "STRING",
               "value": "None"
             },
             {
@@ -2304,6 +3540,10 @@
             {
               "type": "STRING",
               "value": "Maximum"
+            },
+            {
+              "type": "STRING",
+              "value": "Count"
             }
           ]
         }

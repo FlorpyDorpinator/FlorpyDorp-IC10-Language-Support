@@ -1,305 +1,123 @@
-# Auto-Generation System
+# Auto-Generation System (developer notes)
 
-The IC10 LSP automatically generates type definitions and completions from Stationeers game source files. This ensures the extension stays up-to-date with game updates without manual maintenance.
+The IC10 LSP generates **all** of its game knowledge — logic types, enums, instruction
+signatures + docs, device hashes/names, and device descriptions — from four Stationeers game
+files at build time. Replace the files, `cargo build`, and the extension is up to date with no
+hand-maintained tables.
 
-## Overview
+> This is the implementation-level companion to **[`/data/README.md`](../data/README.md)**,
+> which is the canonical overview + update procedure. If the two ever disagree, `data/README.md`
+> wins.
 
-**Problem Solved**: Previously, logic types and other game constants were manually maintained in `instructions.rs`. This led to:
-- Missing types (93 logic types were missing, including `VolumeOfLiquid`)
-- Outdated definitions as game updates added new types
-- Manual maintenance burden
+## The four source files
 
-**Solution**: Auto-generate all type definitions from authoritative game source files during build time.
+All live in the repo-root **`data/`** folder (not `data/game-sources/`, which now only holds
+an `Old Versions/` archive):
 
-## Architecture
+| File | Origin | Drives |
+|------|--------|--------|
+| `Enums.json` | `StreamingAssets/Data/Enums.json` | logic/slot/batch/reagent types + docs; every enum (incl. `GasType`) |
+| `Stationpedia.json` | `StreamingAssets/Language/english/Stationpedia.json` | device name↔hash; instruction docs **and signatures** |
+| `english.xml` | `StreamingAssets/Language/english.xml` | device display names + descriptions |
+| `ProgrammableChip.cs` | decompiled `Assembly-CSharp.dll` | `INSTRUCTION_SIGNATURES` reference (cross-check only) |
 
-### Build-Time Generation
+## Two build-time generators read these files
 
-The auto-generation happens in `build.rs` (Cargo build script) which runs before compilation:
+1. **`ic10lsp/build.rs`** — emits Rust into `OUT_DIR`, `include!`d by `src/`:
 
-```
-Game Source Files (data/game-sources/)
-    ↓
-build.rs (parses & extracts)
-    ↓
-instructions_generated.rs (generated code)
-    ↓
-instructions.rs (includes generated code)
-    ↓
-Compiled into ic10lsp.exe
-```
+   ```
+   data/Enums.json          -> enums_generated.rs, instructions_generated.rs
+   data/Stationpedia.json   -> device_hashes_generated.rs, instructions_generated.rs
+   data/english.xml         -> device_hashes_generated.rs, descriptions_generated.rs
+   data/ProgrammableChip.cs -> instructions_generated.rs (reference signatures)
+   ```
 
-### Source Files
+2. **`tree-sitter-ic10/generate-grammar.js`** — reads `Enums.json`, `Stationpedia.json`, and
+   `ProgrammableChip.cs` to bake the instruction + logic-type/constant tokens into `grammar.js`,
+   **and** syncs the TextMate grammar's instruction + logic-type keyword lists in
+   `FlorpyDorp Language Support/syntaxes/ic10.tmLanguage.json` (so static syntax highlighting
+   stays in sync too). Run via `npm run generate` in `tree-sitter-ic10/` — the `generate: grammar`
+   build task.
 
-Three game source files drive the auto-generation:
+## What `build.rs` generates
 
-1. **Enums.json** - Contains all game enums with values and descriptions
-   - LogicType (257 entries)
-   - SlotLogicType (8 entries)
-   - BatchMode (4 entries)
-   - ReagentMode (3 entries)
+| Constant | From | File |
+|----------|------|------|
+| `LOGIC_TYPES` / `LOGIC_TYPE_DOCS` | Enums.json `LogicType` | instructions_generated.rs |
+| `SLOT_LOGIC_TYPES` / `SLOT_TYPE_DOCS` | Enums.json `LogicSlotType` | instructions_generated.rs |
+| `BATCH_MODES` / `BATCH_MODE_DOCS` | Enums.json `LogicBatchMethod` | instructions_generated.rs |
+| `REAGENT_MODES` / `REAGENT_MODE_DOCS` | Enums.json `LogicReagentMode` | instructions_generated.rs |
+| `ENUM_VALUE_BY_NAME`, `ENUM_DESC_BY_NAME`, `ENUM_DEPRECATED`, `LOGIC_TYPE_NAME_TO_VALUE` | every Enums.json family | enums_generated.rs |
+| `INSTRUCTION_DOCS` | Stationpedia.json `scriptCommands[].desc` | instructions_generated.rs |
+| `INSTRUCTIONS` (type-checking signatures) | Stationpedia.json `scriptCommands[].example` + override table | instructions_generated.rs |
+| `INSTRUCTION_SIGNATURES` (reference) | ProgrammableChip.cs `GetCommandExample` | instructions_generated.rs |
+| `DEVICE_NAME_TO_HASH` / `HASH_TO_DISPLAY_NAME` | Stationpedia.json `pages` + english.xml names | device_hashes_generated.rs |
+| `DEVICE_DESCRIPTIONS` | english.xml | descriptions_generated.rs |
 
-2. **Stationpedia.json** - Contains game documentation
-   - Device information
-   - Instruction descriptions
-   - Logic type descriptions
+Deprecated enum members are skipped automatically. Counts track the game data — as of the
+current files: ~330 logic types, 33 slot types, 5 batch modes, 154 instructions, ~1,788 devices.
 
-3. **ProgrammableChip.cs** - Decompiled game code
-   - GetCommandExample() method contains instruction parameter signatures
-   - Used to generate instruction type hints
+### How instruction signatures are generated
 
-## What Gets Generated
+`INSTRUCTIONS` is parsed from each instruction's color-coded `scriptCommands[].example`
+(blue = Register, teal = Number, green = Device, white = Name, orange = the enum named in the
+label). IC10 semantics are applied (numeric operands also accept a register; mode operands also
+accept a number), which makes **144/154** parse exactly right. A small `signature_override`
+table in `build.rs` covers the ~10 cases where real validation is broader/narrower than the
+literal example. **New instructions added by a game update get a signature automatically** —
+the test `instructions::test::matching_instructions` enforces every instruction has both a
+signature and a doc. `ProgrammableChip.cs` is retained only as a secondary cross-reference.
 
-The build script generates `instructions_generated.rs` containing:
+## Updating for a new game version
 
-```rust
-// Auto-generated constants (pub visibility)
-pub const LOGIC_TYPES: phf::Set<&'static str> = { ... };           // 257 entries
-pub const LOGIC_TYPE_DOCS: phf::Map<&'static str, &'static str> = { ... };
-pub const SLOT_LOGIC_TYPES: phf::Set<&'static str> = { ... };      // 8 entries
-pub const SLOT_TYPE_DOCS: phf::Map<&'static str, &'static str> = { ... };
-pub const BATCH_MODES: phf::Set<&'static str> = { ... };           // 4 entries
-pub const BATCH_MODE_DOCS: phf::Map<&'static str, &'static str> = { ... };
-pub const REAGENT_MODES: phf::Set<&'static str> = { ... };         // 3 entries
-pub const REAGENT_MODE_DOCS: phf::Map<&'static str, &'static str> = { ... };
-pub const INSTRUCTION_SIGNATURES: &[(&str, &[&[&str]])] = [ ... ]; // Instruction params
-```
+See [`/data/README.md`](../data/README.md) for the full procedure. Short version:
 
-These constants are included directly into `instructions.rs` and override the old manual definitions.
-
-## Updating for New Game Versions
-
-When Stationeers releases an update with new logic types or instructions:
-
-### Step 1: Extract Game Source Files
-
-**Option A: From Game Installation**
-1. Locate Stationeers installation (usually `Steam/steamapps/common/Stationeers`)
-2. Copy `rocketstation_Data/StreamingAssets/Data/Enums.json`
-3. Copy `rocketstation_Data/StreamingAssets/Language/english/Stationpedia.json`
-
-**Option B: Decompile Assembly-CSharp.dll**
-1. Use a tool like [ILSpy](https://github.com/icsharpcode/ILSpy) or [dnSpy](https://github.com/dnSpy/dnSpy)
-2. Open `rocketstation_Data/Managed/Assembly-CSharp.dll`
-3. Navigate to `Assets.Scripts.Objects.Electrical.ProgrammableChip`
-4. Export `ProgrammableChip.cs` class to file
-
-### Step 2: Replace Source Files
-
-Copy the new files to the LSP data folder:
 ```bash
-cd ic10lsp/data/game-sources/
-
-# Replace with new versions
-cp /path/to/new/Enums.json .
-cp /path/to/new/Stationpedia.json .
-cp /path/to/new/ProgrammableChip.cs .
+# 1. (optional) archive the current data/ files under data/game-sources/Old Versions/<patch>/
+# 2. drop the 4 fresh files into data/
+# 3. rebuild — both generators run from the VS Code task "build: ic10 lsp + ext", or manually:
+cd tree-sitter-ic10 && npm run generate          # regenerate grammar tokens
+cd ../ic10lsp && cargo build                     # regenerate Rust + compile LSP
+# 4. copy the binary into the extension (the build task does this for you):
+#    target/debug/ic10lsp.exe -> "../FlorpyDorp Language Support/bin/ic10lsp-win32.exe"
+# 5. cargo test   (only touch signature_override if a special-case instruction changed)
 ```
 
-### Step 3: Rebuild LSP
-
-The auto-generation happens automatically during build:
-```bash
-cd ../../ic10lsp
-cargo build --release
-```
-
-The build script will:
-1. Parse the three source files
-2. Extract all enum types and values
-3. Generate `instructions_generated.rs`
-4. Compile it into the LSP binary
-
-### Step 4: Update Extension
-
-Copy the new LSP binary to the VS Code extension:
-```bash
-# Windows
-copy target\release\ic10lsp.exe "..\FlorpyDorp Language Support\bin\ic10lsp-win32.exe"
-
-# Linux
-cp target/release/ic10lsp "../FlorpyDorp Language Support/bin/ic10lsp-linux"
-
-# macOS
-cp target/release/ic10lsp "../FlorpyDorp Language Support/bin/ic10lsp-darwin"
-```
-
-### Step 5: Test
-
-1. Reload VS Code window
-2. Open any `.ic10` file
-3. Type `s d0 ` and check that new logic types appear in completions
-4. Verify tooltips show correct descriptions
-
-## Implementation Details
-
-### Parser Logic (build.rs)
-
-**Enums.json Parser** (lines 242-320):
-```rust
-// Load and parse JSON
-let enums_json: Value = serde_json::from_str(&enums_content)?;
-let script_enums = enums_json["ScriptEnums"].as_object()?;
-
-// Extract LogicType
-if let Some(logic_type) = script_enums.get("LogicType") {
-    if let Some(values) = logic_type["values"].as_object() {
-        for (name, data) in values {
-            let deprecated = data["deprecated"].as_bool().unwrap_or(false);
-            if !deprecated {
-                logic_types_builder.entry(name);
-                let desc = data["description"].as_str().unwrap_or("");
-                logic_type_docs_builder.entry(name, escape_str(desc));
-            }
-        }
-    }
-}
-```
-
-**ProgrammableChip.cs Parser** (lines 376-428):
-```rust
-// Find GetCommandExample method using regex
-let method_regex = Regex::new(
-    r"(?s)public static string GetCommandExample\s*\([^)]*\)\s*\{(.*?)\n\s*\}"
-)?;
-
-// Extract switch cases for each instruction
-let case_regex = Regex::new(
-    r#"case "(\w+)":\s*return "([^"]+)";"#
-)?;
-
-// Parse parameter types from helpstring
-for cap in case_regex.captures_iter(method_body) {
-    let instruction = cap[1];
-    let helpstring = cap[2];
-    // Parse parameters like "<color=yellow>add</color> <color=#0080FFFF>r?</color> ..."
-}
-```
-
-**Generated Output Format**:
-```rust
-// Uses phf crate for compile-time perfect hash maps
-pub const LOGIC_TYPES: phf::Set<&'static str> = phf_set! {
-    "Power",
-    "Open",
-    // ... 255 more entries
-    "VolumeOfLiquid",
-};
-```
-
-### Code Integration (instructions.rs)
-
-The generated file is included at the top of `instructions.rs`:
-
-```rust
-use std::fmt::Display;
-use phf::{phf_map, phf_set};
-
-// Include auto-generated constants
-include!(concat!(env!("OUT_DIR"), "/instructions_generated.rs"));
-
-// DataType enum and other manual code follows...
-```
-
-**Manual Definitions Commented Out**:
-The old manual definitions (187 logic types) are preserved as comments:
-```rust
-/* MANUAL DEFINITIONS DISABLED - NOW AUTO-GENERATED FROM game-sources/Enums.json
-   See include at top of file for auto-generated LOGIC_TYPES, etc.
-
-#[allow(dead_code)]
-pub const LOGIC_TYPES: phf::Set<&'static str> = phf_set! {
-    "Power",
-    "Open",
-    // ... only 187 entries
-};
-
-END OF MANUAL SET DEFINITIONS */
-```
+`build.rs` declares `cargo:rerun-if-changed` on all four files, so editing any of them
+re-triggers generation on the next build.
 
 ## Verification
 
-### Check Generated Output
-
-After building, inspect the generated file:
 ```bash
-# Find the generated file (path varies by build hash)
-find target/debug/build/ic10lsp-*/out/instructions_generated.rs
+# generated files (path has a build hash)
+ls target/debug/build/ic10lsp-*/out/
+#   enums_generated.rs  instructions_generated.rs  device_hashes_generated.rs  descriptions_generated.rs
 
-# Check logic type count
-grep -c "^\s*\"" target/debug/build/ic10lsp-*/out/instructions_generated.rs | head -1
-# Should be 257+ for LOGIC_TYPES
-```
+# device count (÷2 for per-map: DEVICE_NAME_TO_HASH + HASH_TO_DISPLAY_NAME)
+grep -c '=>' target/debug/build/ic10lsp-*/out/device_hashes_generated.rs
 
-### Test in Extension
-
-Create a test file `test.ic10`:
-```ic10
-alias sensor d0
-
-# Type "s d0 " then press Ctrl+Space
-# Should show all 257 logic types including:
-s d0 VolumeOfLiquid
-s d0 VerticalRatio
-s d0 MinimumWattsToContact
+# invariants (signatures<->docs cover the same instruction set, etc.)
+cargo test matching
 ```
 
 ## Troubleshooting
 
-### Build Fails - "File not found"
-- **Cause**: Source files missing from `data/game-sources/`
-- **Fix**: Verify all three files exist:
-  ```bash
-  ls data/game-sources/
-  # Should show: Enums.json, Stationpedia.json, ProgrammableChip.cs
-  ```
+- **`ENOENT ... data/game-sources/...`** — a generator is still pointing at the old folder.
+  Both readers (`build.rs`, `tree-sitter-ic10/generate-grammar.js`) must read from `data/`.
+- **Build fails reading a source file** — confirm all four exist in `data/`:
+  `ls data/` should show `Enums.json Stationpedia.json english.xml ProgrammableChip.cs`.
+- **`duplicate key` panic from phf** — a source file has duplicate keys (english.xml sometimes
+  ships duplicate `Key`s); the build keeps the first. If it still panics, a new duplicate slipped
+  past a dedup guard in `build.rs`.
+- **New types/devices not appearing** — the old LSP binary is still loaded; rebuild and re-copy
+  the binary into `FlorpyDorp Language Support/bin/`, then reload the extension host.
+- **`matching_instructions` test fails** — an instruction has a doc but no signature (or vice
+  versa). Normally auto-resolved; only needs an override entry for a genuine special case.
 
-### Types Missing in Completions
-- **Cause**: Old LSP binary still in use
-- **Fix**: 
-  1. Close all VS Code windows using the extension
-  2. Copy new binary to extension bin folder
-  3. Reopen VS Code and test
+## Related
 
-### Wrong Type Count
-- **Cause**: Source files from wrong game version
-- **Fix**: Re-extract from latest Stationeers installation
-
-### Duplicate Definition Errors
-- **Cause**: Manual definitions not properly commented out
-- **Fix**: Check `instructions.rs` lines 189-930 are inside `/* ... */` comment blocks
-
-## Benefits
-
-✅ **Always Up-to-Date**: Game updates automatically reflected after file replacement  
-✅ **Zero Manual Maintenance**: No need to track new logic types in code  
-✅ **Authoritative Source**: Data comes directly from game, can't drift  
-✅ **Type Safety**: Compile-time generation ensures correctness  
-✅ **Performance**: phf crate provides O(1) lookups with zero runtime cost  
-
-## History
-
-**Before Auto-Generation**:
-- 187 logic types manually maintained
-- 93 types missing (36% incomplete)
-- `VolumeOfLiquid` and other new types unavailable
-- Manual updates required for each game patch
-
-**After Auto-Generation**:
-- 257 logic types from game data (100% coverage)
-- All types include descriptions
-- Update process: replace 3 files + rebuild
-- Future-proof for game updates
-
-## Related Files
-
-- `build.rs` - Build script with parser logic
-- `instructions.rs` - Main type definitions (includes generated code)
-- `data/game-sources/` - Source files directory
-- `Cargo.toml` - Dependencies (regex added to build-dependencies)
-- `target/debug/build/ic10lsp-*/out/instructions_generated.rs` - Generated output
-
-## Credits
-
-Auto-generation system implemented November 2025 to solve missing logic type completions.
-Based on game source extraction and Rust build.rs codegen patterns.
+- `build.rs` — Rust code generator
+- `tree-sitter-ic10/generate-grammar.js` — grammar token generator
+- `src/instructions.rs` — includes the generated maps; the old hand-tuned tables are disabled here
+- `src/device_hashes.rs` — thin `include!` of the generated device maps
+- `/data/README.md` — canonical source-files + update documentation

@@ -249,8 +249,8 @@
       <Value>Nitrogen</Value>
     </Record>
     <Record>
-      <Key>Volatiles</Key>
-      <Value>Volatiles</Value>
+      <Key>Methane</Key>
+      <Value>Methane</Value>
     </Record>
     <Record>
       <Key>Pollutant</Key>
@@ -277,8 +277,8 @@
       <Value>Liquid Oxygen</Value>
     </Record>
     <Record>
-      <Key>LiquidVolatiles</Key>
-      <Value>Liquid Volatiles</Value>
+      <Key>LiquidMethane</Key>
+      <Value>Liquid Methane</Value>
     </Record>
     <Record>
       <Key>Steam</Key>
@@ -311,6 +311,50 @@
     <Record>
       <Key>Fuel</Key>
       <Value>Fuel Mix</Value>
+    </Record>
+    <Record>
+      <Key>Hydrazine</Key>
+      <Value>Hydrazine</Value>
+    </Record>
+    <Record>
+      <Key>LiquidHydrazine</Key>
+      <Value>Liquid Hydrazine</Value>
+    </Record>
+    <Record>
+      <Key>LiquidAlcohol</Key>
+      <Value>Liquid Alcohol</Value>
+    </Record>
+    <Record>
+      <Key>Helium</Key>
+      <Value>Helium</Value>
+    </Record>
+    <Record>
+      <Key>LiquidSodiumChloride</Key>
+      <Value>Liquid Sodium Chloride</Value>
+    </Record>
+    <Record>
+      <Key>Silanol</Key>
+      <Value>Silanol</Value>
+    </Record>
+    <Record>
+      <Key>LiquidSilanol</Key>
+      <Value>Liquid Silanol</Value>
+    </Record>
+    <Record>
+      <Key>HydrochloricAcid</Key>
+      <Value>Hydrochloric Acid</Value>
+    </Record>
+    <Record>
+      <Key>LiquidHydrochloricAcid</Key>
+      <Value>Liquid Hydrochloric Acid</Value>
+    </Record>
+    <Record>
+      <Key>Ozone</Key>
+      <Value>Ozone</Value>
+    </Record>
+    <Record>
+      <Key>LiquidOzone</Key>
+      <Value>Liquid Ozone</Value>
     </Record>
   </Gases>
   <Actions>
@@ -845,9 +889,7 @@ Just bolt it to a {THING:StructureBench} using a {THING:ItemWrench} to power it,
     <RecordThing>
       <Key>CircuitboardAirlockControl</Key>
       <Value>Airlock</Value>
-      <Description>Rumored to have been first sketched on a {LINK:Norsec;Norsec} toilet wall by a disgruntled engineer, the Exgress airlock control circuit board’s versatility and ease of fabrication has made it the {LINK:Stationeers;Stationeers} control system of choice for {THING:StructureAirlock} cycling protocols. 
-
-To enter setup mode, insert the board into a {THING:StructureConsole} along with a data disk. In this mode, you can see all data-accessible objects currently connected to the {THING:StructureConsole}. Doors, lights, gas sensors and slave consoles can be selected (highlighted green), and will be controlled once the data disk is removed.</Description>
+      <Description>To enter setup mode, use a {THING: Screwdriver} on the screw on the side of  {THING:StructureConsole}. In this mode, you can see all data-accessible objects currently connected to the {THING:StructureConsole}. Doors, lights, gas sensors and slave consoles can be selected (highlighted green), and will be controlled once the screw is turned back.</Description>
     </RecordThing>
     <RecordThing>
       <Key>ImGuiCircuitboardAirlockControl</Key>
@@ -955,14 +997,11 @@ The circuit board has two modes: 'Link' switches all devices on or off; 'Toggle'
     <RecordThing>
       <Key>DynamicGasCanisterWater</Key>
       <Value>Portable Liquid Tank (Water)</Value>
-      <Description>This portable tank stores liquid, and liquid only. You just have to fill it up. To do this, bolt one to a {THING:ItemTankConnector} using a {THING:ItemWrench}, then connect it to {THING:StructurePipeLiquidStraight} to supply liquid to a network. 
-Try to keep pressure under 10 MPa, or you'll end up wet, hurt and sorry, without any of the fun.
-You can refill a {THING:ItemGasCanisterWater} by attaching it to the tank's striped section. Or you could use a {THING:ItemWrench} to attach it to a rocket and take it somewhere distant and dry, then feel good about yourself.</Description>
     </RecordThing>
     <RecordThing>
       <Key>DynamicLiquidCanisterEmpty</Key>
       <Value>Portable Liquid Tank</Value>
-      <Description>This portable tank stores liquid, and liquid only. You can bolt one to a {THING:ItemTankConnectorLiquid} using a {THING:ItemWrench}, then connect it to a pipe network to refill it. You can refill a {THING:ItemGasCanisterWater} by attaching it to the tank's striped section. Or you could use a {THING:ItemWrench} to attach it to a rocket and take it somewhere distant and dry, then feel good about yourself.</Description>
+      <Description>This portable tank stores liquid. You can bolt one to a {THING:StructurePortablesConnector} using a {THING:ItemWrench}, then connect it to a pipe network to refill it. You can refill a {THING:ItemLiquidCanisterEmpty} by attaching it to the tank's striped section.</Description>
     </RecordThing>
     <RecordThing>
       <Key>DynamicGenerator</Key>
@@ -1260,8 +1299,8 @@ To use on yourself: put duct tape in your active hand, hold RIGHT MOUSE BUTTON t
     </RecordThing>
     <RecordThing>
       <Key>ItemGasFilterVolatiles</Key>
-      <Value>Filter (Volatiles)</Value>
-      <Description>Filters are used to capture various gases, which can be disposed of or used elsewhere. {GAS:Volatiles} are created by exposing {THING:ItemVolatiles} to heat. The product can then be collected and combined with {GAS:Oxygen} to create fuel, or used within a {THING:StructureFurnace} to smelt ores and create {LINK:IngotPage;alloys}.</Description>
+      <Value>Filter (Methane)</Value>
+      <Description>Filters are used to capture various gases, which can be disposed of or used elsewhere. {GAS:Methane} are created by exposing {THING:ItemVolatiles} to heat. The product can then be collected and combined with {GAS:Oxygen} to create fuel, or used within a {THING:StructureFurnace} to smelt ores and create {LINK:IngotPage;alloys}.</Description>
     </RecordThing>
     <RecordThing>
       <Key>ItemGasFilterWater</Key>
@@ -1530,7 +1569,7 @@ To use on yourself: put duct tape in your active hand, hold RIGHT MOUSE BUTTON t
     </RecordThing>
     <RecordThing>
       <Key>ItemPillStun</Key>
-      <Value>Pill (Paralysis)</Value>
+      <Value>Pill (Stun)</Value>
       <Description>Through rarely publicized, the existence of this pill is an open secret. For use when all else has failed, the Sayonara Suppository immobilizes and rapidly ends the average {LINK:Stationeers;Stationeer}. The delivery mode ensures that if a Stationeer chooses to take this pill, they really have to want it.</Description>
     </RecordThing>
     <RecordThing>
@@ -1674,62 +1713,82 @@ USE: 'J' to activate; 'space' to fly up; 'left ctrl' to descend; and 'WASD' to m
     <RecordThing>
       <Key>ItemSprayCanBlack</Key>
       <Value>Spray Paint (Black)</Value>
-      <Description>Go classic, clandestine or just plain Gothic with black paint, which can be applied to most items. Each can has 20 uses.</Description>
+      <Description>Black spray paint. Using it with a spray gun will extend the usage greatly.</Description>
+    </RecordThing>
+    <RecordThing>
+      <Key>ItemSprayCanMetallicObsidian</Key>
+      <Value>Spray Paint (Obsidian)</Value>
+      <Description>Metallic obsidian spray paint. Using it with a spray gun will extend the usage greatly.</Description>
+    </RecordThing>
+    <RecordThing>
+      <Key>ItemSprayCanMetallicSilver</Key>
+      <Value>Spray Paint (Silver)</Value>
+      <Description>Metallic silver spray paint. Using it with a spray gun will extend the usage greatly.</Description>
+    </RecordThing>
+    <RecordThing>
+      <Key>ItemSprayCanMetallicBronze</Key>
+      <Value>Spray Paint (Bronze)</Value>
+      <Description>Metallic bronze spray paint. Using it with a spray gun will extend the usage greatly.</Description>
+    </RecordThing>
+    <RecordThing>
+      <Key>ItemSprayCanMetallicGold</Key>
+      <Value>Spray Paint (Gold)</Value>
+      <Description>Metallic gold spray paint. Using it with a spray gun will extend the usage greatly.</Description>
     </RecordThing>
     <RecordThing>
       <Key>ItemSprayCanBlue</Key>
       <Value>Spray Paint (Blue)</Value>
-      <Description>What kind of a color is blue? The kind of of color that says, 'Hey, what about me?'</Description>
+      <Description>Blue spray paint. Using it with a spray gun will extend the usage greatly.</Description>
     </RecordThing>
     <RecordThing>
       <Key>ItemSprayCanBrown</Key>
       <Value>Spray Paint (Brown)</Value>
-      <Description>In more artistic {LINK:Stationeers;Stationeers} circles, the absence of brown is often lamented, but seldom changed.</Description>
+      <Description>Brown spray paint. Using it with a spray gun will extend the usage greatly.</Description>
     </RecordThing>
     <RecordThing>
       <Key>ItemSprayCanGreen</Key>
       <Value>Spray Paint (Green)</Value>
-      <Description>Green is the color of life, and longing. Paradoxically, it's also the color of envy, and tolerance. It denotes sickness, youth, and wealth. But really, it's just what light does at around 500 billionths of a meter.</Description>
+      <Description>Green spray paint. Using it with a spray gun will extend the usage greatly.</Description>
     </RecordThing>
     <RecordThing>
       <Key>ItemSprayCanGrey</Key>
       <Value>Spray Paint (Grey)</Value>
-      <Description>Arguably the most popular color in the universe, grey was invented so designers had something to do.</Description>
+      <Description>Grey spray paint. Using it with a spray gun will extend the usage greatly.</Description>
     </RecordThing>
     <RecordThing>
       <Key>ItemSprayCanKhaki</Key>
       <Value>Spray Paint (Khaki)</Value>
-      <Description>Not so much a single color, as a category of boredom, khaki is the pigmentation equivalent of a mild depressive episode.</Description>
+      <Description>Khaki spray paint. Using it with a spray gun will extend the usage greatly.</Description>
     </RecordThing>
     <RecordThing>
       <Key>ItemSprayCanOrange</Key>
       <Value>Spray Paint (Orange)</Value>
-      <Description>Orange is fun, but also suggestive of hazards. Sitting proudly in the middle of the visual spectrum, it has nothing to prove.</Description>
+      <Description>Orange spray paint. Using it with a spray gun will extend the usage greatly.</Description>
     </RecordThing>
     <RecordThing>
       <Key>ItemSprayCanPink</Key>
       <Value>Spray Paint (Pink)</Value>
-      <Description>With the invention of enduring chemical dyes, the 20th century bestowed associations with innocence and tenderness upon this pale tint of red. Yet classically, it was the color of seduction and eroticism. Things change.</Description>
+      <Description>Pink spray paint. Using it with a spray gun will extend the usage greatly.</Description>
     </RecordThing>
     <RecordThing>
       <Key>ItemSprayCanPurple</Key>
       <Value>Spray Paint (Purple)</Value>
-      <Description>Purple is a curious color. You need to be careful with purple. It can be very good, or go horribly, horribly wrong.</Description>
+      <Description>Purple spray paint. Using it with a spray gun will extend the usage greatly.</Description>
     </RecordThing>
     <RecordThing>
       <Key>ItemSprayCanRed</Key>
       <Value>Spray Paint (Red)</Value>
-      <Description>The king of colors, red is perhaps the defining tone of the universe. Linked to blood, royalty, fire and damnation, it is the chromatic expression of power.</Description>
+      <Description>Red spray paint. Using it with a spray gun will extend the usage greatly.</Description>
     </RecordThing>
     <RecordThing>
       <Key>ItemSprayCanWhite</Key>
       <Value>Spray Paint (White)</Value>
-      <Description>White looks clean, sharp and nice. But {LINK:Stationeers;Stationeering} can be a dirty job. White tends to scuff.</Description>
+      <Description>White spray paint. Using it with a spray gun will extend the usage greatly.</Description>
     </RecordThing>
     <RecordThing>
       <Key>ItemSprayCanYellow</Key>
       <Value>Spray Paint (Yellow)</Value>
-      <Description>A caricature of light itself, yellow lacks the self-confidence of red, or the swagger of purple. It's less fun than orange, but less emotionally limp than khaki. It's hard to know when yellow is appropriate, but it persists as a primary color regardless. Suggesting that yellow gonna yellow, no matter what anyone thinks.</Description>
+      <Description>Yellow spray paint. Using it with a spray gun will extend the usage greatly.</Description>
     </RecordThing>
     <RecordThing>
       <Key>ItemSteelFrames</Key>
@@ -2120,19 +2179,19 @@ Chutes are fundamental components of chute networks, which allow the transport o
     <RecordThing>
       <Key>StructureConsole</Key>
       <Value>Console</Value>
-      <Description>This {LINK:Norsec;Norsec-designed} control box manages devices such as the {THING:StructureActiveVent}, {THING:StructurePassiveVent}, {THING:StructureGasSensor} and {THING:StructureCompositeDoor}, depending on which {LINK:LogicPage;circuitboard} is inserted into the unit. It has a shared data/power port.
-A completed console displays all devices connected to the current power network. Any devices not related to the installed circuitboard will be greyed-out and inoperable. Consoles are locked once a {THING:ItemDataDisk} is removed.</Description>
+      <Description>This control box manages devices such as the {THING:StructureActiveVent}, {THING:StructureGasSensor} and {THING:StructureCompositeDoor}, depending on which {LINK:LogicPage;circuitboard} is inserted into the unit. It has a shared data/power port.
+A completed console displays all devices connected to the current power network. Any devices not related to the installed circuitboard will be greyed-out and inoperable. To enter setup mode, use a {THING: Screwdriver} on the screw on the side of the {THING:StructureConsole}.</Description>
     </RecordThing>
     <RecordThing>
       <Key>StructureConsoleDual</Key>
       <Value>Console Dual</Value>
-      <Description>This {LINK:Norsec;Norsec-designed} control box manages devices such as the {THING:StructureActiveVent}, {THING:StructureGasSensor}, {THING:StructureCompositeDoor} and others, depending on which {LINK:LogicPage;circuitboard} is inserted into the unit. It has separate data and power ports.
+      <Description>This control box manages devices such as the {THING:StructureActiveVent}, {THING:StructureGasSensor}, {THING:StructureCompositeDoor} and others, depending on which {LINK:LogicPage;circuitboard} is inserted into the unit. It has separate data and power ports.
 A completed console displays all devices connected to the current power network. Any devices not related to the installed circuitboard will be greyed-out and inoperable. Consoles are locked once a {THING:ItemDataDisk} is removed.</Description>
     </RecordThing>
     <RecordThing>
       <Key>StructureConsoleMonitor</Key>
       <Value>Console Monitor</Value>
-      <Description>This {LINK:Norsec;Norsec-designed} control box manages devices such as the {THING:StructureActiveVent}, {THING:StructurePassiveVent}, {THING:StructureGasSensor}, {THING:ItemSecurityCamera} and {THING:StructureCompositeDoor}, depending on which {LINK:LogicPage;circuitboard} is inserted into the unit. It has a shared data/power port, and a charming sloped interface.
+      <Description>This control box manages devices such as the {THING:StructureActiveVent}, {THING:StructurePassiveVent}, {THING:StructureGasSensor}, {THING:ItemSecurityCamera} and {THING:StructureCompositeDoor}, depending on which {LINK:LogicPage;circuitboard} is inserted into the unit. It has a shared data/power port, and a charming sloped interface.
 A completed console displays all devices connected to the current power network. Any devices not related to the installed circuitboard will be greyed-out and inoperable. Consoles are locked once a {THING:ItemDataDisk} is removed.</Description>
     </RecordThing>
     <RecordThing>
@@ -2231,7 +2290,7 @@ With a little patience and maneuvering, the corner frame's Gothic-inspired silho
     <RecordThing>
       <Key>StructureFurnace</Key>
       <Value>Furnace</Value>
-      <Description>The Zhurong furnace employs a high-temperature gas mixture of {GAS:Oxygen} and {GAS:Volatiles} to smelt {LINK:IngotPage;ingots} and a range of {LINK:IngotPage;alloys} as raw materials for {LINK:FabricatorPage;fabricators}.
+      <Description>The Zhurong furnace employs a high-temperature gas mixture of {GAS:Oxygen} and {GAS:Methane} to smelt {LINK:IngotPage;ingots} and a range of {LINK:IngotPage;alloys} as raw materials for {LINK:FabricatorPage;fabricators}.
 A basic gas mixture can be achieved by adding {THING:ItemOxite} and {THING:ItemVolatiles} in a 1:2 ratio directly to the furnace, but more complex alloys will require careful management of a dedicated gas mixing network. Exact ingredient ratios must be observed. Likewise, smelting ores at insufficient temperatures will produce {LINK:ReagentPage;reagents}, which must be recycled.
 If liquids are present in the furnace, they will gather there until the furnace is connected to a liquid pipe network.</Description>
     </RecordThing>
@@ -2464,6 +2523,10 @@ All the rack's pipes must be connected or the unit will show an error state, but
       <Value>Small Tank</Value>
     </RecordThing>
     <RecordThing>
+      <Key>StructureTankSmallInLine</Key>
+      <Value>Small Tank</Value>
+    </RecordThing>
+    <RecordThing>
       <Key>StructureTankSmallAir</Key>
       <Value>Small Tank (Air)</Value>
     </RecordThing>
@@ -2513,7 +2576,7 @@ For more information about how to control temperatures, consult the {LINK:Temper
     <RecordThing>
       <Key>StructureWallHeater</Key>
       <Value>Wall Heater</Value>
-      <Description>The {LINK:Xigo;Xigo} wall heater is a simple device that can be installed on a wall or frame and connected to power. When switched on, it will start heating the surrounding environment. It consumes 1010W of power and can be controlled by logic chips to run when the temperature hits a certain level.</Description>
+      <Description>The wall heater is a simple device that can be installed on a wall or frame and connected to power. When switched on, it will start heating the surrounding environment. Adds 1000 joules of heat per tick to the contents of your pipe network. It will only operate when the pressure is above the armstrong limit (6.3kPa) and the temperature is below 2500 Kelvin.</Description>
     </RecordThing>
     <RecordThing>
       <Key>StructureWallLight</Key>
@@ -2664,7 +2727,7 @@ Note that transformers operate as data isolators, preventing data flowing into a
       <Value>Arc Furnace</Value>
       <Description>The simplest smelting system available to the average {LINK:Stationeers;Stationeer}, {LINK:Recurso;Recurso's} arc furnace was forged itself in the depths of the Solar System to help explorational geologists determine the purity of potential asteroidal mining targets.
 Co-opted by the {LINK:ODA;ODA}, it now provides Stationeers with a way to produce pure ingots of various resources.
-The smelting process also releases a range of by product {LINK:GasPage;gases}, principally {GAS:Nitrogen}, {GAS:CarbonDioxide}, {GAS:Volatiles} and {GAS:Oxygen} in differing ratios. These can be recaptured from the atmosphere by filtering, but also make the arc furnace a risk in closed environments. 
+The smelting process also releases a range of by product {LINK:GasPage;gases}, principally {GAS:Nitrogen}, {GAS:CarbonDioxide}, {GAS:Methane} and {GAS:Oxygen} in differing ratios. These can be recaptured from the atmosphere by filtering, but also make the arc furnace a risk in closed environments. 
 Unlike the more advanced {THING:StructureFurnace}, the arc furnace cannot create {LINK:IngotPage;alloys}.</Description>
     </RecordThing>
     <RecordThing>
@@ -2821,10 +2884,7 @@ Unlike the more advanced {THING:StructureFurnace}, the arc furnace cannot create
     <RecordThing>
       <Key>ItemVolatiles</Key>
       <Value>Ice (Volatiles)</Value>
-      <Description>An extremely reactive ice with numerous hydrocarbons trapped inside. For simplicity's sake, these are often displayed as H2 by devices like the {THING:CartridgeAtmosAnalyser}.
-      
-{GAS:Volatiles} combust in a 2:1 ratio with {GAS:Oxygen}, creating {GAS:CarbonDioxide} and pollutants. However when catalysed via devices such as the {THING:H2Combustor} in the presence of {GAS:Oxygen}, they produce
-        {GAS:Steam} and heat with a modicum of {GAS:CarbonDioxide} and {GAS:Pollutant} due to the autoignition of the volatiles in the chamber. Along with {GAS:Oxygen}, volatiles gas is also the major component of fuel for such devices as the {THING:ItemWeldingTorch}.
+      <Description>An extremely reactive ice with numerous hydrocarbons trapped inside. It contains mostly {GAS:Methane} as well as a small amount of {GAS:Hydrogen}. Volatile gases are used to create fuel mixes for items like the {THING:ItemWeldingTorch} and {THING:DynamicGenerator}.
 </Description>
     </RecordThing>
     <RecordThing>
@@ -3141,6 +3201,10 @@ Note that transformers operate as data isolators, preventing data flowing into a
     </RecordThing>
     <RecordThing>
       <Key>StructureTankBig</Key>
+      <Value>Large Tank</Value>
+    </RecordThing>
+    <RecordThing>
+      <Key>StructureTankBigInLine</Key>
       <Value>Large Tank</Value>
     </RecordThing>
     <RecordThing>
@@ -4293,11 +4357,11 @@ Output = 1 exporting items inside and eventually the main item.</Description>
     </RecordThing>
     <RecordThing>
       <Key>ItemGasFilterVolatilesL</Key>
-      <Value>Heavy Filter (Volatiles)</Value>
+      <Value>Heavy Filter (Methane)</Value>
     </RecordThing>
     <RecordThing>
       <Key>ItemGasFilterVolatilesM</Key>
-      <Value>Medium Filter (Volatiles)</Value>
+      <Value>Medium Filter (Methane)</Value>
     </RecordThing>
     <RecordThing>
       <Key>ItemGasFilterWaterL</Key>
@@ -4939,11 +5003,6 @@ USE: 'J' to activate; 'space' to fly up; 'left ctrl' to descend; and 'WASD' to m
       <Value>Reverse Electrolyzer</Value>
     </RecordThing>
     <RecordThing>
-      <Key>H2Combustor</Key>
-      <Value>H2 Combustor</Value>
-      <Description>Adapted slightly from its original {LINK:Recurso;Recurso} design, the {GAS:Volatiles} Combustor does exactly what its name suggests - it burns a mixture of volatiles and {GAS:Oxygen} to create water. Extremely useful in hot or arid environments, users need to be aware that the combustor outputs considerable waste heat. The device is also less than perfectly efficient, resulting in the autoignition of volatiles in the chamber, and the production of waste gases which must be dealt with.</Description>
-    </RecordThing>
-    <RecordThing>
       <Key>StructureInsulatedPipeStraight</Key>
       <Value>Insulated Pipe (Straight)</Value>
       <Description>Insulated pipes greatly reduce heat loss from gases stored in them.</Description>
@@ -5231,6 +5290,15 @@ USE: 'J' to activate; 'space' to fly up; 'left ctrl' to descend; and 'WASD' to m
       <Value>Tank Big (Insulated)</Value>
     </RecordThing>
     <RecordThing>
+      <Key>StructureTankSmallInsulatedInLine</Key>
+      <Value>Tank Small (Insulated)</Value>
+      <Description />
+    </RecordThing>
+    <RecordThing>
+      <Key>StructureTankBigInsulatedInLine</Key>
+      <Value>Tank Big (Insulated)</Value>
+    </RecordThing>
+    <RecordThing>
       <Key>ItemKitTankInsulated</Key>
       <Value>Kit (Insulated Tank)</Value>
       <Description />
@@ -5389,6 +5457,11 @@ USE: 'J' to activate; 'space' to fly up; 'left ctrl' to descend; and 'WASD' to m
       <Description>The first piece to place when building a rocket. Rockets can be constructed and/or landed here. Each Launch Mount will be allocated a slot on the Space Map and assigned a Location Code.</Description>
     </RecordThing>
     <RecordThing>
+      <Key>StructureLaunchMountOrbital</Key>
+      <Value>Orbital Launch Mount</Value>
+      <Description>A launch mount deployed in low orbit using a {THING:DynamicOrbitalLaunchMountPayload} carried in a {THING:StructureRocketLargePayloadBay}. Rockets can be constructed and/or landed here. Each Orbital Launch Mount will be allocated a slot on the Space Map and assigned a Location Code.</Description>
+    </RecordThing>
+    <RecordThing>
       <Key>ItemKitAirlockGate</Key>
       <Value>Kit (Hangar Door)</Value>
       <Description />
@@ -5411,7 +5484,7 @@ USE: 'J' to activate; 'space' to fly up; 'left ctrl' to descend; and 'WASD' to m
     <RecordThing>
       <Key>StructureBatteryLarge</Key>
       <Value>Station Battery (Large)</Value>
-      <Description>Providing even better large-scale, reliable power storage than the {THING;StructureBattery}, the {LINK:Sinotai;Sinotai} 'Da Dianchi' large station battery is the heart of most {LINK:Stationeers;Stationeer} bases. 
+      <Description>Providing even better large-scale, reliable power storage than the {THING:StructureBattery}, the {LINK:Sinotai;Sinotai} 'Da Dianchi' large station battery is the heart of most {LINK:Stationeers;Stationeer} bases. 
 There are a variety of cautions to the design of electrical systems using batteries, and every experienced Stationeer has a story to tell, hence the Stationeer adage: 'Dianzi cooks, but it also frys.' 
 {HEADER:POWER OUTPUT}
 Able to store up to 9000001 watts of power, there are no practical limits to its throughput, hence it is wise to use {THING:ItemCableCoilHeavy}. Seasoned electrical engineers will also laugh in the face of those who fail to separate out their power generation networks using an {THING:StructureAreaPowerControl} and {THING:StructureTransformer}. </Description>
@@ -5550,8 +5623,7 @@ A quad-array of hub-mounted electric engines propels the reinforced aluminium fr
     <RecordThing>
       <Key>StructureUprightWindTurbine</Key>
       <Value>Upright Wind Turbine</Value>
-      <Description>Norsec's basic wind turbine is an easily fabricated, rapidly deployed design that is strong enough to withstand the worst that environments can throw at it. 
-While the wind turbine is optimized to produce power even on low atmosphere worlds (up to 200W), it performs best in denser environments. Output varies with wind speed, and during storms, may increase dramatically (up to 800W), so be careful to design your power networks with that in mind.</Description>
+      <Description>The wind turbine is optimized to produce power even on low atmosphere worlds (up to 200W), it performs best in denser environments. Output varies with wind speed, and during storms, may increase dramatically (up to 1,000W), so be careful to design your power networks with that in mind.</Description>
     </RecordThing>
     <RecordThing>
       <Key>CrateMkII</Key>
@@ -5576,7 +5648,7 @@ While the wind turbine is optimized to produce power even on low atmosphere worl
     <RecordThing>
       <Key>ItemCornSoup</Key>
       <Value>Corn Soup</Value>
-      <Description>Made using {THING:ItemCookedCorn} and an {THING:ItemEmptyCan} in a {THING:AppliancePackagingMachine} or {THING:StructureAdvancedPackagingMachine}. Faily high in nutrition, canned food does not {LINK:DecayPage;decay}.</Description>
+      <Description>Made using {THING:ItemCookedCorn} and an {THING:ItemEmptyCan} in a {THING:AppliancePackagingMachine} or {THING:StructureAdvancedPackagingMachine}. Fairly high in nutrition, canned food does not {LINK:DecayPage;decay}.</Description>
     </RecordThing>
     <RecordThing>
       <Key>ItemBreadLoaf</Key>
@@ -5642,8 +5714,9 @@ It can be automated using the {THING:StructureHarvie}. Note that unlike the {THI
     <RecordThing>
       <Key>StructureWindTurbine</Key>
       <Value>Wind Turbine</Value>
-      <Description>The Stationeers wind turbine was first designed by Norsec atmospheric engineers, looking to create a wind-driven power generation system that would operate even on exceedingly low atmosphere worlds. The ultra-light blades respond to exceedingly low atmospheric densities, while being strong enough to function even under huge strain in much more demanding environments.
-While the wind turbine is optimized to produce power (up to 500W) even on low atmosphere worlds, it performs best in denser environments. Output varies with wind speed and, during storms, may increase dramatically (up to 10,000W), so be careful to design your power networks with that in mind.</Description>
+      <Description>
+          The Wind Turbine is optimized to produce power (up to 500W) even on low atmosphere worlds, it performs best in denser environments. Output varies with wind speed and, during storms, may increase dramatically (up to 20,000W), so be careful to design your power networks with that in mind.
+      </Description>
     </RecordThing>
     <RecordThing>
       <Key>ItemKitWindTurbine</Key>
@@ -5761,7 +5834,7 @@ The speed of heat gain or loss will depend on the liquid in question. Adding mul
     <RecordThing>
       <Key>DynamicMKIILiquidCanisterEmpty</Key>
       <Value>Portable Liquid Tank Mk II</Value>
-      <Description>An empty, insulated liquid {SLOT:GasCanister}.</Description>
+      <Description>This portable tank stores liquid and is fully insulated. You can bolt one to a {THING:StructurePortablesConnector} using a {THING:ItemWrench}, then connect it to a pipe network to refill it. You can refill a {THING:ItemLiquidCanisterEmpty} by attaching it to the tank's striped section.</Description>
     </RecordThing>
     <RecordThing>
       <Key>ItemKitDynamicMKIILiquidCanister</Key>
@@ -5865,6 +5938,16 @@ To use on yourself: put duct tape in your active hand, hold RIGHT MOUSE BUTTON t
       <Description />
     </RecordThing>
     <RecordThing>
+      <Key>StructureLiquidTankBigInLine</Key>
+      <Value>Liquid Tank Big</Value>
+      <Description />
+    </RecordThing>
+    <RecordThing>
+      <Key>StructureLiquidTankSmallInLine</Key>
+      <Value>Liquid Tank Small</Value>
+      <Description />
+    </RecordThing>
+    <RecordThing>
       <Key>ItemKitLiquidTank</Key>
       <Value>Kit (Liquid Tank)</Value>
       <Description />
@@ -5881,6 +5964,16 @@ To use on yourself: put duct tape in your active hand, hold RIGHT MOUSE BUTTON t
     </RecordThing>
     <RecordThing>
       <Key>StructureLiquidTankSmallInsulated</Key>
+      <Value>Liquid Tank Small (Insulated)</Value>
+      <Description />
+    </RecordThing>
+    <RecordThing>
+      <Key>StructureLiquidTankBigInsulatedInLine</Key>
+      <Value>Liquid Tank Big (Insulated)</Value>
+      <Description />
+    </RecordThing>
+    <RecordThing>
+      <Key>StructureLiquidTankSmallInsulatedInLine</Key>
       <Value>Liquid Tank Small (Insulated)</Value>
       <Description />
     </RecordThing>
@@ -6048,7 +6141,7 @@ Central to this pastime is the step sequencer, which allows Stationeers to seque
 &gt; {GAS:Oxygen} x 1.3
 &gt; {GAS:Nitrogen} x 0.6
 &gt; {GAS:CarbonDioxide} x 0.8
-&gt; {GAS:Volatiles} x 1
+&gt; {GAS:Methane} x 1
 &gt; {GAS:Pollutant} x 3
 &gt; {GAS:NitrousOxide} x 1.5
 &gt; {GAS:Steam} x 2
@@ -6178,7 +6271,7 @@ The effect of these ingredients depends on their respective proportions in the c
       <Key>StructureAdvancedComposter</Key>
       <Value>Advanced Composter</Value>
       <Description>The advanced composter creates {THING:Fertilizer} out of organic matter. It accepts {LINK:OrganicPage;food}, {THING:DecayedFood} or {THING:ItemBiomass}. It requires {GAS:Water} and power to operate, accelerating the natural composting process.
-When processing, it releases nitrogen and volatiles, as well a small amount of heat. 
+When processing, it releases nitrogen and {GAS:Methane}, as well a small amount of heat. 
 
 {HEADER:Compost composition}
 Fertilizer is produced at a 1:3 ratio of fertilizer to ingredients. The fertilizer's effects on plants will vary depending on the respective proportions of its ingredients.
@@ -6212,7 +6305,7 @@ Fertilizer is produced at a 1:3 ratio of fertilizer to ingredients. The fertiliz
       <Key>PortableComposter</Key>
       <Value>Portable Composter</Value>
       <Description>A simple composting device, the basic composter creates {THING:Fertilizer} out of organic matter. It accepts {LINK:OrganicPage;food}, {THING:DecayedFood} or {THING:ItemBiomass}. It requires a full {THING:ItemLiquidCanisterEmpty} and a battery to operate, accelerating the natural composting process.
-When processing, it releases nitrogen and volatiles, as well a small amount of heat.
+When processing, it releases nitrogen and {GAS:Methane}, as well a small amount of heat.
 
 {HEADER:Compost composition}
 Fertilizer is produced at a 1:3 ratio of fertilizer to ingredients. The fertilizer's effects on plants will vary depending on the respective proportions of its ingredients.
@@ -6479,7 +6572,7 @@ Note: the Cannifier will flash an error on its activation switch if you attempt 
     <RecordThing>
       <Key>StructurePipeHeater</Key>
       <Value>Pipe Heater (Gas)</Value>
-      <Description>Adds 1000 joules of heat per tick to the contents of your pipe network.</Description>
+      <Description>Adds 1000 joules of heat per tick to the contents of your pipe network. The Pipe Heater will only operate when the pipe pressure is above the armstrong limit (6.3kPa) and the temperature is below 2500 Kelvin.</Description>
     </RecordThing>
     <RecordThing>
       <Key>StructurePipeOneWayValve</Key>
@@ -6515,7 +6608,7 @@ Note: the Cannifier will flash an error on its activation switch if you attempt 
     <RecordThing>
       <Key>StructureLiquidPipeHeater</Key>
       <Value>Pipe Heater (Liquid)</Value>
-      <Description>Adds 1000 joules of heat per tick to the contents of your pipe network.</Description>
+      <Description>Adds 1000 joules of heat per tick to the contents of your pipe network. The Pipe Heater will only operate when the pipe pressure is above the armstrong limit (6.3kPa) and the temperature is below 2500 Kelvin.</Description>
     </RecordThing>
     <RecordThing>
       <Key>StructureTurboVolumePump</Key>
@@ -6646,22 +6739,22 @@ You must place the laptop down to interact with the onsreen UI.
     <RecordThing>
       <Key>ItemPlantEndothermic_Genepool1</Key>
       <Value>Winterspawn (Alpha strain)</Value>
-      <Description>{LINK:Agrizero;Agrizero's} Winterspawn atmospheric bio-processor is a recent addition to their catalog of genespliced environmental decorations. Using ambient heat to split {GAS:Water} into {GAS:Volatiles} and {GAS:Oxygen}, the Winterspawn cools its surroundings, when supplied with sufficient {GAS:Nitrogen}. The alpha variant has a peak cooling and electrolysis capacity of 90Watts and is most efficient operating in air temperatures of 0 to 40 Degrees Celsius.</Description>
+      <Description>{LINK:Agrizero;Agrizero's} Winterspawn atmospheric bio-processor is a recent addition to their catalog of genespliced environmental decorations. Using ambient heat to split {GAS:Water} into {GAS:Methane} and {GAS:Oxygen}, the Winterspawn cools its surroundings, when supplied with sufficient {GAS:Nitrogen}. The alpha variant has a peak cooling and electrolysis capacity of 90Watts and is most efficient operating in air temperatures of 0 to 40 Degrees Celsius.</Description>
     </RecordThing>
     <RecordThing>
       <Key>ItemPlantEndothermic_Genepool2</Key>
       <Value>Winterspawn (Beta strain)</Value>
-      <Description>{LINK:Agrizero;Agrizero's} Winterspawn atmospheric bio-processor is a recent addition to their catalog of genespliced environmental decorations. Using ambient heat to split {GAS:Water} into {GAS:Volatiles} and {GAS:Oxygen}, the Winterspawn cools its surroundings when supplied with sufficient {GAS:Nitrogen}. The beta variant has a peak cooling and electrolysis capacity of 150Watts and is most efficient operating in air temperatures of 14 to 24 Degrees Celsius.</Description>
+      <Description>{LINK:Agrizero;Agrizero's} Winterspawn atmospheric bio-processor is a recent addition to their catalog of genespliced environmental decorations. Using ambient heat to split {GAS:Water} into {GAS:Methane} and {GAS:Oxygen}, the Winterspawn cools its surroundings when supplied with sufficient {GAS:Nitrogen}. The beta variant has a peak cooling and electrolysis capacity of 150Watts and is most efficient operating in air temperatures of 14 to 24 Degrees Celsius.</Description>
     </RecordThing>
     <RecordThing>
       <Key>ItemPlantThermogenic_Genepool1</Key>
       <Value>Hades Flower (Alpha strain)</Value>
-      <Description>The {LINK:Agrizero;Agrizero's}-created Hades Flower is the result of as dubious experiment to combine the allure of tropical plants with the comfort and homeliness of a heat pump. The plant breathes a 1:3 mix of {GAS:Volatiles} and {GAS:Oxygen}, and exhales heated {GAS:Pollutant}.</Description>
+      <Description>The {LINK:Agrizero;Agrizero's}-created Hades Flower is the result of as dubious experiment to combine the allure of tropical plants with the comfort and homeliness of a heat pump. The plant breathes a 1:3 mix of {GAS:Methane} and {GAS:Oxygen}, and exhales heated {GAS:Pollutant}.</Description>
     </RecordThing>
     <RecordThing>
       <Key>ItemPlantThermogenic_Genepool2</Key>
       <Value>Hades Flower (Beta strain)</Value>
-      <Description>The {LINK:Agrizero;Agrizero's}-created Hades Flower is the result of as dubious experiment to combine the allure of tropical plants with the comfort and homeliness of a heat pump. The plant breathes a 1:3 mix of {GAS:Volatiles} and {GAS:Oxygen}, and exhales heated {GAS:Pollutant}. The beta strain is notably more efficient than the earlier, more experimental alpha variant.</Description>
+      <Description>The {LINK:Agrizero;Agrizero's}-created Hades Flower is the result of as dubious experiment to combine the allure of tropical plants with the comfort and homeliness of a heat pump. The plant breathes a 1:3 mix of {GAS:Methane} and {GAS:Oxygen}, and exhales heated {GAS:Pollutant}. The beta strain is notably more efficient than the earlier, more experimental alpha variant.</Description>
     </RecordThing>
     <RecordThing>
       <Key>SeedBag_HadesAlpha</Key>
@@ -6888,8 +6981,13 @@ Highly sensitive to temperature, nitrice will begin to melt as soon as it is min
     </RecordThing>
     <RecordThing>
       <Key>StructureH2Combustor</Key>
-      <Value>H2 Combustor</Value>
-      <Description>Adapted slightly from its original {LINK:Recurso;Recurso} design, the {GAS:Volatiles} Combustor does exactly what its name suggests - it burns a mixture of volatiles and {GAS:Oxygen} to create water. Extremely useful in hot or arid environments, users need to be aware that the combustor outputs considerable waste heat. The device is also less than perfectly efficient, resulting in the autoignition of volatiles in the chamber, and the production of waste gases which must be dealt with.</Description>
+      <Value>Combustor</Value>
+      <Description>The Combustor allows for controlled combustion of volatile gasses. When fed with {GAS:Hydrogen} and {GAS:Oxygen} it will output {GAS:Steam} which can be cooled for drinking water or hydroponics.</Description>
+    </RecordThing>
+    <RecordThing>
+      <Key>H2Combustor</Key>
+      <Value>Combustor</Value>
+      <Description>The Combustor allows for controlled combustion of volatile gasses. When fed with {GAS:Hydrogen} and {GAS:Oxygen} it will output {GAS:Steam} which can be cooled for drinking water or hydroponics.</Description>
     </RecordThing>
     <RecordThing>
       <Key>StructurePipeRadiatorFlat</Key>
@@ -6944,7 +7042,17 @@ Highly sensitive to temperature, nitrice will begin to melt as soon as it is min
     <RecordThing>
       <Key>StructureDeepMiner</Key>
       <Value>Deep Miner</Value>
-      <Description>Drills through terrain until it hits bedrock. Once inside bedrock {THING:ItemDirtyOre} is produced roughly every 90s</Description>
+      <Description>Drills through terrain until it hits bedrock. Once inside bedrock {THING:ItemDirtyOre} is produced roughly every 90s. The type of ore mined will vary by location, you can read the make-up of ore mined at any position using the {THING:CartridgeDeepMiner}</Description>
+    </RecordThing>
+    <RecordThing>
+      <Key>StructureCombustionDeepMiner</Key>
+      <Value>Combustion Deep Miner</Value>
+      <Description>The Combustion Deep Miner is a gas fuel powered version of the {THING:StructureDeepMiner}. The machine's RPMs must be controlled via the throttle and combustion limiter levers. If the Combustion Deep Miner gains, or loses, RPMs too fast it will experience stress, and eventually grind to a halt. 
+Higher RPMs directly result in faster mining speeds. 
+The throttle lever controls the amount of fuel being pulled into the machine, increasing the temperature inside the engine, and leading to an increase in RPM. 
+The limiter lever influences the speed of the combustion, and how much uncombusted gas is in the exhaust. 
+Turning the machine off will reduce RPMs in a controlled manner.
+          </Description>
     </RecordThing>
     <RecordThing>
       <Key>StructureSleeperVertical</Key>
@@ -6977,9 +7085,14 @@ Highly sensitive to temperature, nitrice will begin to melt as soon as it is min
       <Description />
     </RecordThing>
     <RecordThing>
+      <Key>ItemKitCombustionDeepMiner</Key>
+      <Value>Kit (Combustion Deep Miner)</Value>
+      <Description />
+    </RecordThing>
+    <RecordThing>
       <Key>ItemDirtyOre</Key>
       <Value>Dirty Ore</Value>
-      <Description>Ore mined from bedrock via the {THING:StructureDeepMiner} which then can be used in the {THING:StructureCentrifuge}, or {THING:StructureCombustionCentrifuge}. Once processed, it produces ore in a ratio similar to the average found on the planet's surface. </Description>
+      <Description>Ore mined from bedrock via the {THING:StructureDeepMiner} which then can be processed in the {THING:StructureCentrifuge}, or {THING:StructureCombustionCentrifuge}. The type of ore created once processed will vary depending on the area in which the deep ore was mined. To found out what minerals can be mined in any area use the {Thing:CartridgeDeepMiner}.</Description>
     </RecordThing>
     <RecordThing>
       <Key>StructureChuteFlipFlopSplitter</Key>
@@ -6994,7 +7107,7 @@ Highly sensitive to temperature, nitrice will begin to melt as soon as it is min
     <RecordThing>
       <Key>StructureCombustionCentrifuge</Key>
       <Value>Combustion Centrifuge</Value>
-      <Description>The Combustion Centrifuge is a gas powered version of the {THING:StructureCentrifuge}. If a {THING:StructureRecycler} or unbalanced {THING:StructureFurnace} outputs {LINK:ReagentPage;reagent} mixture rather than the desired {LINK:IngotPage;ingots}, a centrifuge allows you to reclaim the raw {LINK:OrePage;ore}.
+      <Description>The Combustion Centrifuge is a gas fuel powered version of the {THING:StructureCentrifuge}. If a {THING:StructureRecycler} or unbalanced {THING:StructureFurnace} outputs {LINK:ReagentPage;reagent} mixture rather than the desired {LINK:IngotPage;ingots}, a centrifuge allows you to reclaim the raw {LINK:OrePage;ore}.
         It also refines {THING:ItemDirtyOre} produced from the {THING:StructureDeepMiner} and {THING:ItemSpaceOre} produced from the {THING:StructureRocketMiner}. A combustible fuel mix should be supplied to the gas input, and waste gasses should be vented from the output. 
         The machine's RPMs must be controlled via the throttle and combustion limiter levers. If the Combustion Centrifuge gains, or loses, RPMs too fast it will experience stress, and eventually grind to a halt.  Higher RPMs directly result in faster processing speeds. 
         The throttle lever controls the amount of fuel being pulled into the machine, increasing the temperature inside the engine, and leading to an increase in RPM. The limiter lever influences the speed of the combustion, and how much uncombusted gas is in the exhaust. 
@@ -7253,8 +7366,8 @@ To begin splicing, place a plant or seed bag in the left slot (source) and place
     </RecordThing>
     <RecordThing>
       <Key>ItemGasFilterVolatilesInfinite</Key>
-      <Value>Catalytic Filter (Volatiles)</Value>
-      <Description>A filter that selectively targets {GAS:Volatiles}. It uses internal pressure differentials to regenerate a unique phase change catalyst, giving it a long lasting lifecycle.</Description>
+      <Value>Catalytic Filter (Methane)</Value>
+      <Description>A filter that selectively targets {GAS:Methane}. It uses internal pressure differentials to regenerate a unique phase change catalyst, giving it a long lasting lifecycle.</Description>
     </RecordThing>
     <RecordThing>
       <Key>ItemGasFilterWaterInfinite</Key>
@@ -7449,7 +7562,7 @@ To begin splicing, place a plant or seed bag in the left slot (source) and place
     <RecordThing>
       <Key>LiquidRocketEngineBasic</Key>
       <Value>Liquid Rocket Engine Basic</Value>
-      <Description>A small liquid fueled rocket engine with an electric TurboPump. The Liquid input should be supplied with fuel mix of volatiles and oxygen. It has a thrust range of around 6kN to 30kN and an expected Isp of 230s (exhaust velocity: 2.2km/s).</Description>
+      <Description>A small liquid fueled rocket engine with an electric TurboPump. The Liquid input should be supplied with fuel mix. It has a thrust range of around 6kN to 30kN and an expected Isp of 230s (exhaust velocity: 2.2km/s).</Description>
     </RecordThing>
     <RecordThing>
       <Key>StructureDuctCorner</Key>
@@ -7582,8 +7695,8 @@ To begin splicing, place a plant or seed bag in the left slot (source) and place
     </RecordThing>
     <RecordThing>
       <Key>ItemPureIceVolatiles</Key>
-      <Value>Pure Ice Volatiles</Value>
-      <Description>A frozen chunk of pure {GAS:Volatiles}</Description>
+      <Value>Pure Ice Methane</Value>
+      <Description>A frozen chunk of pure {GAS:Methane}</Description>
     </RecordThing>
     <RecordThing>
       <Key>ItemPureIceLiquidCarbonDioxide</Key>
@@ -7612,8 +7725,8 @@ To begin splicing, place a plant or seed bag in the left slot (source) and place
     </RecordThing>
     <RecordThing>
       <Key>ItemPureIceLiquidVolatiles</Key>
-      <Value>Pure Ice Liquid Volatiles</Value>
-      <Description>A frozen chunk of pure {GAS:LiquidVolatiles}</Description>
+      <Value>Pure Ice Liquid Methane</Value>
+      <Description>A frozen chunk of pure {GAS:LiquidMethane}</Description>
     </RecordThing>
     <RecordThing>
       <Key>ItemPureIceSteam</Key>
@@ -7634,6 +7747,56 @@ To begin splicing, place a plant or seed bag in the left slot (source) and place
       <Key>ItemPureIcePollutedWater</Key>
       <Value>Pure Ice Polluted Water</Value>
       <Description>A frozen chunk of {GAS:PollutedWater}</Description>
+    </RecordThing>
+    <RecordThing>
+      <Key>ItemPureIceHydrazine</Key>
+      <Value>Pure Ice Hydrazine</Value>
+      <Description>A frozen chunk of {GAS:Hydrazine}</Description>
+    </RecordThing>
+    <RecordThing>
+      <Key>ItemPureIceHydrochloricAcid</Key>
+      <Value>Pure Ice Hydrochloric Acid</Value>
+      <Description>A frozen chunk of {GAS:HydrochloricAcid}</Description>
+    </RecordThing>
+    <RecordThing>
+      <Key>ItemPureIceLiquidAlcohol</Key>
+      <Value>Pure Ice Liquid Alcohol</Value>
+      <Description>A frozen chunk of {GAS:LiquidAlcohol}</Description>
+    </RecordThing>
+    <RecordThing>
+      <Key>ItemPureIceLiquidHydrazine</Key>
+      <Value>Pure Ice Liquid Hydrazine</Value>
+      <Description>A frozen chunk of {GAS:LiquidHydrazine}</Description>
+    </RecordThing>
+    <RecordThing>
+      <Key>ItemPureIceLiquidHydrochloricAcid</Key>
+      <Value>Pure Ice Liquid Hydrochloric Acid</Value>
+      <Description>A frozen chunk of {GAS:LiquidHydrochloricAcid}</Description>
+    </RecordThing>
+    <RecordThing>
+      <Key>ItemPureIceLiquidSilanol</Key>
+      <Value>Pure Ice Liquid Silanol</Value>
+      <Description>A frozen chunk of {GAS:LiquidSilanol}</Description>
+    </RecordThing>
+    <RecordThing>
+      <Key>ItemPureIceSilanol</Key>
+      <Value>Pure Ice Silanol</Value>
+      <Description>A frozen chunk of {GAS:Silanol}</Description>
+    </RecordThing>
+    <RecordThing>
+      <Key>ItemPureIceLiquidSodiumChloride</Key>
+      <Value>Salt</Value>
+      <Description>A solid chunk of {GAS:LiquidSodiumChloride}. It has a very high melt temperature and can only be melted either in a hot furnace or a hot melting room. It cannot be processed by the {THING:StructureIceCrusher} or {THING:StructureArcFurnace}.</Description>
+    </RecordThing>
+    <RecordThing>
+      <Key>ItemPureIceOzone</Key>
+      <Value>Pure Ice Ozone</Value>
+      <Description>A frozen chunk of {GAS:Ozone}</Description>
+    </RecordThing>
+    <RecordThing>
+      <Key>ItemPureIceLiquidOzone</Key>
+      <Value>Pure Ice Ozone</Value>
+      <Description>A frozen chunk of {GAS:LiquidOzone}</Description>
     </RecordThing>
     <RecordThing>
       <Key>StructurePassiveLiquidDrain</Key>
@@ -8029,6 +8192,11 @@ To begin splicing, place a plant or seed bag in the left slot (source) and place
       <Description />
     </RecordThing>
     <RecordThing>
+      <Key>ItemKitLaunchMountOrbital</Key>
+      <Value>Kit (Orbital Launch Mount)</Value>
+      <Description />
+    </RecordThing>
+    <RecordThing>
       <Key>StructureRocketManufactory</Key>
       <Value>Rocket Manufactory</Value>
     </RecordThing>
@@ -8145,7 +8313,7 @@ To begin splicing, place a plant or seed bag in the left slot (source) and place
     <RecordThing>
       <Key>StructurePumpedLiquidEngine</Key>
       <Value>Pumped Liquid Engine</Value>
-      <Description>Liquid propellants bring greater efficiencies with Pumped Liquid Engine. Two inputs are provided so Stationeers can seperate their fuels, the Setting variable controls the mixing ratio of the inputs. The engine is designed to run on {GAS:LiquidVolatiles} and {GAS:LiquidOxygen}, some Stationeers have reported excessive thrust values by switching to {GAS:LiquidNitrousOxide}</Description>
+      <Description>Liquid propellants bring greater efficiencies with Pumped Liquid Engine. Two inputs are provided so Stationeers can seperate their fuels, the Setting variable controls the mixing ratio of the inputs. The engine is designed to run on {GAS:LiquidMethane} and {GAS:LiquidOxygen}, some Stationeers have reported excessive thrust values by switching to {GAS:LiquidNitrousOxide}</Description>
     </RecordThing>
     <RecordThing>
       <Key>ItemKitPumpedLiquidEngine</Key>
@@ -8155,7 +8323,7 @@ To begin splicing, place a plant or seed bag in the left slot (source) and place
     <RecordThing>
       <Key>StructureGovernedGasEngine</Key>
       <Value>Pumped Gas Engine</Value>
-      <Description>The most reliable of all the rocket engines, the Pumped Gas Engine runs on a 2:1 mix of {GAS:Volatiles} to {GAS:Oxygen} gas.</Description>
+      <Description>The most reliable of all the rocket engines, the Pumped Gas Engine runs on a 2:1 mix of {GAS:Methane} to {GAS:Oxygen} gas.</Description>
     </RecordThing>
     <RecordThing>
       <Key>ItemKitPressureFedGasEngine</Key>
@@ -8165,7 +8333,7 @@ To begin splicing, place a plant or seed bag in the left slot (source) and place
     <RecordThing>
       <Key>StructurePressureFedGasEngine</Key>
       <Value>Pressure Fed Gas Engine</Value>
-      <Description>Inefficient but very powerful, the Pressure Fed Gas Engine moves gas from each of its two inputs based on the pressure of the input pipes. Control the mixing ratio of fuels by tweaking the input pressures to target a 2:1 mix of {GAS:Volatiles} to {GAS:Oxygen} gas. Chilling propellant gasses or using {GAS:NitrousOxide} as an oxydizer will result in even higher thrust outputs.</Description>
+      <Description>Inefficient but very powerful, the Pressure Fed Gas Engine moves gas from each of its two inputs based on the pressure of the input pipes. Control the mixing ratio of fuels by tweaking the input pressures to target a 2:1 mix of {GAS:Methane} to {GAS:Oxygen} gas. Chilling propellant gasses or using {GAS:NitrousOxide} as an oxydizer will result in even higher thrust outputs.</Description>
     </RecordThing>
     <RecordThing>
       <Key>ItemKitPressureFedLiquidEngine</Key>
@@ -8185,7 +8353,7 @@ To begin splicing, place a plant or seed bag in the left slot (source) and place
     <RecordThing>
       <Key>StructurePressureFedGasEngineHeavy</Key>
       <Value>Heavy Pressure Fed Gas Engine</Value>
-      <Description>A larger more powerful variant of the {THING:StructurePressureFedGasEngine}. It sacrifices a small amount of efficiency for greatly increased thrust. Pressure Fed Gas Engines move gas from each of their inputs based on the pressure of the input pipes. Control the mixing ratio of fuels by tweaking the input pressures to target a 2:1 mix of {GAS:Volatiles} to {GAS:Oxygen} gas. Chilling propellant gasses or using {GAS:NitrousOxide} as an oxydizer will result in even higher thrust outputs.</Description>
+      <Description>A larger more powerful variant of the {THING:StructurePressureFedGasEngine}. It sacrifices a small amount of efficiency for greatly increased thrust. Pressure Fed Gas Engines move gas from each of their inputs based on the pressure of the input pipes. Control the mixing ratio of fuels by tweaking the input pressures to target a 2:1 mix of {GAS:Methane} to {GAS:Oxygen} gas. Chilling propellant gasses or using {GAS:NitrousOxide} as an oxydizer will result in even higher thrust outputs.</Description>
     </RecordThing>
     <RecordThing>
       <Key>ItemKitPressureFedLiquidEngineHeavy</Key>
@@ -9119,7 +9287,7 @@ It is liquid cooled for superb thermal performance and boasts superior resistanc
     <RecordThing>
       <Key>CartridgeDeepMiner</Key>
       <Value>Cartridge (Deep Miner)</Value>
-      <Description />
+      <Description>Displays the makeup of ore mined at this location using a {THING:StructureDeepMiner}</Description>
     </RecordThing>
     <RecordThing>
       <Key>StructureCircuitHousingCompact</Key>
@@ -9475,6 +9643,464 @@ All the rack's pipes must be connected or the unit will show an error state, but
       <Value>Drinking Fountain</Value>
       <Description>The Drinking Fountain can be interacted with directly to increase hydration. It needs a {GAS:Water} supply.</Description>
     </RecordThing>
+    <RecordThing>
+      <Key>ItemKitLiquidFiltration</Key>
+      <Value>Kit (Liquid Filtration)</Value>
+      <Description />
+    </RecordThing>
+    <RecordThing>
+      <Key>StructureFiltrationLiquid</Key>
+      <Value>Filtration Liquid</Value>
+      <Description />
+    </RecordThing>
+    <RecordThing>
+      <Key>DynamicPayloadDeliveryContainer</Key>
+      <Value>Payload Delivery Container</Value>
+      <Description>When attached to a {THING:StructureRocketLargePayloadBay} the {THING:DynamicPayloadDeliveryContainer} can be deployed in Low Orbit to drop supplies to any location on the map.</Description>
+    </RecordThing>
+    <RecordThing>
+      <Key>ItemKitPayloadDeliveryContainer</Key>
+      <Value>Kit (Payload Delivery Container)</Value>
+    </RecordThing>
+    <RecordThing>
+      <Key>DynamicOrbitalLaunchMountPayload</Key>
+      <Value>Orbital Launch Mount Payload</Value>
+      <Description>When attached to a {THING:StructureRocketLargePayloadBay} the {THING:DynamicOrbitalLaunchMountPayload} can be deployed in Low Orbit, where it unpacks into a {THING:StructureLaunchMountOrbital}. Rockets can then be constructed and landed there, and crewed rockets can travel between it and launch mounts on the surface.</Description>
+    </RecordThing>
+    <RecordThing>
+      <Key>ItemKitOrbitalLaunchMountPayload</Key>
+      <Value>Kit (Orbital Launch Mount Payload)</Value>
+      <Description>Constructs a {THING:DynamicOrbitalLaunchMountPayload} that can be carried to Low Orbit in a {THING:StructureRocketLargePayloadBay}.</Description>
+    </RecordThing>
+    <RecordThing>
+      <Key>StructureRocketLargePayloadBay</Key>
+      <Value>Payload Bay Large</Value>
+      <Description>The {THING:StructureRocketLargePayloadBay} functions as an attachment point for the {THING:DynamicPayloadDeliveryContainer}. Set the deploy location by setting the PositionX and PositionZ logic variables on the device. Use the deploy action on the rocket location panel to deploy an attached payload. The Open logic variable must be set to 1 to commence payload deploy.</Description>
+    </RecordThing>
+    <RecordThing>
+      <Key>ItemKitRocketLargePayloadBay</Key>
+      <Value>Kit (Payload Bay Large)</Value>
+    </RecordThing>
+    <RecordThing>
+      <Key>ItemDefibrillator</Key>
+      <Value>Defibrillator</Value>
+      <Description />
+    </RecordThing>
+    <RecordThing>
+      <Key>StructureCrewModule</Key>
+      <Value>Crew Module</Value>
+      <Description>Crew compartment for rockets.</Description>
+    </RecordThing>
+    <RecordThing>
+      <Key>StructureCrewModuleCableConnectorA</Key>
+      <Value>Crew Module Cable Connector A</Value>
+      <Description />
+    </RecordThing>
+    <RecordThing>
+      <Key>StructureCrewModuleCableConnectorB</Key>
+      <Value>Crew Module Cable Connector B</Value>
+      <Description />
+    </RecordThing>
+    <RecordThing>
+      <Key>StructureCrewModuleChair</Key>
+      <Value>Crew Module Chair</Value>
+      <Description>Seat for crewing a rocket. While the seat is occupied the rocket can only travel between launch mounts, and the seat can only be exited while the rocket is landed on one.</Description>
+    </RecordThing>
+    <RecordThing>
+      <Key>StructureCrewModuleScreen</Key>
+      <Value>Crew Module Screen</Value>
+      <Description />
+    </RecordThing>
+    <RecordThing>
+      <Key>ItemKitCrewParts</Key>
+      <Value>Kit (Crew Parts)</Value>
+      <Description />
+    </RecordThing>
+    <RecordThing>
+      <Key>StructureCrewUmbilical</Key>
+      <Value>Umbilical (Crew)</Value>
+      <Description />
+    </RecordThing>
+    <RecordThing>
+      <Key>ItemOreDetector</Key>
+      <Value>Ore Detector</Value>
+      <Description>A device for locating specific ores. The closer the player is to the selected type of ore, the more indicators will light up.</Description>
+    </RecordThing>
+    <RecordThing>
+      <Key>ItemKitFermenter</Key>
+      <Value>Kit Fermenter</Value>
+      <Description />
+    </RecordThing>
+    <RecordThing>
+      <Key>StructureFermenter</Key>
+      <Value>Fermenter</Value>
+      <Description />
+    </RecordThing>
+    <RecordThing>
+      <Key>ItemGasFilterAlcohol</Key>
+      <Value>Filter (Alcohol)</Value>
+      <Description />
+    </RecordThing>
+    <RecordThing>
+      <Key>ItemGasFilterAlcoholInfinite</Key>
+      <Value>Catalytic Filter (Alcohol)</Value>
+      <Description />
+    </RecordThing>
+    <RecordThing>
+      <Key>ItemGasFilterAlcoholL</Key>
+      <Value>Heavy Filter (Alcohol)</Value>
+      <Description />
+    </RecordThing>
+    <RecordThing>
+      <Key>ItemGasFilterAlcoholM</Key>
+      <Value>Medium Filter (Alcohol)</Value>
+      <Description />
+    </RecordThing>
+    <RecordThing>
+      <Key>ItemGasFilterHCl</Key>
+      <Value>Filter (Hydrochloric Acid)</Value>
+      <Description />
+    </RecordThing>
+    <RecordThing>
+      <Key>ItemGasFilterHClInfinite</Key>
+      <Value>Catalytic Filter (Hydrochloric Acid)</Value>
+      <Description />
+    </RecordThing>
+    <RecordThing>
+      <Key>ItemGasFilterHClL</Key>
+      <Value>Heavy Filter (Hydrochloric Acid)</Value>
+      <Description />
+    </RecordThing>
+    <RecordThing>
+      <Key>ItemGasFilterHClM</Key>
+      <Value>Medium Filter (Hydrochloric Acid)</Value>
+      <Description />
+    </RecordThing>
+    <RecordThing>
+      <Key>ItemGasFilterHelium</Key>
+      <Value>Filter (Helium)</Value>
+      <Description />
+    </RecordThing>
+    <RecordThing>
+      <Key>ItemGasFilterHeliumInfinite</Key>
+      <Value>Catalytic Filter (Helium)</Value>
+      <Description />
+    </RecordThing>
+    <RecordThing>
+      <Key>ItemGasFilterHeliumL</Key>
+      <Value>Heavy Filter (Helium)</Value>
+      <Description />
+    </RecordThing>
+    <RecordThing>
+      <Key>ItemGasFilterHeliumM</Key>
+      <Value>Medium Filter (Helium)</Value>
+      <Description />
+    </RecordThing>
+    <RecordThing>
+      <Key>ItemGasFilterHydrazine</Key>
+      <Value>Filter (Hydrazine)</Value>
+      <Description />
+    </RecordThing>
+    <RecordThing>
+      <Key>ItemGasFilterHydrazineInfinite</Key>
+      <Value>Catalytic Filter (Hydrazine)</Value>
+      <Description />
+    </RecordThing>
+    <RecordThing>
+      <Key>ItemGasFilterHydrazineL</Key>
+      <Value>Heavy Filter (Hydrazine)</Value>
+      <Description />
+    </RecordThing>
+    <RecordThing>
+      <Key>ItemGasFilterHydrazineM</Key>
+      <Value>Medium Filter (Hydrazine)</Value>
+      <Description />
+    </RecordThing>
+    <RecordThing>
+      <Key>ItemGasFilterHydrogen</Key>
+      <Value>Filter (Hydrogen)</Value>
+      <Description />
+    </RecordThing>
+    <RecordThing>
+      <Key>ItemGasFilterHydrogenInfinite</Key>
+      <Value>Catalytic Filter (Hydrogen)</Value>
+      <Description />
+    </RecordThing>
+    <RecordThing>
+      <Key>ItemGasFilterHydrogenL</Key>
+      <Value>Heavy Filter (Hydrogen)</Value>
+      <Description />
+    </RecordThing>
+    <RecordThing>
+      <Key>ItemGasFilterHydrogenM</Key>
+      <Value>Medium Filter (Hydrogen)</Value>
+      <Description />
+    </RecordThing>
+    <RecordThing>
+      <Key>ItemGasFilterOzone</Key>
+      <Value>Filter (Ozone)</Value>
+      <Description />
+    </RecordThing>
+    <RecordThing>
+      <Key>ItemGasFilterOzoneInfinite</Key>
+      <Value>Catalytic Filter (Ozone)</Value>
+      <Description />
+    </RecordThing>
+    <RecordThing>
+      <Key>ItemGasFilterOzoneL</Key>
+      <Value>Heavy Filter (Ozone)</Value>
+      <Description />
+    </RecordThing>
+    <RecordThing>
+      <Key>ItemGasFilterOzoneM</Key>
+      <Value>Medium Filter (Ozone)</Value>
+      <Description />
+    </RecordThing>
+    <RecordThing>
+      <Key>ItemGasFilterPollutedWater</Key>
+      <Value>Filter (Polluted Water)</Value>
+      <Description />
+    </RecordThing>
+    <RecordThing>
+      <Key>ItemGasFilterPollutedWaterInfinite</Key>
+      <Value>Catalytic Filter (Polluted Water)</Value>
+      <Description />
+    </RecordThing>
+    <RecordThing>
+      <Key>ItemGasFilterPollutedWaterL</Key>
+      <Value>Heavy Filter (Polluted Water)</Value>
+      <Description />
+    </RecordThing>
+    <RecordThing>
+      <Key>ItemGasFilterPollutedWaterM</Key>
+      <Value>Medium Filter (Polluted Water)</Value>
+      <Description />
+    </RecordThing>
+    <RecordThing>
+      <Key>ItemGasFilterSalt</Key>
+      <Value>Filter (Salt)</Value>
+      <Description />
+    </RecordThing>
+    <RecordThing>
+      <Key>ItemGasFilterSaltInfinite</Key>
+      <Value>Catalytic Filter (Salt)</Value>
+      <Description />
+    </RecordThing>
+    <RecordThing>
+      <Key>ItemGasFilterSaltL</Key>
+      <Value>Heavy Filter (Salt)</Value>
+      <Description />
+    </RecordThing>
+    <RecordThing>
+      <Key>ItemGasFilterSaltM</Key>
+      <Value>Medium Filter (Salt)</Value>
+      <Description />
+    </RecordThing>
+    <RecordThing>
+      <Key>ItemGasFilterSilanol</Key>
+      <Value>Filter (Silanol)</Value>
+      <Description />
+    </RecordThing>
+    <RecordThing>
+      <Key>ItemGasFilterSilanolInfinite</Key>
+      <Value>Catalytic Filter (Silanol)</Value>
+      <Description />
+    </RecordThing>
+    <RecordThing>
+      <Key>ItemGasFilterSilanolL</Key>
+      <Value>Heavy Filter (Silanol)</Value>
+      <Description />
+    </RecordThing>
+    <RecordThing>
+      <Key>ItemGasFilterSilanolM</Key>
+      <Value>Medium Filter (Silanol)</Value>
+      <Description />
+    </RecordThing>
+    <RecordThing>
+      <Key>StructureEngineMountTypeE1</Key>
+      <Value>Engine Mount (Type E1)</Value>
+      <Description />
+    </RecordThing>
+    <RecordThing>
+      <Key>StructureEngineMountTypeE2</Key>
+      <Value>Engine Mount (Type E2)</Value>
+      <Description />
+    </RecordThing>
+    <RecordThing>
+      <Key>StructureFairingTypeE1</Key>
+      <Value>Fairing (Type E1)</Value>
+      <Description />
+    </RecordThing>
+    <RecordThing>
+      <Key>StructureFuselageTypeE1</Key>
+      <Value>Fuselage (Type E1)</Value>
+      <Description />
+    </RecordThing>
+    <RecordThing>
+      <Key>ItemKitFuselageTypeE</Key>
+      <Value>Kit (Fuselage Type E)</Value>
+      <Description />
+    </RecordThing>
+    <RecordThing>
+      <Key>ItemInjectorEpi</Key>
+      <Value>Auto-Injector (Stim)</Value>
+      <Description />
+    </RecordThing>
+    <RecordThing>
+      <Key>ItemInjectorHealth</Key>
+      <Value>Auto-Injector (Health)</Value>
+      <Description />
+    </RecordThing>
+    <RecordThing>
+      <Key>ItemInjectorStun</Key>
+      <Value>Auto-Injector (Stun)</Value>
+      <Description />
+    </RecordThing>
+    <RecordThing>
+      <Key>ItemInjectorDex</Key>
+      <Value>Injector Dex</Value>
+      <Description />
+    </RecordThing>
+    <RecordThing>
+      <Key>ItemWaterPacket</Key>
+      <Value>Water Packet</Value>
+      <Description />
+    </RecordThing>
+    <RecordThing>
+      <Key>StructureCrewModuleFuselage</Key>
+      <Value>Crew Module Fuselage (Type C)</Value>
+      <Description>Streamlined crew compartment for rockets. Board by interacting with the module.</Description>
+    </RecordThing>
+    <RecordThing>
+      <Key>ItemWasteBagEmpty</Key>
+      <Value>Waste Bag</Value>
+      <Description>A disposable bag that can be used to clear {LINK:SanitationPage;sanitation} needs. Cannot be used when wearing the {SLOT:Suit}.</Description>
+    </RecordThing>
+    <RecordThing>
+      <Key>ItemWasteBagFilled</Key>
+      <Value>Waste Bag (Filled)</Value>
+      <Description>A partially or completely used disposable bag that can be used to clear {LINK:SanitationPage;sanitation} needs, so long as is there is room remaining. Cannot be used when wearing the {SLOT:Suit}.</Description>
+    </RecordThing>
+    <RecordThing>
+      <Key>StructureToiletModern</Key>
+      <Value>Modern Toilet</Value>
+      <Description>A device for reducing {LINK:SanitationPage;sanitation} needs. Requires {GAS:Water} and outputs {GAS:PollutedWater} from those who use it.</Description>
+    </RecordThing>
+    <RecordThing>
+      <Key>ItemKitToilet</Key>
+      <Value>Kit (Toilet)</Value>
+      <Description />
+    </RecordThing>
+    <RecordThing>
+      <Key>OrganStomach</Key>
+      <Value>Stomach</Value>
+      <Description />
+    </RecordThing>
+    <RecordThing>
+      <Key>StructureCrewModulePassiveVent</Key>
+      <Value>Crew Module Passive Vent</Value>
+      <Description />
+    </RecordThing>
+    <RecordThing>
+      <Key>StructureCrewModuleActiveVent</Key>
+      <Value>Crew Module Active Vent</Value>
+      <Description />
+    </RecordThing>
+    <RecordThing>
+      <Key>ItemWaterPacket</Key>
+      <Value>Water Packet</Value>
+      <Description />
+    </RecordThing>
+    <RecordThing>
+      <Key>ItemWasteBagEmpty</Key>
+      <Value>Waste Bag</Value>
+      <Description>A disposable bag that can be used to clear {LINK:SanitationPage;sanitation} needs. Cannot be used when wearing the {SLOT:Suit}.</Description>
+    </RecordThing>
+    <RecordThing>
+      <Key>ItemWasteBagFilled</Key>
+      <Value>Waste Bag (Filled)</Value>
+      <Description>A partially or completely used disposable bag that can be used to clear {LINK:SanitationPage;sanitation} needs, so long as is there is room remaining. Cannot be used when wearing the {SLOT:Suit}.</Description>
+    </RecordThing>
+    <RecordThing>
+      <Key>ItemSurvivalBelt</Key>
+      <Value>Survival Belt</Value>
+      <Description />
+    </RecordThing>
+    <RecordThing>
+      <Key>StructureCrewModuleFuselageSimple</Key>
+      <Value>Crew Module Fuselage (Type A)</Value>
+      <Description>Compact crew compartment for rockets. Board by interacting with the module.</Description>
+    </RecordThing>
+    <RecordThing>
+      <Key>ItemClothingBagOveralls_Paintable</Key>
+      <Value>Overalls (Paintable)</Value>
+      <Description>Overalls that can be coloured using the Spray Paints.</Description>
+    </RecordThing>
+    <RecordThing>
+      <Key>StructureLogicRocketUplinkCompact</Key>
+      <Value>Logic Uplink (Compact)</Value>
+      <Description />
+    </RecordThing>
+    <RecordThing>
+      <Key>ItemKitCrewModuleChair</Key>
+      <Value>Kit (Crew Module Chair)</Value>
+      <Description />
+    </RecordThing>
+    <RecordThing>
+      <Key>ItemKitCrewModuleCableConnector</Key>
+      <Value>Kit (Crew Module Cable Connector)</Value>
+      <Description />
+    </RecordThing>
+    <RecordThing>
+      <Key>ItemKitCrewModuleScreen</Key>
+      <Value>Kit (Crew Module Screen)</Value>
+      <Description />
+    </RecordThing>
+    <RecordThing>
+      <Key>StructureCrewBulkhead</Key>
+      <Value>Crew Bulkhead</Value>
+      <Description />
+    </RecordThing>
+    <RecordThing>
+      <Key>ItemKitCrewModuleElectronics</Key>
+      <Value>Kit (Crew Electronics)</Value>
+      <Description />
+    </RecordThing>
+    <RecordThing>
+      <Key>StructureCrewModuleLight</Key>
+      <Value>Crew Light</Value>
+      <Description />
+    </RecordThing>
+    <RecordThing>
+      <Key>StructureCableStraight3</Key>
+      <Value>Cable (Straight 3)</Value>
+      <Description />
+    </RecordThing>
+    <RecordThing>
+      <Key>StructureCableStraight3Burnt</Key>
+      <Value>Burnt Cable (Straight 3)</Value>
+      <Description />
+    </RecordThing>
+    <RecordThing>
+      <Key>StructureCableStraight5</Key>
+      <Value>Cable (Straight 5)</Value>
+      <Description />
+    </RecordThing>
+    <RecordThing>
+      <Key>StructureCableStraight5Burnt</Key>
+      <Value>Burnt Cable (Straight 5)</Value>
+      <Description />
+    </RecordThing>
+    <RecordThing>
+      <Key>StructureCableStraight10</Key>
+      <Value>Cable (Straight 10)</Value>
+      <Description />
+    </RecordThing>
+    <RecordThing>
+      <Key>StructureCableStraight10Burnt</Key>
+      <Value>Burnt Cable (Straight 10)</Value>
+      <Description />
+    </RecordThing>
   </Things>
   <Slots>
     <Record>
@@ -9744,6 +10370,14 @@ All the rack's pipes must be connected or the unit will show an error state, but
     <Record>
       <Key>ProgrammableChip</Key>
       <Value>Programmable Chip</Value>
+    </Record>
+    <Record>
+      <Key>AutoInjector</Key>
+      <Value>Auto-Injector</Value>
+    </Record>
+    <Record>
+      <Key>Stomach</Key>
+      <Value>Stomach</Value>
     </Record>
     <Record>
       <Key>CreditCard</Key>
@@ -13242,6 +13876,10 @@ All the rack's pipes must be connected or the unit will show an error state, but
       <Value>Umbilicals</Value>
     </Record>
     <Record>
+      <Key>Sanitation</Key>
+      <Value>Sanitation</Value>
+    </Record>
+    <Record>
       <Key>RocketPayloadCategory</Key>
       <Value>Rocket Payloads</Value>
     </Record>
@@ -14084,6 +14722,10 @@ All the rack's pipes must be connected or the unit will show an error state, but
     <Record>
       <Key>ButtonOk</Key>
       <Value>OK</Value>
+    </Record>
+    <Record>
+      <Key>ServerAnnouncement</Key>
+      <Value>Announcement</Value>
     </Record>
     <Record>
       <Key>InputPassword</Key>
@@ -15593,8 +16235,8 @@ All the rack's pipes must be connected or the unit will show an error state, but
       <Value>The ratio of pollutant in device atmosphere</Value>
     </Record>
     <Record>
-      <Key>LogicTypeRatioVolatiles</Key>
-      <Value>The ratio of volatiles in device atmosphere</Value>
+      <Key>LogicTypeRatioMethane</Key>
+      <Value>The ratio of {GAS:Methane} in device atmosphere</Value>
     </Record>
     <Record>
       <Key>LogicTypeRatioWater</Key>
@@ -15633,8 +16275,8 @@ All the rack's pipes must be connected or the unit will show an error state, but
       <Value>The ratio of pollutant in device's input network</Value>
     </Record>
     <Record>
-      <Key>LogicTypeRatioVolatilesInput</Key>
-      <Value>The ratio of volatiles in device's input network</Value>
+      <Key>LogicTypeRatioMethaneInput</Key>
+      <Value>The ratio of {GAS:Methane} in device's input network</Value>
     </Record>
     <Record>
       <Key>LogicTypeRatioWaterInput</Key>
@@ -15669,8 +16311,8 @@ All the rack's pipes must be connected or the unit will show an error state, but
       <Value>The ratio of pollutant in device's Input2 network</Value>
     </Record>
     <Record>
-      <Key>LogicTypeRatioVolatilesInput2</Key>
-      <Value>The ratio of volatiles in device's Input2 network</Value>
+      <Key>LogicTypeRatioMethaneInput2</Key>
+      <Value>The ratio of {GAS:Methane} in device's Input2 network</Value>
     </Record>
     <Record>
       <Key>LogicTypeRatioWaterInput2</Key>
@@ -15705,8 +16347,8 @@ All the rack's pipes must be connected or the unit will show an error state, but
       <Value>The ratio of pollutant in device's Output network</Value>
     </Record>
     <Record>
-      <Key>LogicTypeRatioVolatilesOutput</Key>
-      <Value>The ratio of volatiles in device's Output network</Value>
+      <Key>LogicTypeRatioMethaneOutput</Key>
+      <Value>The ratio of {GAS:Methane} in device's Output network</Value>
     </Record>
     <Record>
       <Key>LogicTypeRatioWaterOutput</Key>
@@ -15741,8 +16383,8 @@ All the rack's pipes must be connected or the unit will show an error state, but
       <Value>The ratio of pollutant in device's Output2 network</Value>
     </Record>
     <Record>
-      <Key>LogicTypeRatioVolatilesOutput2</Key>
-      <Value>The ratio of volatiles in device's Output2 network</Value>
+      <Key>LogicTypeRatioMethaneOutput2</Key>
+      <Value>The ratio of {GAS:Methane} in device's Output2 network</Value>
     </Record>
     <Record>
       <Key>LogicTypeRatioWaterOutput2</Key>
@@ -16222,24 +16864,24 @@ All the rack's pipes must be connected or the unit will show an error state, but
       <Value>The ratio of {GAS:LiquidOxygen} in device's Output2 Atmopshere</Value>
     </Record>
     <Record>
-      <Key>LogicTypeRatioLiquidVolatiles</Key>
-      <Value>The ratio of {GAS:LiquidVolatiles} in device's Atmosphere</Value>
+      <Key>LogicTypeRatioLiquidMethane</Key>
+      <Value>The ratio of {GAS:LiquidMethane} in device's Atmosphere</Value>
     </Record>
     <Record>
-      <Key>LogicTypeRatioLiquidVolatilesInput</Key>
-      <Value>The ratio of {GAS:LiquidVolatiles} in device's Input Atmosphere</Value>
+      <Key>LogicTypeRatioLiquidMethaneInput</Key>
+      <Value>The ratio of {GAS:LiquidMethane} in device's Input Atmosphere</Value>
     </Record>
     <Record>
-      <Key>LogicTypeRatioLiquidVolatilesInput2</Key>
-      <Value>The ratio of {GAS:LiquidVolatiles} in device's Input2 Atmosphere</Value>
+      <Key>LogicTypeRatioLiquidMethaneInput2</Key>
+      <Value>The ratio of {GAS:LiquidMethane} in device's Input2 Atmosphere</Value>
     </Record>
     <Record>
-      <Key>LogicTypeRatioLiquidVolatilesOutput</Key>
-      <Value>The ratio of {GAS:LiquidVolatiles} in device's device's Output Atmosphere</Value>
+      <Key>LogicTypeRatioLiquidMethaneOutput</Key>
+      <Value>The ratio of {GAS:LiquidMethane} in device's device's Output Atmosphere</Value>
     </Record>
     <Record>
-      <Key>LogicTypeRatioLiquidVolatilesOutput2</Key>
-      <Value>The ratio of {GAS:LiquidVolatiles} in device's Output2 Atmopshere</Value>
+      <Key>LogicTypeRatioLiquidMethaneOutput2</Key>
+      <Value>The ratio of {GAS:LiquidMethane} in device's Output2 Atmopshere</Value>
     </Record>
     <Record>
       <Key>LogicTypeRatioSteam</Key>
@@ -16388,6 +17030,278 @@ All the rack's pipes must be connected or the unit will show an error state, but
     <Record>
       <Key>LogicTypeMass</Key>
       <Value>The total Mass of the rocket in kilograms including fuel and cargo. The more massive the rocket the more fuel will be required to move to a new location in space.</Value>
+    </Record>
+    <Record>
+      <Key>LogicTypeContactSlotIndex</Key>
+      <Value>The index of the slot in which the trader has spawned. This defines the class of the trader i.e. Utility, Small, Medium etc.</Value>
+    </Record>
+    <Record>
+      <Key>LogicTypeRatioHydrazine</Key>
+      <Value>The ratio of {GAS:Hydrazine} in device's Atmosphere</Value>
+    </Record>
+    <Record>
+      <Key>LogicTypeRatioLiquidHydrazine</Key>
+      <Value>The ratio of {GAS:LiquidHydrazine} in device's Atmosphere</Value>
+    </Record>
+    <Record>
+      <Key>LogicTypeRatioLiquidAlcohol</Key>
+      <Value>The ratio of {GAS:LiquidAlcohol} in device's Atmosphere</Value>
+    </Record>
+    <Record>
+      <Key>LogicTypeRatioHelium</Key>
+      <Value>The ratio of {GAS:Helium} in device's Atmosphere</Value>
+    </Record>
+    <Record>
+      <Key>LogicTypeRatioLiquidSodiumChloride</Key>
+      <Value>The ratio of {GAS:LiquidSodiumChloride} in device's Atmosphere</Value>
+    </Record>
+    <Record>
+      <Key>LogicTypeRatioSilanol</Key>
+      <Value>The ratio of {GAS:Silanol} in device's Atmosphere</Value>
+    </Record>
+    <Record>
+      <Key>LogicTypeRatioLiquidSilanol</Key>
+      <Value>The ratio of {GAS:LiquidSilanol} in device's Atmosphere</Value>
+    </Record>
+    <Record>
+      <Key>LogicTypeRatioHydrochloricAcid</Key>
+      <Value>The ratio of {GAS:HydrochloricAcid} in device's Atmosphere</Value>
+    </Record>
+    <Record>
+      <Key>LogicTypeRatioLiquidHydrochloricAcid</Key>
+      <Value>The ratio of {GAS:LiquidHydrochloricAcid} in device's Atmosphere</Value>
+    </Record>
+    <Record>
+      <Key>LogicTypeRatioOzone</Key>
+      <Value>The ratio of {GAS:Ozone} in device's Atmosphere</Value>
+    </Record>
+    <Record>
+      <Key>LogicTypeRatioLiquidOzone</Key>
+      <Value>The ratio of {GAS:LiquidOzone} in device's Atmosphere</Value>
+    </Record>
+    <Record>
+      <Key>LogicTypeRatioHydrogenInput</Key>
+      <Value>The ratio of {GAS:Hydrogen} in device's Input Atmosphere</Value>
+    </Record>
+    <Record>
+      <Key>LogicTypeRatioHydrogenInput2</Key>
+      <Value>The ratio of {GAS:Hydrogen} in device's Input2 Atmosphere</Value>
+    </Record>
+    <Record>
+      <Key>LogicTypeRatioHydrogenOutput</Key>
+      <Value>The ratio of {GAS:Hydrogen} in device's Output Atmosphere</Value>
+    </Record>
+    <Record>
+      <Key>LogicTypeRatioHydrogenOutput2</Key>
+      <Value>The ratio of {GAS:Hydrogen} in device's Output2 Atmosphere</Value>
+    </Record>
+    <Record>
+      <Key>LogicTypeRatioLiquidHydrogenInput</Key>
+      <Value>The ratio of {GAS:LiquidHydrogen} in device's Input Atmosphere</Value>
+    </Record>
+    <Record>
+      <Key>LogicTypeRatioLiquidHydrogenInput2</Key>
+      <Value>The ratio of {GAS:LiquidHydrogen} in device's Input2 Atmosphere</Value>
+    </Record>
+    <Record>
+      <Key>LogicTypeRatioLiquidHydrogenOutput</Key>
+      <Value>The ratio of {GAS:LiquidHydrogen} in device's Output Atmosphere</Value>
+    </Record>
+    <Record>
+      <Key>LogicTypeRatioLiquidHydrogenOutput2</Key>
+      <Value>The ratio of {GAS:LiquidHydrogen} in device's Output2 Atmosphere</Value>
+    </Record>
+    <Record>
+      <Key>LogicTypeRatioPollutedWaterInput</Key>
+      <Value>The ratio of {GAS:PollutedWater} in device's Input Atmosphere</Value>
+    </Record>
+    <Record>
+      <Key>LogicTypeRatioPollutedWaterInput2</Key>
+      <Value>The ratio of {GAS:PollutedWater} in device's Input2 Atmosphere</Value>
+    </Record>
+    <Record>
+      <Key>LogicTypeRatioPollutedWaterOutput</Key>
+      <Value>The ratio of {GAS:PollutedWater} in device's Output Atmosphere</Value>
+    </Record>
+    <Record>
+      <Key>LogicTypeRatioPollutedWaterOutput2</Key>
+      <Value>The ratio of {GAS:PollutedWater} in device's Output2 Atmosphere</Value>
+    </Record>
+    <Record>
+      <Key>LogicTypeRatioHydrazineInput</Key>
+      <Value>The ratio of {GAS:Hydrazine} in device's Input Atmosphere</Value>
+    </Record>
+    <Record>
+      <Key>LogicTypeRatioHydrazineInput2</Key>
+      <Value>The ratio of {GAS:Hydrazine} in device's Input2 Atmosphere</Value>
+    </Record>
+    <Record>
+      <Key>LogicTypeRatioHydrazineOutput</Key>
+      <Value>The ratio of {GAS:Hydrazine} in device's Output Atmosphere</Value>
+    </Record>
+    <Record>
+      <Key>LogicTypeRatioHydrazineOutput2</Key>
+      <Value>The ratio of {GAS:Hydrazine} in device's Output2 Atmosphere</Value>
+    </Record>
+    <Record>
+      <Key>LogicTypeRatioLiquidHydrazineInput</Key>
+      <Value>The ratio of {GAS:LiquidHydrazine} in device's Input Atmosphere</Value>
+    </Record>
+    <Record>
+      <Key>LogicTypeRatioLiquidHydrazineInput2</Key>
+      <Value>The ratio of {GAS:LiquidHydrazine} in device's Input2 Atmosphere</Value>
+    </Record>
+    <Record>
+      <Key>LogicTypeRatioLiquidHydrazineOutput</Key>
+      <Value>The ratio of {GAS:LiquidHydrazine} in device's Output Atmosphere</Value>
+    </Record>
+    <Record>
+      <Key>LogicTypeRatioLiquidHydrazineOutput2</Key>
+      <Value>The ratio of {GAS:LiquidHydrazine} in device's Output2 Atmosphere</Value>
+    </Record>
+    <Record>
+      <Key>LogicTypeRatioLiquidAlcoholInput</Key>
+      <Value>The ratio of {GAS:LiquidAlcohol} in device's Input Atmosphere</Value>
+    </Record>
+    <Record>
+      <Key>LogicTypeRatioLiquidAlcoholInput2</Key>
+      <Value>The ratio of {GAS:LiquidAlcohol} in device's Input2 Atmosphere</Value>
+    </Record>
+    <Record>
+      <Key>LogicTypeRatioLiquidAlcoholOutput</Key>
+      <Value>The ratio of {GAS:LiquidAlcohol} in device's Output Atmosphere</Value>
+    </Record>
+    <Record>
+      <Key>LogicTypeRatioLiquidAlcoholOutput2</Key>
+      <Value>The ratio of {GAS:LiquidAlcohol} in device's Output2 Atmosphere</Value>
+    </Record>
+    <Record>
+      <Key>LogicTypeRatioHeliumInput</Key>
+      <Value>The ratio of {GAS:Helium} in device's Input Atmosphere</Value>
+    </Record>
+    <Record>
+      <Key>LogicTypeRatioHeliumInput2</Key>
+      <Value>The ratio of {GAS:Helium} in device's Input2 Atmosphere</Value>
+    </Record>
+    <Record>
+      <Key>LogicTypeRatioHeliumOutput</Key>
+      <Value>The ratio of {GAS:Helium} in device's Output Atmosphere</Value>
+    </Record>
+    <Record>
+      <Key>LogicTypeRatioHeliumOutput2</Key>
+      <Value>The ratio of {GAS:Helium} in device's Output2 Atmosphere</Value>
+    </Record>
+    <Record>
+      <Key>LogicTypeRatioLiquidSodiumChlorideInput</Key>
+      <Value>The ratio of {GAS:LiquidSodiumChloride} in device's Input Atmosphere</Value>
+    </Record>
+    <Record>
+      <Key>LogicTypeRatioLiquidSodiumChlorideInput2</Key>
+      <Value>The ratio of {GAS:LiquidSodiumChloride} in device's Input2 Atmosphere</Value>
+    </Record>
+    <Record>
+      <Key>LogicTypeRatioLiquidSodiumChlorideOutput</Key>
+      <Value>The ratio of {GAS:LiquidSodiumChloride} in device's Output Atmosphere</Value>
+    </Record>
+    <Record>
+      <Key>LogicTypeRatioLiquidSodiumChlorideOutput2</Key>
+      <Value>The ratio of {GAS:LiquidSodiumChloride} in device's Output2 Atmosphere</Value>
+    </Record>
+    <Record>
+      <Key>LogicTypeRatioSilanolInput</Key>
+      <Value>The ratio of {GAS:Silanol} in device's Input Atmosphere</Value>
+    </Record>
+    <Record>
+      <Key>LogicTypeRatioSilanolInput2</Key>
+      <Value>The ratio of {GAS:Silanol} in device's Input2 Atmosphere</Value>
+    </Record>
+    <Record>
+      <Key>LogicTypeRatioSilanolOutput</Key>
+      <Value>The ratio of {GAS:Silanol} in device's Output Atmosphere</Value>
+    </Record>
+    <Record>
+      <Key>LogicTypeRatioSilanolOutput2</Key>
+      <Value>The ratio of {GAS:Silanol} in device's Output2 Atmosphere</Value>
+    </Record>
+    <Record>
+      <Key>LogicTypeRatioLiquidSilanolInput</Key>
+      <Value>The ratio of {GAS:LiquidSilanol} in device's Input Atmosphere</Value>
+    </Record>
+    <Record>
+      <Key>LogicTypeRatioLiquidSilanolInput2</Key>
+      <Value>The ratio of {GAS:LiquidSilanol} in device's Input2 Atmosphere</Value>
+    </Record>
+    <Record>
+      <Key>LogicTypeRatioLiquidSilanolOutput</Key>
+      <Value>The ratio of {GAS:LiquidSilanol} in device's Output Atmosphere</Value>
+    </Record>
+    <Record>
+      <Key>LogicTypeRatioLiquidSilanolOutput2</Key>
+      <Value>The ratio of {GAS:LiquidSilanol} in device's Output2 Atmosphere</Value>
+    </Record>
+    <Record>
+      <Key>LogicTypeRatioHydrochloricAcidInput</Key>
+      <Value>The ratio of {GAS:HydrochloricAcid} in device's Input Atmosphere</Value>
+    </Record>
+    <Record>
+      <Key>LogicTypeRatioHydrochloricAcidInput2</Key>
+      <Value>The ratio of {GAS:HydrochloricAcid} in device's Input2 Atmosphere</Value>
+    </Record>
+    <Record>
+      <Key>LogicTypeRatioHydrochloricAcidOutput</Key>
+      <Value>The ratio of {GAS:HydrochloricAcid} in device's Output Atmosphere</Value>
+    </Record>
+    <Record>
+      <Key>LogicTypeRatioHydrochloricAcidOutput2</Key>
+      <Value>The ratio of {GAS:HydrochloricAcid} in device's Output2 Atmosphere</Value>
+    </Record>
+    <Record>
+      <Key>LogicTypeRatioLiquidHydrochloricAcidInput</Key>
+      <Value>The ratio of {GAS:LiquidHydrochloricAcid} in device's Input Atmosphere</Value>
+    </Record>
+    <Record>
+      <Key>LogicTypeRatioLiquidHydrochloricAcidInput2</Key>
+      <Value>The ratio of {GAS:LiquidHydrochloricAcid} in device's Input2 Atmosphere</Value>
+    </Record>
+    <Record>
+      <Key>LogicTypeRatioLiquidHydrochloricAcidOutput</Key>
+      <Value>The ratio of {GAS:LiquidHydrochloricAcid} in device's Output Atmosphere</Value>
+    </Record>
+    <Record>
+      <Key>LogicTypeRatioLiquidHydrochloricAcidOutput2</Key>
+      <Value>The ratio of {GAS:LiquidHydrochloricAcid} in device's Output2 Atmosphere</Value>
+    </Record>
+    <Record>
+      <Key>LogicTypeRatioOzoneInput</Key>
+      <Value>The ratio of {GAS:Ozone} in device's Input Atmosphere</Value>
+    </Record>
+    <Record>
+      <Key>LogicTypeRatioOzoneInput2</Key>
+      <Value>The ratio of {GAS:Ozone} in device's Input2 Atmosphere</Value>
+    </Record>
+    <Record>
+      <Key>LogicTypeRatioOzoneOutput</Key>
+      <Value>The ratio of {GAS:Ozone} in device's Output Atmosphere</Value>
+    </Record>
+    <Record>
+      <Key>LogicTypeRatioOzoneOutput2</Key>
+      <Value>The ratio of {GAS:Ozone} in device's Output2 Atmosphere</Value>
+    </Record>
+    <Record>
+      <Key>LogicTypeRatioLiquidOzoneInput</Key>
+      <Value>The ratio of {GAS:LiquidOzone} in device's Input Atmosphere</Value>
+    </Record>
+    <Record>
+      <Key>LogicTypeRatioLiquidOzoneInput2</Key>
+      <Value>The ratio of {GAS:LiquidOzone} in device's Input2 Atmosphere</Value>
+    </Record>
+    <Record>
+      <Key>LogicTypeRatioLiquidOzoneOutput</Key>
+      <Value>The ratio of {GAS:LiquidOzone} in device's Output Atmosphere</Value>
+    </Record>
+    <Record>
+      <Key>LogicTypeRatioLiquidOzoneOutput2</Key>
+      <Value>The ratio of {GAS:LiquidOzone} in device's Output2 Atmosphere</Value>
     </Record>
     <Record>
       <Key>AppearanceButtonRandomize</Key>
@@ -18679,6 +19593,10 @@ Recruiting from civil engineering backgrounds, military and aerospace industries
       <Value>Specific Heat:</Value>
     </Record>
     <Record>
+      <Key>StationpediaAutoIgnition</Key>
+      <Value>Auto Ignition:</Value>
+    </Record>
+    <Record>
       <Key>StationpediaLatentHeatHeader</Key>
       <Value>Latent Heat:</Value>
     </Record>
@@ -18743,12 +19661,20 @@ Recruiting from civil engineering backgrounds, military and aerospace industries
       <Value>Gases and Liquids</Value>
     </Record>
     <Record>
+      <Key>StationpediaFermentationHeader</Key>
+      <Value>Fermentation Results</Value>
+    </Record>
+    <Record>
       <Key>StationpediaResoucesHeader</Key>
       <Value>Resources Used</Value>
     </Record>
     <Record>
       <Key>StationpediaUsedIn</Key>
       <Value>Used In</Value>
+    </Record>
+    <Record>
+      <Key>StationpediaCombustion</Key>
+      <Value>Combustion</Value>
     </Record>
     <Record>
       <Key>StationpediaManufactures</Key>
@@ -18815,6 +19741,18 @@ Recruiting from civil engineering backgrounds, military and aerospace industries
     <Record>
       <Key>HydrationCritical</Key>
       <Value>Hydration Critical</Value>
+    </Record>
+    <Record>
+      <Key>SanitationCaution</Key>
+      <Value>Sanitation Caution</Value>
+    </Record>
+    <Record>
+      <Key>SanitationCritical</Key>
+      <Value>Sanitation Critical</Value>
+    </Record>
+    <Record>
+      <Key>SoiledCritical</Key>
+      <Value>Soiled</Value>
     </Record>
     <Record>
       <Key>MoodLow</Key>
@@ -18968,8 +19906,8 @@ Recruiting from civil engineering backgrounds, military and aerospace industries
 {THING:StructureWallCooler}. {GAS:Water} is better, but usually has more important uses.</Value>
     </Record>
     <Record>
-      <Key>MoleVolatilesDescription</Key>
-      <Value>Volatiles is a combustible fuel. It is refined from {THING:ItemVolatiles}</Value>
+      <Key>MoleMethaneDescription</Key>
+      <Value>Methane is a combustible fuel. It is refined from {THING:ItemVolatiles}</Value>
     </Record>
     <Record>
       <Key>MolePollutantDescription</Key>
@@ -18987,19 +19925,20 @@ A {THING:StructureWaterPurifier} can be used to convert it back to {GAS:Water}.<
     </Record>
     <Record>
       <Key>MoleNitrousOxideDescription</Key>
-      <Value>Nitrous oxide is a reactive gas that will knock players out if inhaled.  It acts as an oxidizer for combustion, and allows volatiles to burn significantly hotter, faster, and at a lower autoignition temperature. It can be produced in an energy intensive process inside of a {THING:StructureNitrolyzer}.</Value>
+      <Value>Nitrous oxide is a reactive gas that will knock players out if inhaled.  It acts as an oxidizer for combustion, and allows
+          volatile gasses to burn significantly hotter, faster, and at a lower autoignition temperature. It can be produced in an energy intensive process inside of a {THING:StructureNitrolyzer}.</Value>
     </Record>
     <Record>
       <Key>MoleLiquidNitrogenDescription</Key>
-      <Value>{GAS:Nitrogen} in its liquid form. It can be created by lowering the temperature of {GAS:Nitrogen} gas below it's boiling point. This can be achieved using a {THING:StructureHeatExchangerGastoGas} or a {THING:StructureAirConditioner}. {GAS:LiquidNitrogen} introduced into the atmosphere will quickly evaporate back into {GAS:Nitrogen}.</Value>
+      <Value>{GAS:Nitrogen} in its liquid form. It can be created by lowering the temperature of {GAS:Nitrogen} gas below it's boiling point. This can be achieved using a {THING:StructureHeatExchangerGastoGas} or a {THING:StructureAirConditioner}.</Value>
     </Record>
     <Record>
       <Key>MoleLiquidOxygenDescription</Key>
-      <Value>{GAS:Oxygen} in its liquid form. It can be created by lowering the temperature of {GAS:Oxygen} gas below it's boiling point. This can be achieved using a {THING:StructureHeatExchangerGastoGas} or a {THING:StructureAirConditioner}. {GAS:LiquidOxygen} introduced into the atmosphere will quickly evaporate back into {GAS:Oxygen}.</Value>
+      <Value>{GAS:Oxygen} in its liquid form. It can be created by lowering the temperature of {GAS:Oxygen} gas below it's boiling point. This can be achieved using a {THING:StructureHeatExchangerGastoGas} or a {THING:StructureAirConditioner}.</Value>
     </Record>
     <Record>
-      <Key>MoleLiquidVolatilesDescription</Key>
-      <Value>{GAS:Volatiles} in its liquid form. It can be created by lowering the temperature of {GAS:Volatiles} gas below it's boiling point. This can be achieved using a {THING:StructureHeatExchangerGastoGas} or a {THING:StructureAirConditioner}. {GAS:LiquidVolatiles} introduced into the atmosphere will quickly evaporate back into {GAS:Volatiles}.</Value>
+      <Key>MoleLiquidMethaneDescription</Key>
+      <Value>{GAS:Methane} in its liquid form. It can be created by lowering the temperature of {GAS:Methane} gas below it's boiling point. This can be achieved using a {THING:StructureHeatExchangerGastoGas} or a {THING:StructureAirConditioner}.</Value>
     </Record>
     <Record>
       <Key>MoleLiquidCarbonDioxideDescription</Key>
@@ -19015,15 +19954,59 @@ A {THING:StructureWaterPurifier} can be used to convert it back to {GAS:Water}.<
     </Record>
     <Record>
       <Key>MoleLiquidHydrogenDescription</Key>
-      <Value>{GAS:Hydrogen} in its liquid form. It can be created by lowering the temperature of {GAS:Hydrogen} gas below it's boiling point. This can be achieved using a {THING:StructureHeatExchangerGastoGas} or a {THING:StructureAirConditioner}. {GAS:LiquidHydrogen} introduced into the atmosphere will quickly evaporate back into {GAS:Hydrogen}.</Value>
+      <Value>{GAS:Hydrogen} in its liquid form. It can be created by lowering the temperature of {GAS:Hydrogen} gas below it's boiling point. This can be achieved using a {THING:StructureHeatExchangerGastoGas} or a {THING:StructureAirConditioner}.</Value>
     </Record>
     <Record>
       <Key>MoleHydrogenDescription</Key>
-      <Value />
+      <Value>{GAS:Hydrogen} Is the most efficient fuel by weight for rocketry. When mixed with {GAS:Oxygen} it will cleanly combust into {GAS:Steam}.</Value>
     </Record>
     <Record>
       <Key>MoleSteamDescription</Key>
-      <Value>Evaporated {GAS:Water}. It can be created by rasing the temperature of {GAS:Water} to its boiling point. When introduced into a pipe {GAS:Steam} will condense back into {GAS:Water} if it's temperature is below it's boiling point. Steam can be created by combusting {GAS:Volatiles} and oxygen using the {THING:H2Combustor}</Value>
+      <Value>Evaporated {GAS:Water}. It can be created by rasing the temperature of {GAS:Water} to its boiling point. When introduced into a pipe {GAS:Steam} will condense back into {GAS:Water} if it's temperature is below it's boiling point. Steam can be created by combusting {GAS:Methane} and oxygen using the {THING:H2Combustor}</Value>
+    </Record>
+    <Record>
+      <Key>MoleHydrazineDescription</Key>
+      <Value>{GAS:Hydrazine} is the perfect fuel for space exploration as it requires no oxidiser to combust, only needing heat or a spark. It is more commonly stored in it's liquid form {GAS:LiquidHydrazine} which is stable at room temperature. It is extremely toxic to all forms of life.</Value>
+    </Record>
+    <Record>
+      <Key>MoleLiquidHydrazineDescription</Key>
+      <Value>{GAS:Hydrazine} in its liquid form. It is stable at room temperature and makes for an excellent rocket fuel.</Value>
+    </Record>
+    <Record>
+      <Key>MoleHeliumDescription</Key>
+      <Value>{GAS:Helium} is a fully inert gas that will neither freeze or condense into liquid, making it an excellent working gas in atmospherics systems that must avoid phase-change.</Value>
+    </Record>
+    <Record>
+      <Key>MoleLiquidAlcoholDescription</Key>
+      <Value>{GAS:LiquidAlcohol} is a relatively safe and versatile volatile liquid at room temperatures. When exposed to a vacuum it will decompose into {GAS:Methane} to form a small head pressure.</Value>
+    </Record>
+    <Record>
+      <Key>MoleLiquidSodiumChlorideDescription</Key>
+      <Value>{GAS:LiquidSodiumChloride} is unique in that it will remain in liquid form at extremely high temperatures making it an excellent medium for storing heat energy. When exposed to a vacuum it will decompose into {GAS:Pollutant} to form a small head pressure. At room temperature it exists as solid {THING:ItemPureIceLiquidSodiumChloride}.</Value>
+    </Record>
+    <Record>
+      <Key>MoleSilanolDescription</Key>
+      <Value>{GAS:Silanol} is the premium refrigerant gas for utilising phase change to pump heat. It has a wide liquid range an is more commonly found in it's liquid form {GAS:LiquidSilanol}.</Value>
+    </Record>
+    <Record>
+      <Key>MoleLiquidSilanolDescription</Key>
+      <Value>{GAS:Silanol} in its liquid form is the premium refrigerant gas for utilising phase change to pump heat. With its extremely high heat capacity it also makes an excellent coolant, able to absorb large quantities of heat energy with minimal temperature fluctuation.</Value>
+    </Record>
+    <Record>
+      <Key>MoleHydrochloricAcidDescription</Key>
+      <Value>A highly toxic gas.</Value>
+    </Record>
+    <Record>
+      <Key>MoleLiquidHydrochloricAcidDescription</Key>
+      <Value>A highly toxic liquid.</Value>
+    </Record>
+    <Record>
+      <Key>MoleOzoneDescription</Key>
+      <Value>{GAS:Ozone} is a highly energetic oxidiser. As with {GAS:NitrousOxide}, when mixed with a volatile gas {GAS:Ozone} will create extra hot combustion.</Value>
+    </Record>
+    <Record>
+      <Key>MoleLiquidOzoneDescription</Key>
+      <Value>{GAS:Ozone} in its liquid form.</Value>
     </Record>
     <Record>
       <Key>SettingsSmoothTerrain</Key>
@@ -20266,7 +21249,7 @@ A {THING:StructureWaterPurifier} can be used to convert it back to {GAS:Water}.<
     </Record>
     <Record>
       <Key>TutorialAirlockProgramingInserDisk</Key>
-      <Value>Insert the {THING:ItemDataDisk} into the disk slot on the side of the {THING:StructureConsole} to enable the setup screen.</Value>
+      <Value>Use your {THING:ItemScrewdriver} on the setting screw on the side of the {THING:StructureConsole} to enable the setup screen.</Value>
     </Record>
     <Record>
       <Key>TutorialAirlockProgramingPressureSettingNote</Key>
@@ -20286,7 +21269,7 @@ A {THING:StructureWaterPurifier} can be used to convert it back to {GAS:Water}.<
     </Record>
     <Record>
       <Key>TutorialAirlockProgramingRemoveDisk</Key>
-      <Value>Once the sensor has been selected, if all selections have been made correctly, the switch should be solid green and no longer blinking. Remove the disk.</Value>
+      <Value>Once the sensor has been selected, if all selections have been made correctly, the switch should be solid green and no longer blinking. Use your {THING:ItemScrewdriver} to disable the setup screen.</Value>
     </Record>
     <Record>
       <Key>TutorialAirlockActivateAirlockName</Key>
@@ -20491,7 +21474,7 @@ A {THING:StructureWaterPurifier} can be used to convert it back to {GAS:Water}.<
     </Record>
     <Record>
       <Key>FurnaceTutorialReHeatingInfo</Key>
-      <Value>A 2:1 mix of {GAS:Volatiles}:{GAS:Oxygen} fuel is the most common fuel source and autoignites at 300c, while a 50:50 mix of {GAS:Volatiles}:{GAS:NitrousOxide} will autoignite at 50c but will burn much hotter.</Value>
+      <Value>A 2:1 mix of {GAS:Methane}:{GAS:Oxygen} fuel is the most common fuel source and autoignites at 300c, while a 50:50 mix of {GAS:Methane}:{GAS:NitrousOxide} will autoignite at 50c but will burn much hotter.</Value>
     </Record>
     <Record>
       <Key>FurnaceTutorialReHeatingInsertMoreFuel</Key>
@@ -20659,7 +21642,7 @@ A {THING:StructureWaterPurifier} can be used to convert it back to {GAS:Water}.<
     </Record>
     <Record>
       <Key>ManufacturingTutorialModsInfo</Key>
-      <Value>Stationeers does not have a research mechanism, but it does have technology tiers that need to be unlocked by upgrading the printers to tier 2. Tier 2 printers have a slight increase in power use and slight decrease in speed. Theses values can be found in the Stationpedia {KEY:Help}. Only the 4 main printers have upgrades: {THING:StructureAutolathe}, {THING:StructureElectronicsPrinter}, {THING:StructureHydraulicPipeBender} and {THING:StructureToolManufactory}.</Value>
+      <Value>Stationeers does not have a research mechanism, but it does have technology tiers that need to be unlocked by upgrading the printers to tier 2. Tier 2 printers have a slight increase in power use and slight increase in speed. Theses values can be found in the Stationpedia {KEY:Help}. Only the 4 main printers have upgrades: {THING:StructureAutolathe}, {THING:StructureElectronicsPrinter}, {THING:StructureHydraulicPipeBender} and {THING:StructureToolManufactory}.</Value>
     </Record>
     <Record>
       <Key>ManufacturingTutorialModsNeedModToUpgrade</Key>
@@ -20878,6 +21861,10 @@ A {THING:StructureWaterPurifier} can be used to convert it back to {GAS:Water}.<
       <Value>Zero Gee</Value>
     </Record>
     <Record>
+      <Key>StatusWarningAcceleration</Key>
+      <Value>Acceleration</Value>
+    </Record>
+    <Record>
       <Key>StatusNoticeActiveHandOff</Key>
       <Value>Active Hand Off</Value>
     </Record>
@@ -20896,6 +21883,14 @@ A {THING:StructureWaterPurifier} can be used to convert it back to {GAS:Water}.<
     <Record>
       <Key>StatusNoticeJetpackOn</Key>
       <Value>Jetpack On</Value>
+    </Record>
+    <Record>
+      <Key>ConnectedSlot</Key>
+      <Value>Screen Connection</Value>
+    </Record>
+    <Record>
+      <Key>StatusNoticeHealingNotice</Key>
+      <Value>Healing</Value>
     </Record>
     <Record>
       <Key>StatusNoticeLightOff</Key>
@@ -21110,6 +22105,10 @@ A {THING:StructureWaterPurifier} can be used to convert it back to {GAS:Water}.<
       <Value>Fuel Tank</Value>
     </Record>
     <Record>
+      <Key>SpawnDataHydrogenFuelTank</Key>
+      <Value>Hydrogen Fuel Tank</Value>
+    </Record>
+    <Record>
       <Key>SpawnDataOxygenTank</Key>
       <Value>Oxygen Tank</Value>
     </Record>
@@ -21160,6 +22159,10 @@ A {THING:StructureWaterPurifier} can be used to convert it back to {GAS:Water}.<
     <Record>
       <Key>SpawnDataAirlockSupplies</Key>
       <Value>Airlock Supplies</Value>
+    </Record>
+    <Record>
+      <Key>SpawnDataNavigationPackage</Key>
+      <Value>Navigation Package</Value>
     </Record>
     <Record>
       <Key>SpawnDataAdvancedAirlockSupplies</Key>
@@ -21348,6 +22351,10 @@ A {THING:StructureWaterPurifier} can be used to convert it back to {GAS:Water}.<
     <Record>
       <Key>AshStorm</Key>
       <Value>Ash Storm</Value>
+    </Record>
+    <Record>
+      <Key>FireStorm</Key>
+      <Value>Fire Storm</Value>
     </Record>
     <Record>
       <Key>RainWeather</Key>
@@ -21555,7 +22562,15 @@ A {THING:StructureWaterPurifier} can be used to convert it back to {GAS:Water}.<
     </Record>
     <Record>
       <Key>BuyDataBulkCarbonDioxide</Key>
-      <Value>Bulk Carbon Dioxide</Value>
+      <Value>Carbon Dioxide</Value>
+    </Record>
+    <Record>
+      <Key>BuyDataBulkCarbonDioxideVenus</Key>
+      <Value>Carbon Dioxide from Venus</Value>
+    </Record>
+    <Record>
+      <Key>BuyDataBulkCarbonDioxideMars</Key>
+      <Value>Carbon Dioxide from Mars</Value>
     </Record>
     <Record>
       <Key>BuyDataBulkWater</Key>
@@ -21635,11 +22650,15 @@ A {THING:StructureWaterPurifier} can be used to convert it back to {GAS:Water}.<
     </Record>
     <Record>
       <Key>BuyDataBulkVolatiles</Key>
-      <Value>Bulk Volatiles</Value>
+      <Value>Methane from Vulcan</Value>
+    </Record>
+    <Record>
+      <Key>BuyDataBulkHydrogen</Key>
+      <Value>Hydrogen from Vulcan</Value>
     </Record>
     <Record>
       <Key>BuyDataBulkOxygen</Key>
-      <Value>Bulk Oxygen</Value>
+      <Value>Oxygen from Europa</Value>
     </Record>
     <Record>
       <Key>BuyDataEmptyGasCanister</Key>
@@ -21654,12 +22673,24 @@ A {THING:StructureWaterPurifier} can be used to convert it back to {GAS:Water}.<
       <Value>Bulk Nitrogen</Value>
     </Record>
     <Record>
+      <Key>SellDataBulkHelium</Key>
+      <Value>Bulk Helium</Value>
+    </Record>
+    <Record>
       <Key>SellDataBulkCarbonDioxide</Key>
       <Value>Bulk Carbon Dioxide</Value>
     </Record>
     <Record>
       <Key>SellDataBulkVolatiles</Key>
-      <Value>Bulk Volatiles</Value>
+      <Value>Bulk Methane</Value>
+    </Record>
+    <Record>
+      <Key>SellDataBulkHydrogen</Key>
+      <Value>Bulk Hydrogen</Value>
+    </Record>
+    <Record>
+      <Key>SellDataBulkSilanol</Key>
+      <Value>Bulk Silanol</Value>
     </Record>
     <Record>
       <Key>SellDataBulkPollutants</Key>
@@ -21674,8 +22705,16 @@ A {THING:StructureWaterPurifier} can be used to convert it back to {GAS:Water}.<
       <Value>Bulk Nitrous Oxide</Value>
     </Record>
     <Record>
+      <Key>SellDataBulkOzone</Key>
+      <Value>Bulk Ozone</Value>
+    </Record>
+    <Record>
       <Key>SellDataBulkDirtyVolatiles</Key>
       <Value>Bulk Dirty Volatiles</Value>
+    </Record>
+    <Record>
+      <Key>SellDataBulkHydrazine</Key>
+      <Value>Bulk Hydrazine</Value>
     </Record>
     <Record>
       <Key>SellDataSteam</Key>
@@ -21686,8 +22725,16 @@ A {THING:StructureWaterPurifier} can be used to convert it back to {GAS:Water}.<
       <Value>Oxygen Canister</Value>
     </Record>
     <Record>
+      <Key>SellDataHydrazineCanister</Key>
+      <Value>Hydrazine Canister</Value>
+    </Record>
+    <Record>
       <Key>SellDataFuelCanister</Key>
       <Value>Fuel Canister</Value>
+    </Record>
+    <Record>
+      <Key>SellDataLiquidHydrazineCanister</Key>
+      <Value>Liquid Hydrazine Canister</Value>
     </Record>
     <Record>
       <Key>SellDataWaterCanister</Key>
@@ -21715,7 +22762,23 @@ A {THING:StructureWaterPurifier} can be used to convert it back to {GAS:Water}.<
     </Record>
     <Record>
       <Key>SellDataBulkLiquidVolatiles</Key>
-      <Value>Bulk Liquid Volatiles</Value>
+      <Value>Bulk Liquid Methane</Value>
+    </Record>
+    <Record>
+      <Key>SellDataBulkLiquidHydrogen</Key>
+      <Value>Bulk Liquid Hydrogen</Value>
+    </Record>
+    <Record>
+      <Key>SellDataBulkLiquidOzone</Key>
+      <Value>Bulk Liquid Ozone</Value>
+    </Record>
+    <Record>
+      <Key>SellDataBulkLiquidHydrochloricAcid</Key>
+      <Value>Bulk Liquid HydrochloricAcid</Value>
+    </Record>
+    <Record>
+      <Key>SellDataBulkLiquidHydrazine</Key>
+      <Value>Bulk Liquid Hydrazine</Value>
     </Record>
     <Record>
       <Key>SellDataLiquidNitrogenCanister</Key>
@@ -21727,7 +22790,7 @@ A {THING:StructureWaterPurifier} can be used to convert it back to {GAS:Water}.<
     </Record>
     <Record>
       <Key>SellDataLiquidVolatilesCanister</Key>
-      <Value>Liquid Volatiles Canister</Value>
+      <Value>Liquid Methane Canister</Value>
     </Record>
     <Record>
       <Key>SellDataBoxofSprayCans</Key>
@@ -22308,7 +23371,7 @@ Thank you for your understanding, and we can’t wait for you to experience what
     </Record>
     <Record>
       <Key>StationpediaMetabolicSuspensionDesc</Key>
-      <Value>When powered this device will suspend the metabolism of the occupand ensuring they  no longer consume food or water</Value>
+      <Value>When powered, this device will suspend the metabolism of the occupant, ensuring they no longer consume food or water</Value>
     </Record>
     <Record>
       <Key>StationpediaCryogenicRegenerationDesc</Key>
@@ -22317,6 +23380,26 @@ Thank you for your understanding, and we can’t wait for you to experience what
     <Record>
       <Key>StationpediaCryogenicRegeneration</Key>
       <Value>Cryogenic Regeneration</Value>
+    </Record>
+    <Record>
+      <Key>ButtonLink</Key>
+      <Value>Link</Value>
+    </Record>
+    <Record>
+      <Key>StationpediaFermentation</Key>
+      <Value>Ferments into: </Value>
+    </Record>
+    <Record>
+      <Key>StationpediaFermentable</Key>
+      <Value>Fermentable:</Value>
+    </Record>
+    <Record>
+      <Key>ButtonSurfaceScan</Key>
+      <Value>Surface Scan</Value>
+    </Record>
+    <Record>
+      <Key>ButtonTransfer</Key>
+      <Value>Transfer</Value>
     </Record>
   </Interface>
   <Colors>
@@ -22367,6 +23450,22 @@ Thank you for your understanding, and we can’t wait for you to experience what
     <Record>
       <Key>ColorPurple</Key>
       <Value>Purple</Value>
+    </Record>
+    <Record>
+      <Key>ColorObsidian</Key>
+      <Value>Obsidian</Value>
+    </Record>
+    <Record>
+      <Key>ColorSilver</Key>
+      <Value>Silver</Value>
+    </Record>
+    <Record>
+      <Key>ColorBronze</Key>
+      <Value>Bronze</Value>
+    </Record>
+    <Record>
+      <Key>ColorGold</Key>
+      <Value>Gold</Value>
     </Record>
   </Colors>
   <Keys>
@@ -27437,19 +28536,19 @@ Status: {LOCAL:StatusValue}</Value>
     </Record>
     <Record>
       <Key>StationpediaLowFoodQuality</Key>
-      <Value>Low (-25% hydration capacity)</Value>
+      <Value>&lt;color=red&gt;Low&lt;/color&gt; (-25% hydration capacity)</Value>
     </Record>
     <Record>
       <Key>StationpediaOkFoodQuality</Key>
-      <Value>Ok</Value>
+      <Value>&lt;color=orange&gt;Ok&lt;/color&gt;</Value>
     </Record>
     <Record>
       <Key>StationpediaGoodFoodQuality</Key>
-      <Value>Good (+25% hydration capacity)</Value>
+      <Value>&lt;color=yellow&gt;Good&lt;/color&gt; (+25% hydration capacity)</Value>
     </Record>
     <Record>
       <Key>StationpediaSuperiorFoodQuality</Key>
-      <Value>Best (+75% hydration capacity)</Value>
+      <Value>&lt;color=green&gt;Best&lt;/color&gt; (+75% hydration capacity)</Value>
     </Record>
     <Record>
       <Key>TooltipLowFoodQuality</Key>
@@ -27466,6 +28565,26 @@ Status: {LOCAL:StatusValue}</Value>
     <Record>
       <Key>TooltipSuperiorFoodQuality</Key>
       <Value>Best &lt;color=green&gt;+75% hydration&lt;/color&gt;</Value>
+    </Record>
+    <Record>
+      <Key>FoodQualityLow</Key>
+      <Value>Low</Value>
+    </Record>
+    <Record>
+      <Key>FoodQualityOk</Key>
+      <Value>Ok</Value>
+    </Record>
+    <Record>
+      <Key>FoodQualityGood</Key>
+      <Value>Good</Value>
+    </Record>
+    <Record>
+      <Key>FoodQualityBest</Key>
+      <Value>Best</Value>
+    </Record>
+    <Record>
+      <Key>TooltipFoodQuality</Key>
+      <Value>Food Quality {LOCAL:Quality}</Value>
     </Record>
     <Record>
       <Key>WaterPurifierCharcoalErrorMsg</Key>
@@ -28018,7 +29137,7 @@ Status: {LOCAL:StatusValue}</Value>
     </Record>
     <Record>
       <Key>RocketDeployActionInfo</Key>
-      <Value>Cargo Bay: {LOCAL:OnOff}, State: {LOCAL:Open}, Progress: {LOCAL:Progress}</Value>
+      <Value>Payload Bay: {LOCAL:OnOff}, State: {LOCAL:Open}, Progress: {LOCAL:Progress}</Value>
     </Record>
     <Record>
       <Key>TutorialYouDied</Key>
@@ -28443,7 +29562,7 @@ Status: {LOCAL:StatusValue}</Value>
     </Record>
     <Record>
       <Key>AirlockPressurize</Key>
-      <Value>PRESURIZE</Value>
+      <Value>PRESSURIZE</Value>
     </Record>
     <Record>
       <Key>AirlockDepressurize</Key>
@@ -29524,6 +30643,190 @@ Status: {LOCAL:StatusValue}</Value>
     <Record>
       <Key>FertilizedEggProcess</Key>
       <Value>The {LOCAL:Thing} is {LOCAL:Percent} to hatching</Value>
+    </Record>
+    <Record>
+      <Key>ThisDeviceNotOpen</Key>
+      <Value>{LOCAL:Thing} must be open to operate</Value>
+    </Record>
+    <Record>
+      <Key>RocketLogDeploy</Key>
+      <Value>{LOCAL:DisplayName} has successfully deployed {LOCAL:Thing} to x: {LOCAL:X} z:{LOCAL:Z}</Value>
+    </Record>
+    <Record>
+      <Key>RocketDeployFailNotInLowOrbit</Key>
+      <Value>{LOCAL:Payload} Can only be deployed in Low Orbit</Value>
+    </Record>
+    <Record>
+      <Key>RocketDeployFailNoFreePosition</Key>
+      <Value>{LOCAL:Payload} All deploy positions in Low Orbit are occupied</Value>
+    </Record>
+    <Record>
+      <Key>RocketCannotExitSeatInFlight</Key>
+      <Value>Cannot exit the seat unless the rocket is landed on a launch mount</Value>
+    </Record>
+    <Record>
+      <Key>RocketCrewModuleMannedTravel</Key>
+      <Value>Cannot travel here while the crew module is manned</Value>
+    </Record>
+    <Record>
+      <Key>RocketDeployFailNoPayload</Key>
+      <Value>No payload to deploy</Value>
+    </Record>
+    <Record>
+      <Key>ConstructionBlockedByDynamic</Key>
+      <Value>Construction blocked by {LOCAL:Thing}</Value>
+    </Record>
+    <Record>
+      <Key>Waste</Key>
+      <Value>Waste</Value>
+    </Record>
+    <Record>
+      <Key>Use</Key>
+      <Value>Use</Value>
+    </Record>
+    <Record>
+      <Key>Healing</Key>
+      <Value>Healing</Value>
+    </Record>
+    <Record>
+      <Key>SanitationNeed</Key>
+      <Value>Sanitation Need</Value>
+    </Record>
+    <Record>
+      <Key>DeviceNotInPosition</Key>
+      <Value>{LOCAL:Occupant} is not close enough to use</Value>
+    </Record>
+    <Record>
+      <Key>DeviceCannotWhenWearing</Key>
+      <Value>Cannot use wearing {LOCAL:Thing}</Value>
+    </Record>
+    <Record>
+      <Key>NoSanitationNeed</Key>
+      <Value>{LOCAL:Human} has no sanitation need right now</Value>
+    </Record>
+    <Record>
+      <Key>ScriptDescriptionSgn</Key>
+      <Value>Stores the sign of a in the register: -1 if a is negative, 1 if positive, and 0 if a is zero (or not a number).</Value>
+    </Record>
+    <Record>
+      <Key>ScriptDescriptionClamp</Key>
+      <Value>Stores a clamped to the inclusive range [min, max] in the register provided.</Value>
+    </Record>
+    <Record>
+      <Key>ScriptDescriptionRol</Key>
+      <Value>Performs a bitwise left rotation on the binary representation of a by b places, wrapping the bits shifted out of the most significant position back into the least significant position.</Value>
+    </Record>
+    <Record>
+      <Key>ScriptDescriptionRor</Key>
+      <Value>Performs a bitwise right rotation on the binary representation of a by b places, wrapping the bits shifted out of the least significant position back into the most significant position.</Value>
+    </Record>
+    <Record>
+      <Key>TrackablePlayerBodyBag</Key>
+      <Value>{LOCAL:UserName}'s Body Bag</Value>
+    </Record>
+    <Record>
+      <Key>Progress</Key>
+      <Value>Progress</Value>
+    </Record>
+    <Record>
+      <Key>DistanceToBedRock</Key>
+      <Value>Distance to Bedrock</Value>
+    </Record>
+    <Record>
+      <Key>Defibrillate</Key>
+      <Value>Defibrillate</Value>
+    </Record>
+    <Record>
+      <Key>DefibrillatorNotOperable</Key>
+      <Value>Defibrillator is not operable for this action.</Value>
+    </Record>
+    <Record>
+      <Key>NoPartnerUmbilical</Key>
+      <Value>No partner umbilical connected</Value>
+    </Record>
+    <Record>
+      <Key>RocketScannerWrongHeadType</Key>
+      <Value>{LOCAL:Thing} scanning head is the wrong type for action you are trying to do</Value>
+    </Record>
+    <Record>
+      <Key>RocketSurfaceScanActionInfo</Key>
+      <Value>Sending scan data to connected map motherboards. Scanner: {LOCAL:OnOff}</Value>
+    </Record>
+    <Record>
+      <Key>RocketActionSurfaceScan</Key>
+      <Value>Scanning Surface</Value>
+    </Record>
+    <Record>
+      <Key>RocketActionTransfer</Key>
+      <Value>Transfering Resources</Value>
+    </Record>
+    <Record>
+      <Key>DeviceNotEnoughWater</Key>
+      <Value>Not enough water</Value>
+    </Record>
+    <Record>
+      <Key>DeviceWaterTooHot</Key>
+      <Value>Water is too hot</Value>
+    </Record>
+    <Record>
+      <Key>DeviceWaterTooCold</Key>
+      <Value>Water is too cold</Value>
+    </Record>
+    <Record>
+      <Key>DeviceWaterPolluted</Key>
+      <Value>Water is polluted</Value>
+    </Record>
+    <Record>
+      <Key>DeviceOutputFull</Key>
+      <Value>&lt;color=yellow&gt;Output&lt;/color&gt; network is full</Value>
+    </Record>
+    <Record>
+      <Key>DeviceMinimumPressure</Key>
+      <Value>World atmosphere must be at least {LOCAL:PRESSURE}</Value>
+    </Record>
+    <Record>
+      <Key>DifficultyStatisticSanitation</Key>
+      <Value>Sanitation</Value>
+    </Record>
+    <Record>
+      <Key>FermenterItemsLeftToFerment</Key>
+      <Value>Fermenting &lt;color=yellow&gt;{LOCAL:Amount}&lt;/color&gt; × &lt;color=green&gt;{LOCAL:Value} {LOCAL:Percentage}%&lt;/color&gt;</Value>
+    </Record>
+    <Record>
+      <Key>FermenterWillProduce</Key>
+      <Value>Will produce &lt;color=purple&gt;{LOCAL:Value}&lt;/color&gt;.</Value>
+    </Record>
+    <Record>
+      <Key>FermenterInputIsEmpty</Key>
+      <Value>No Fermentable item in Input.</Value>
+    </Record>
+    <Record>
+      <Key>RocketNoAvailableSeat</Key>
+      <Value>No seat available in crew module</Value>
+    </Record>
+    <Record>
+      <Key>NoAvailableBattery</Key>
+      <Value>No battery available. Battery must be turned on and have charge</Value>
+    </Record>
+    <Record>
+      <Key>PowerTransferActionInfo</Key>
+      <Value>Transferring Power. Source {LOCAL:SourcePercent}. Target {LOCAL:TargetPercent}</Value>
+    </Record>
+    <Record>
+      <Key>NoUmbilicalForTransfer</Key>
+      <Value>No umbilical to transfer from</Value>
+    </Record>
+    <Record>
+      <Key>GasTransferActionInfo</Key>
+      <Value>Transferring Gasses and Liquids. </Value>
+    </Record>
+    <Record>
+      <Key>ActionSource</Key>
+      <Value>Source </Value>
+    </Record>
+    <Record>
+      <Key>ActionTarget</Key>
+      <Value>Target </Value>
     </Record>
   </GameStrings>
   <GameTip />

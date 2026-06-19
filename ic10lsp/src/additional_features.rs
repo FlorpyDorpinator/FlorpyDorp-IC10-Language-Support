@@ -812,7 +812,7 @@ impl RegisterAnalyzer {
     fn fallback_line_scan(
         &mut self,
         content: &str,
-        _aliases: &HashMap<String, crate::DefinitionData<crate::AliasValue>>,
+        aliases: &HashMap<String, crate::DefinitionData<crate::AliasValue>>,
     ) {
         for (idx, line) in content.lines().enumerate() {
             let tokens: Vec<&str> = line.split_whitespace().collect();
@@ -857,8 +857,17 @@ impl RegisterAnalyzer {
                                 .map(|u| u.value_kind)
                                 .unwrap_or(ValueKind::Unknown);
                             self.ensure_register_entry(dst).value_kind = src_kind;
+                        } else if let Some(crate::AliasValue::Register(src_reg)) =
+                            aliases.get(src).map(|d| &d.value)
+                        {
+                            // move from an alias of a register: propagate that register's kind
+                            let src_kind = self
+                                .register_usage
+                                .get(src_reg)
+                                .map(|u| u.value_kind)
+                                .unwrap_or(ValueKind::Unknown);
+                            self.ensure_register_entry(dst).value_kind = src_kind;
                         }
-                        // Skip alias sources - tree-sitter handles those
                     }
                 }
                 "get" | "getd" | "pop" | "peek" => {

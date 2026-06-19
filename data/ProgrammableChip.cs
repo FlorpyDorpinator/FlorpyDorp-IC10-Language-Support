@@ -23,16 +23,16 @@ using UnityEngine;
 
 namespace Assets.Scripts.Objects.Electrical
 {
-	// Token: 0x02000C9C RID: 3228
+	// Token: 0x02000D25 RID: 3365
 	public class ProgrammableChip : Item, ISourceCode, IReferencable, IEvaluable, ISpatial, IPhysical, IProfile, IDensePoolable, ILogicable, IMemoryWritable, IMemory, IMemoryReadable
 	{
-		// Token: 0x06006F0C RID: 28428 RVA: 0x00214AD7 File Offset: 0x00212CD7
+		// Token: 0x060075C8 RID: 30152 RVA: 0x002388CF File Offset: 0x00236ACF
 		public override string GetStationpediaCategory()
 		{
 			return Localization.GetInterface(StationpediaCategoryStrings.LogicIntegratedCircuitsCategory, false);
 		}
 
-		// Token: 0x06006F0D RID: 28429 RVA: 0x00214AE4 File Offset: 0x00212CE4
+		// Token: 0x060075C9 RID: 30153 RVA: 0x002388DC File Offset: 0x00236ADC
 		public static string UnpackAscii6(double packedDouble, bool signed)
 		{
 			ulong num = (ulong)ProgrammableChip.DoubleToLong(packedDouble, signed);
@@ -52,7 +52,7 @@ namespace Assets.Scripts.Objects.Electrical
 			return new string(array);
 		}
 
-		// Token: 0x06006F0E RID: 28430 RVA: 0x00214B40 File Offset: 0x00212D40
+		// Token: 0x060075CA RID: 30154 RVA: 0x00238938 File Offset: 0x00236B38
 		public static double PackAscii6(string text, int lineNumber)
 		{
 			if (string.IsNullOrEmpty(text))
@@ -75,13 +75,13 @@ namespace Assets.Scripts.Objects.Electrical
 			return (double)num;
 		}
 
-		// Token: 0x06006F0F RID: 28431 RVA: 0x00214BA6 File Offset: 0x00212DA6
+		// Token: 0x060075CB RID: 30155 RVA: 0x0023899E File Offset: 0x00236B9E
 		public override bool CanLogicRead(LogicType logicType)
 		{
 			return logicType == LogicType.LineNumber || base.CanLogicRead(logicType);
 		}
 
-		// Token: 0x06006F10 RID: 28432 RVA: 0x00214BB9 File Offset: 0x00212DB9
+		// Token: 0x060075CC RID: 30156 RVA: 0x002389B1 File Offset: 0x00236BB1
 		public override double GetLogicValue(LogicType logicType)
 		{
 			if (logicType == LogicType.LineNumber)
@@ -91,18 +91,18 @@ namespace Assets.Scripts.Objects.Electrical
 			return base.GetLogicValue(logicType);
 		}
 
-		// Token: 0x1700137F RID: 4991
-		// (get) Token: 0x06006F12 RID: 28434 RVA: 0x002150AA File Offset: 0x002132AA
-		// (set) Token: 0x06006F13 RID: 28435 RVA: 0x002150B2 File Offset: 0x002132B2
+		// Token: 0x1700159C RID: 5532
+		// (get) Token: 0x060075CE RID: 30158 RVA: 0x00238EA2 File Offset: 0x002370A2
+		// (set) Token: 0x060075CF RID: 30159 RVA: 0x00238EAA File Offset: 0x002370AA
 		public char[] SourceCodeCharArray { get; set; }
 
-		// Token: 0x17001380 RID: 4992
-		// (get) Token: 0x06006F14 RID: 28436 RVA: 0x002150BB File Offset: 0x002132BB
-		// (set) Token: 0x06006F15 RID: 28437 RVA: 0x002150C3 File Offset: 0x002132C3
+		// Token: 0x1700159D RID: 5533
+		// (get) Token: 0x060075D0 RID: 30160 RVA: 0x00238EB3 File Offset: 0x002370B3
+		// (set) Token: 0x060075D1 RID: 30161 RVA: 0x00238EBB File Offset: 0x002370BB
 		public int SourceCodeWritePointer { get; set; }
 
-		// Token: 0x17001381 RID: 4993
-		// (get) Token: 0x06006F16 RID: 28438 RVA: 0x002150CC File Offset: 0x002132CC
+		// Token: 0x1700159E RID: 5534
+		// (get) Token: 0x060075D2 RID: 30162 RVA: 0x00238EC4 File Offset: 0x002370C4
 		public string ErrorLineNumberString
 		{
 			get
@@ -111,14 +111,14 @@ namespace Assets.Scripts.Objects.Electrical
 			}
 		}
 
-		// Token: 0x17001382 RID: 4994
-		// (get) Token: 0x06006F17 RID: 28439 RVA: 0x002150D9 File Offset: 0x002132D9
-		// (set) Token: 0x06006F18 RID: 28440 RVA: 0x002150E1 File Offset: 0x002132E1
+		// Token: 0x1700159F RID: 5535
+		// (get) Token: 0x060075D3 RID: 30163 RVA: 0x00238ED1 File Offset: 0x002370D1
+		// (set) Token: 0x060075D4 RID: 30164 RVA: 0x00238ED9 File Offset: 0x002370D9
 		public ulong LastEditedId { get; set; }
 
-		// Token: 0x17001383 RID: 4995
-		// (get) Token: 0x06006F19 RID: 28441 RVA: 0x002150EA File Offset: 0x002132EA
-		// (set) Token: 0x06006F1A RID: 28442 RVA: 0x002150F2 File Offset: 0x002132F2
+		// Token: 0x170015A0 RID: 5536
+		// (get) Token: 0x060075D5 RID: 30165 RVA: 0x00238EE2 File Offset: 0x002370E2
+		// (set) Token: 0x060075D6 RID: 30166 RVA: 0x00238EEA File Offset: 0x002370EA
 		private ushort _ErrorLineNumber
 		{
 			get
@@ -138,8 +138,8 @@ namespace Assets.Scripts.Objects.Electrical
 			}
 		}
 
-		// Token: 0x17001384 RID: 4996
-		// (get) Token: 0x06006F1B RID: 28443 RVA: 0x0021511E File Offset: 0x0021331E
+		// Token: 0x170015A1 RID: 5537
+		// (get) Token: 0x060075D7 RID: 30167 RVA: 0x00238F16 File Offset: 0x00237116
 		public string ErrorTypeString
 		{
 			get
@@ -148,9 +148,9 @@ namespace Assets.Scripts.Objects.Electrical
 			}
 		}
 
-		// Token: 0x17001385 RID: 4997
-		// (get) Token: 0x06006F1C RID: 28444 RVA: 0x00215131 File Offset: 0x00213331
-		// (set) Token: 0x06006F1D RID: 28445 RVA: 0x0021513C File Offset: 0x0021333C
+		// Token: 0x170015A2 RID: 5538
+		// (get) Token: 0x060075D8 RID: 30168 RVA: 0x00238F29 File Offset: 0x00237129
+		// (set) Token: 0x060075D9 RID: 30169 RVA: 0x00238F34 File Offset: 0x00237134
 		private ProgrammableChipException.ICExceptionType _ErrorType
 		{
 			get
@@ -170,8 +170,8 @@ namespace Assets.Scripts.Objects.Electrical
 			}
 		}
 
-		// Token: 0x17001386 RID: 4998
-		// (get) Token: 0x06006F1E RID: 28446 RVA: 0x00215175 File Offset: 0x00213375
+		// Token: 0x170015A3 RID: 5539
+		// (get) Token: 0x060075DA RID: 30170 RVA: 0x00238F6D File Offset: 0x0023716D
 		public bool CompilationError
 		{
 			get
@@ -180,9 +180,9 @@ namespace Assets.Scripts.Objects.Electrical
 			}
 		}
 
-		// Token: 0x17001387 RID: 4999
-		// (get) Token: 0x06006F1F RID: 28447 RVA: 0x00215183 File Offset: 0x00213383
-		// (set) Token: 0x06006F20 RID: 28448 RVA: 0x0021518B File Offset: 0x0021338B
+		// Token: 0x170015A4 RID: 5540
+		// (get) Token: 0x060075DB RID: 30171 RVA: 0x00238F7B File Offset: 0x0023717B
+		// (set) Token: 0x060075DC RID: 30172 RVA: 0x00238F83 File Offset: 0x00237183
 		private ushort CompileErrorLineNumber
 		{
 			get
@@ -199,9 +199,9 @@ namespace Assets.Scripts.Objects.Electrical
 			}
 		}
 
-		// Token: 0x17001388 RID: 5000
-		// (get) Token: 0x06006F21 RID: 28449 RVA: 0x002151AE File Offset: 0x002133AE
-		// (set) Token: 0x06006F22 RID: 28450 RVA: 0x002151B6 File Offset: 0x002133B6
+		// Token: 0x170015A5 RID: 5541
+		// (get) Token: 0x060075DD RID: 30173 RVA: 0x00238FA6 File Offset: 0x002371A6
+		// (set) Token: 0x060075DE RID: 30174 RVA: 0x00238FAE File Offset: 0x002371AE
 		private ProgrammableChipException.ICExceptionType CompileErrorType
 		{
 			get
@@ -218,8 +218,8 @@ namespace Assets.Scripts.Objects.Electrical
 			}
 		}
 
-		// Token: 0x17001389 RID: 5001
-		// (get) Token: 0x06006F23 RID: 28451 RVA: 0x002151D9 File Offset: 0x002133D9
+		// Token: 0x170015A6 RID: 5542
+		// (get) Token: 0x060075DF RID: 30175 RVA: 0x00238FD1 File Offset: 0x002371D1
 		private ICircuitHolder CircuitHousing
 		{
 			get
@@ -229,7 +229,7 @@ namespace Assets.Scripts.Objects.Electrical
 			}
 		}
 
-		// Token: 0x06006F24 RID: 28452 RVA: 0x002151F4 File Offset: 0x002133F4
+		// Token: 0x060075E0 RID: 30176 RVA: 0x00238FEC File Offset: 0x002371EC
 		public override void BuildUpdate(RocketBinaryWriter writer, ushort networkUpdateType)
 		{
 			base.BuildUpdate(writer, networkUpdateType);
@@ -246,7 +246,7 @@ namespace Assets.Scripts.Objects.Electrical
 			}
 		}
 
-		// Token: 0x06006F25 RID: 28453 RVA: 0x00215260 File Offset: 0x00213460
+		// Token: 0x060075E1 RID: 30177 RVA: 0x00239058 File Offset: 0x00237258
 		public override void ProcessUpdate(RocketBinaryReader reader, ushort networkUpdateType)
 		{
 			base.ProcessUpdate(reader, networkUpdateType);
@@ -259,11 +259,11 @@ namespace Assets.Scripts.Objects.Electrical
 			}
 			if (Thing.IsNetworkUpdateRequired(256U, networkUpdateType))
 			{
-				this.SetSourceCode(new string(reader.ReadChars()));
+				this.SetSourceCode(reader.ReadAscii());
 			}
 		}
 
-		// Token: 0x06006F26 RID: 28454 RVA: 0x002152D0 File Offset: 0x002134D0
+		// Token: 0x060075E2 RID: 30178 RVA: 0x002390C8 File Offset: 0x002372C8
 		public override void SerializeOnJoin(RocketBinaryWriter writer)
 		{
 			base.SerializeOnJoin(writer);
@@ -274,7 +274,7 @@ namespace Assets.Scripts.Objects.Electrical
 			writer.WriteAscii(this.SourceCode);
 		}
 
-		// Token: 0x06006F27 RID: 28455 RVA: 0x00215320 File Offset: 0x00213520
+		// Token: 0x060075E3 RID: 30179 RVA: 0x00239118 File Offset: 0x00237318
 		public override void DeserializeOnJoin(RocketBinaryReader reader)
 		{
 			base.DeserializeOnJoin(reader);
@@ -282,10 +282,10 @@ namespace Assets.Scripts.Objects.Electrical
 			this._ErrorType = (ProgrammableChipException.ICExceptionType)reader.ReadByte();
 			this.CompileErrorLineNumber = reader.ReadUInt16();
 			this.CompileErrorType = (ProgrammableChipException.ICExceptionType)reader.ReadByte();
-			this.SetSourceCode(new string(reader.ReadChars()));
+			this.SetSourceCode(reader.ReadAscii());
 		}
 
-		// Token: 0x06006F28 RID: 28456 RVA: 0x00215375 File Offset: 0x00213575
+		// Token: 0x060075E4 RID: 30180 RVA: 0x0023916D File Offset: 0x0023736D
 		public void SendUpdate()
 		{
 			if (NetworkManager.IsClient)
@@ -299,8 +299,8 @@ namespace Assets.Scripts.Objects.Electrical
 			}
 		}
 
-		// Token: 0x1700138A RID: 5002
-		// (get) Token: 0x06006F29 RID: 28457 RVA: 0x002153AA File Offset: 0x002135AA
+		// Token: 0x170015A7 RID: 5543
+		// (get) Token: 0x060075E5 RID: 30181 RVA: 0x002391A2 File Offset: 0x002373A2
 		public float MemoryUsed
 		{
 			get
@@ -309,20 +309,20 @@ namespace Assets.Scripts.Objects.Electrical
 			}
 		}
 
-		// Token: 0x06006F2A RID: 28458 RVA: 0x002153B8 File Offset: 0x002135B8
+		// Token: 0x060075E6 RID: 30182 RVA: 0x002391B0 File Offset: 0x002373B0
 		public override string GetQuantityText()
 		{
 			return StringGenerator.GetString((int)this.MemoryUsed, Unit.ProgrammableChip);
 		}
 
-		// Token: 0x06006F2B RID: 28459 RVA: 0x002153C7 File Offset: 0x002135C7
+		// Token: 0x060075E7 RID: 30183 RVA: 0x002391BF File Offset: 0x002373BF
 		public void SetSourceCode(string sourceCode, ICircuitHolder parent)
 		{
 			parent.ClearError();
 			this.SetSourceCode(sourceCode);
 		}
 
-		// Token: 0x06006F2C RID: 28460 RVA: 0x002153D8 File Offset: 0x002135D8
+		// Token: 0x060075E8 RID: 30184 RVA: 0x002391D0 File Offset: 0x002373D0
 		public void SetSourceCode(string sourceCode)
 		{
 			this._LinesOfCode.Clear();
@@ -384,15 +384,21 @@ namespace Assets.Scripts.Objects.Electrical
 				}
 			}
 			this._NextAddr = 0;
+			Slot parentSlot = base.ParentSlot;
+			if (parentSlot == null)
+			{
+				return;
+			}
+			parentSlot.RefreshQuantity();
 		}
 
-		// Token: 0x06006F2D RID: 28461 RVA: 0x002155BC File Offset: 0x002137BC
+		// Token: 0x060075E9 RID: 30185 RVA: 0x002393C4 File Offset: 0x002375C4
 		public AsciiString GetSourceCode()
 		{
 			return this.SourceCode;
 		}
 
-		// Token: 0x06006F2E RID: 28462 RVA: 0x002155C4 File Offset: 0x002137C4
+		// Token: 0x060075EA RID: 30186 RVA: 0x002393CC File Offset: 0x002375CC
 		public override Thing.DelayedActionInstance AttackWith(Attack attack, bool doAction = true)
 		{
 			Labeller labeller = attack.SourceItem as Labeller;
@@ -421,7 +427,7 @@ namespace Assets.Scripts.Objects.Electrical
 			return delayedActionInstance;
 		}
 
-		// Token: 0x06006F2F RID: 28463 RVA: 0x0021563C File Offset: 0x0021383C
+		// Token: 0x060075EB RID: 30187 RVA: 0x00239444 File Offset: 0x00237644
 		public void Execute(int runCount)
 		{
 			if (this._NextAddr < 0 || this._NextAddr >= this._LinesOfCode.Count || this._LinesOfCode.Count == 0)
@@ -475,7 +481,7 @@ namespace Assets.Scripts.Objects.Electrical
 			}
 		}
 
-		// Token: 0x06006F30 RID: 28464 RVA: 0x00215794 File Offset: 0x00213994
+		// Token: 0x060075EC RID: 30188 RVA: 0x0023959C File Offset: 0x0023779C
 		public override ThingSaveData SerializeSave()
 		{
 			ThingSaveData thingSaveData;
@@ -484,7 +490,7 @@ namespace Assets.Scripts.Objects.Electrical
 			return result;
 		}
 
-		// Token: 0x06006F31 RID: 28465 RVA: 0x002157B0 File Offset: 0x002139B0
+		// Token: 0x060075ED RID: 30189 RVA: 0x002395B8 File Offset: 0x002377B8
 		public override void DeserializeSave(ThingSaveData savedData)
 		{
 			base.DeserializeSave(savedData);
@@ -554,7 +560,7 @@ namespace Assets.Scripts.Objects.Electrical
 			}
 		}
 
-		// Token: 0x06006F32 RID: 28466 RVA: 0x00215A18 File Offset: 0x00213C18
+		// Token: 0x060075EE RID: 30190 RVA: 0x00239820 File Offset: 0x00237A20
 		protected override void InitialiseSaveData(ref ThingSaveData savedData)
 		{
 			base.InitialiseSaveData(ref savedData);
@@ -618,13 +624,13 @@ namespace Assets.Scripts.Objects.Electrical
 			}
 		}
 
-		// Token: 0x06006F33 RID: 28467 RVA: 0x00215D3C File Offset: 0x00213F3C
+		// Token: 0x060075EF RID: 30191 RVA: 0x00239B44 File Offset: 0x00237D44
 		public static string GetIntroString()
 		{
 			return string.Format("These functions are generally typed per line of instruction to your Integrated Circuit (IC). Below are a list of the functions. {0} refers to a device, the ? character replaced with either the screw number, or 'b' for base unit. For example 'd0' or 'db'. {1} refers to a register, the ? refers to the number of the register, such as 'r0'. Additional r in front allows indirect referencing. {2} refers to a logic variable, whether slot or general.", "<color=green>d?</color>", "<color=#0080FFFF>r?</color>", "<color=orange>var</color>");
 		}
 
-		// Token: 0x06006F34 RID: 28468 RVA: 0x00215D58 File Offset: 0x00213F58
+		// Token: 0x060075F0 RID: 30192 RVA: 0x00239B60 File Offset: 0x00237D60
 		private static string MakeString(ScriptCommand command, string color, int paramCount, params ProgrammableChip.HelpString[] strings)
 		{
 			bool flag = paramCount >= 0;
@@ -653,7 +659,7 @@ namespace Assets.Scripts.Objects.Electrical
 			return text;
 		}
 
-		// Token: 0x06006F35 RID: 28469 RVA: 0x00215E04 File Offset: 0x00214004
+		// Token: 0x060075F1 RID: 30193 RVA: 0x00239C0C File Offset: 0x00237E0C
 		public static string SetString(string format, string command)
 		{
 			return string.Format(format, new object[]
@@ -676,13 +682,13 @@ namespace Assets.Scripts.Objects.Electrical
 			});
 		}
 
-		// Token: 0x06006F36 RID: 28470 RVA: 0x00215EA2 File Offset: 0x002140A2
+		// Token: 0x060075F2 RID: 30194 RVA: 0x00239CAA File Offset: 0x00237EAA
 		public static string SetString(string format, ScriptCommand command)
 		{
 			return ProgrammableChip.SetString(format, command.ToString());
 		}
 
-		// Token: 0x06006F37 RID: 28471 RVA: 0x00215EB8 File Offset: 0x002140B8
+		// Token: 0x060075F3 RID: 30195 RVA: 0x00239CC0 File Offset: 0x00237EC0
 		public static string GetCommandExample(ScriptCommand command, string color = "yellow", int spaceCount = -1)
 		{
 			switch (command)
@@ -762,6 +768,7 @@ namespace Assets.Scripts.Objects.Electrical
 			case ScriptCommand.snan:
 			case ScriptCommand.snanz:
 			case ScriptCommand.not:
+			case ScriptCommand.sgn:
 				return ProgrammableChip.MakeString(command, color, spaceCount, new ProgrammableChip.HelpString[]
 				{
 					ProgrammableChip.REGISTER,
@@ -792,6 +799,8 @@ namespace Assets.Scripts.Objects.Electrical
 			case ScriptCommand.sll:
 			case ScriptCommand.sla:
 			case ScriptCommand.pow:
+			case ScriptCommand.rol:
+			case ScriptCommand.ror:
 				return ProgrammableChip.MakeString(command, color, spaceCount, new ProgrammableChip.HelpString[]
 				{
 					ProgrammableChip.REGISTER,
@@ -1068,12 +1077,20 @@ namespace Assets.Scripts.Objects.Electrical
 					(ProgrammableChip.REGISTER + ProgrammableChip.NUMBER).Var("b"),
 					(ProgrammableChip.REGISTER + ProgrammableChip.NUMBER).Var("c")
 				});
+			case ScriptCommand.clamp:
+				return ProgrammableChip.MakeString(command, color, spaceCount, new ProgrammableChip.HelpString[]
+				{
+					ProgrammableChip.REGISTER,
+					(ProgrammableChip.REGISTER + ProgrammableChip.NUMBER).Var("a"),
+					(ProgrammableChip.REGISTER + ProgrammableChip.NUMBER).Var("min"),
+					(ProgrammableChip.REGISTER + ProgrammableChip.NUMBER).Var("max")
+				});
 			default:
 				throw new ArgumentOutOfRangeException(Localization.GetInterface("ScriptCommandCommand", false), command, null);
 			}
 		}
 
-		// Token: 0x06006F38 RID: 28472 RVA: 0x00216D5C File Offset: 0x00214F5C
+		// Token: 0x060075F4 RID: 30196 RVA: 0x0023ABF8 File Offset: 0x00238DF8
 		private UniTaskVoid HaltAndCatchFireFromThread()
 		{
 			ProgrammableChip.<HaltAndCatchFireFromThread>d__125 <HaltAndCatchFireFromThread>d__;
@@ -1084,7 +1101,7 @@ namespace Assets.Scripts.Objects.Electrical
 			return <HaltAndCatchFireFromThread>d__.<>t__builder.Task;
 		}
 
-		// Token: 0x06006F39 RID: 28473 RVA: 0x00216DA0 File Offset: 0x00214FA0
+		// Token: 0x060075F5 RID: 30197 RVA: 0x0023AC3C File Offset: 0x00238E3C
 		private void HaltAndCatchFire()
 		{
 			if (GameManager.IsThread)
@@ -1102,7 +1119,7 @@ namespace Assets.Scripts.Objects.Electrical
 			Achievements.AchieveHaltAndCatchFire();
 		}
 
-		// Token: 0x06006F3A RID: 28474 RVA: 0x00216DE7 File Offset: 0x00214FE7
+		// Token: 0x060075F6 RID: 30198 RVA: 0x0023AC83 File Offset: 0x00238E83
 		public void Reset()
 		{
 			this._NextAddr = 0;
@@ -1111,7 +1128,7 @@ namespace Assets.Scripts.Objects.Electrical
 			this._ErrorLineNumber = 0;
 		}
 
-		// Token: 0x06006F3B RID: 28475 RVA: 0x00216E14 File Offset: 0x00215014
+		// Token: 0x060075F7 RID: 30199 RVA: 0x0023ACB0 File Offset: 0x00238EB0
 		public override PassiveTooltip GetPassiveTooltip(Collider hitCollider)
 		{
 			PassiveTooltip passiveTooltip = base.GetPassiveTooltip(hitCollider);
@@ -1119,15 +1136,16 @@ namespace Assets.Scripts.Objects.Electrical
 			return passiveTooltip;
 		}
 
-		// Token: 0x06006F3C RID: 28476 RVA: 0x00216E3F File Offset: 0x0021503F
+		// Token: 0x060075F8 RID: 30200 RVA: 0x0023ACDB File Offset: 0x00238EDB
 		public override StringBuilder GetExtendedText()
 		{
 			StringBuilder extendedText = base.GetExtendedText();
 			extendedText.AppendLine(GameStrings.ItemInSlotValue.AsString(base.ToTooltip(), this.GetQuantityText()));
+			extendedText.Append(this.GetErrorCode());
 			return extendedText;
 		}
 
-		// Token: 0x06006F3D RID: 28477 RVA: 0x00216E64 File Offset: 0x00215064
+		// Token: 0x060075F9 RID: 30201 RVA: 0x0023AD10 File Offset: 0x00238F10
 		public string GetErrorCode()
 		{
 			if (this.CompilationError)
@@ -1141,7 +1159,7 @@ namespace Assets.Scripts.Objects.Electrical
 			return string.Empty;
 		}
 
-		// Token: 0x06006F3E RID: 28478 RVA: 0x00216EE8 File Offset: 0x002150E8
+		// Token: 0x060075FA RID: 30202 RVA: 0x0023AD94 File Offset: 0x00238F94
 		public void AppendErrorsToActionInstance(Thing.DelayedActionInstance actionInstance)
 		{
 			if (this.CompilationError)
@@ -1155,7 +1173,7 @@ namespace Assets.Scripts.Objects.Electrical
 			}
 		}
 
-		// Token: 0x06006F3F RID: 28479 RVA: 0x00216F44 File Offset: 0x00215144
+		// Token: 0x060075FB RID: 30203 RVA: 0x0023ADF0 File Offset: 0x00238FF0
 		public static double LongToDouble(long l)
 		{
 			bool flag = (l & 9007199254740992L) != 0L;
@@ -1167,7 +1185,7 @@ namespace Assets.Scripts.Objects.Electrical
 			return (double)l;
 		}
 
-		// Token: 0x06006F40 RID: 28480 RVA: 0x00216F74 File Offset: 0x00215174
+		// Token: 0x060075FC RID: 30204 RVA: 0x0023AE20 File Offset: 0x00239020
 		public static long DoubleToLong(double d, bool signed)
 		{
 			long num = (long)(d % 9007199254740992.0);
@@ -1178,9 +1196,9 @@ namespace Assets.Scripts.Objects.Electrical
 			return num;
 		}
 
-		// Token: 0x1700138B RID: 5003
-		// (get) Token: 0x06006F41 RID: 28481 RVA: 0x00216F9E File Offset: 0x0021519E
-		// (set) Token: 0x06006F42 RID: 28482 RVA: 0x00216FA8 File Offset: 0x002151A8
+		// Token: 0x170015A8 RID: 5544
+		// (get) Token: 0x060075FD RID: 30205 RVA: 0x0023AE4A File Offset: 0x0023904A
+		// (set) Token: 0x060075FE RID: 30206 RVA: 0x0023AE54 File Offset: 0x00239054
 		public double LineNumber
 		{
 			get
@@ -1199,7 +1217,7 @@ namespace Assets.Scripts.Objects.Electrical
 			}
 		}
 
-		// Token: 0x06006F43 RID: 28483 RVA: 0x00216FEC File Offset: 0x002151EC
+		// Token: 0x060075FF RID: 30207 RVA: 0x0023AE98 File Offset: 0x00239098
 		public double ReadMemory(int address)
 		{
 			if (address < 0)
@@ -1213,7 +1231,7 @@ namespace Assets.Scripts.Objects.Electrical
 			return this._Stack[address];
 		}
 
-		// Token: 0x06006F44 RID: 28484 RVA: 0x00217011 File Offset: 0x00215211
+		// Token: 0x06007600 RID: 30208 RVA: 0x0023AEBD File Offset: 0x002390BD
 		public void WriteMemory(int address, double value)
 		{
 			if (address < 0)
@@ -1227,7 +1245,7 @@ namespace Assets.Scripts.Objects.Electrical
 			this._Stack[address] = value;
 		}
 
-		// Token: 0x06006F45 RID: 28485 RVA: 0x00217038 File Offset: 0x00215238
+		// Token: 0x06007601 RID: 30209 RVA: 0x0023AEE4 File Offset: 0x002390E4
 		public void ClearMemory()
 		{
 			for (int i = 0; i < this._Stack.Length; i++)
@@ -1236,19 +1254,19 @@ namespace Assets.Scripts.Objects.Electrical
 			}
 		}
 
-		// Token: 0x06006F46 RID: 28486 RVA: 0x00217069 File Offset: 0x00215269
+		// Token: 0x06007602 RID: 30210 RVA: 0x0023AF15 File Offset: 0x00239115
 		public int GetStackSize()
 		{
 			return this._Stack.Length;
 		}
 
-		// Token: 0x06006F47 RID: 28487 RVA: 0x00217073 File Offset: 0x00215273
+		// Token: 0x06007603 RID: 30211 RVA: 0x0023AF1F File Offset: 0x0023911F
 		public static string StripColorTags(string input)
 		{
 			return Regex.Replace(input, "<color\\s*=\\s*['\"]?(?<color>[^'\">]+)['\"]?\\s*>(?<content>.*?)<\\/color>", "${content}");
 		}
 
-		// Token: 0x06006F48 RID: 28488 RVA: 0x00217088 File Offset: 0x00215288
+		// Token: 0x06007604 RID: 30212 RVA: 0x0023AF34 File Offset: 0x00239134
 		public static string GetCommandDescription(ScriptCommand command)
 		{
 			switch (command)
@@ -1553,196 +1571,204 @@ namespace Assets.Scripts.Objects.Electrical
 				return GameStrings.ScriptDescriptionIns.DisplayString;
 			case ScriptCommand.lerp:
 				return GameStrings.ScriptDescriptionLerp.DisplayString;
+			case ScriptCommand.sgn:
+				return GameStrings.ScriptDescriptionSgn.DisplayString;
+			case ScriptCommand.clamp:
+				return GameStrings.ScriptDescriptionClamp.DisplayString;
+			case ScriptCommand.rol:
+				return GameStrings.ScriptDescriptionRol.DisplayString;
+			case ScriptCommand.ror:
+				return GameStrings.ScriptDescriptionRor.DisplayString;
 			default:
 				throw new ArgumentOutOfRangeException(Localization.GetInterface("ScriptCommandCommand", false), command, null);
 			}
 		}
 
-		// Token: 0x04005568 RID: 21864
+		// Token: 0x04005902 RID: 22786
 		[SerializeField]
 		[ReadOnly]
 		private readonly double[] _Registers = new double[18];
 
-		// Token: 0x04005569 RID: 21865
+		// Token: 0x04005903 RID: 22787
 		private readonly int _StackPointerIndex = 16;
 
-		// Token: 0x0400556A RID: 21866
+		// Token: 0x04005904 RID: 22788
 		private readonly int _ReturnAddressIndex = 17;
 
-		// Token: 0x0400556B RID: 21867
+		// Token: 0x04005905 RID: 22789
 		private readonly double[] _Stack = new double[512];
 
-		// Token: 0x0400556C RID: 21868
+		// Token: 0x04005906 RID: 22790
 		public AsciiString SourceCode = AsciiString.Empty;
 
-		// Token: 0x0400556F RID: 21871
+		// Token: 0x04005909 RID: 22793
 		private readonly Dictionary<string, ProgrammableChip._AliasValue> _Aliases = new Dictionary<string, ProgrammableChip._AliasValue>();
 
-		// Token: 0x04005570 RID: 21872
+		// Token: 0x0400590A RID: 22794
 		private readonly Dictionary<string, int> _JumpTags = new Dictionary<string, int>();
 
-		// Token: 0x04005571 RID: 21873
+		// Token: 0x0400590B RID: 22795
 		private readonly Dictionary<string, double> _Defines = new Dictionary<string, double>();
 
-		// Token: 0x04005572 RID: 21874
+		// Token: 0x0400590C RID: 22796
 		[ByteArraySync]
 		private ushort _ErrorLineNumberSynced;
 
-		// Token: 0x04005574 RID: 21876
+		// Token: 0x0400590E RID: 22798
 		private static EnumCollection<ProgrammableChipException.ICExceptionType, byte> _exceptionTypes = new EnumCollection<ProgrammableChipException.ICExceptionType, byte>(false);
 
-		// Token: 0x04005575 RID: 21877
+		// Token: 0x0400590F RID: 22799
 		[ByteArraySync]
 		private byte _ErrorTypeSynced;
 
-		// Token: 0x04005576 RID: 21878
+		// Token: 0x04005910 RID: 22800
 		private ushort _compileErrorLineNumber;
 
-		// Token: 0x04005577 RID: 21879
+		// Token: 0x04005911 RID: 22801
 		private ProgrammableChipException.ICExceptionType _compileErrorType;
 
-		// Token: 0x04005578 RID: 21880
+		// Token: 0x04005912 RID: 22802
 		private int _NextAddr;
 
-		// Token: 0x04005579 RID: 21881
+		// Token: 0x04005913 RID: 22803
 		private readonly List<ProgrammableChip._LineOfCode> _LinesOfCode = new List<ProgrammableChip._LineOfCode>();
 
-		// Token: 0x0400557A RID: 21882
+		// Token: 0x04005914 RID: 22804
 		private int _executeIndex;
 
-		// Token: 0x0400557B RID: 21883
+		// Token: 0x04005915 RID: 22805
 		public const string _strCommand = "<color=yellow>{0}</color>";
 
-		// Token: 0x0400557C RID: 21884
+		// Token: 0x04005916 RID: 22806
 		public const string _strDevice = "<color=green>d?</color>";
 
-		// Token: 0x0400557D RID: 21885
+		// Token: 0x04005917 RID: 22807
 		public const string _strLogicType = "<color=orange>var</color>";
 
-		// Token: 0x0400557E RID: 21886
+		// Token: 0x04005918 RID: 22808
 		public const string _strNumber = "<color=white>num</color>";
 
-		// Token: 0x0400557F RID: 21887
+		// Token: 0x04005919 RID: 22809
 		public const string _strInteger = "<color=white>int</color>";
 
-		// Token: 0x04005580 RID: 21888
+		// Token: 0x0400591A RID: 22810
 		public const string _strOr = "<color=#585858FF>|</color>";
 
-		// Token: 0x04005581 RID: 21889
+		// Token: 0x0400591B RID: 22811
 		public const string _strRegister = "<color=#0080FFFF>r?</color>";
 
-		// Token: 0x04005582 RID: 21890
+		// Token: 0x0400591C RID: 22812
 		public const string _strString = "<color=white>str</color>";
 
-		// Token: 0x04005583 RID: 21891
+		// Token: 0x0400591D RID: 22813
 		public const string _strAny = "<color=#0080FFFF>r?</color>|<color=white>num</color>";
 
-		// Token: 0x04005584 RID: 21892
+		// Token: 0x0400591E RID: 22814
 		public const string _strRegOrDev = "<color=#0080FFFF>r?</color>|<color=green>d?</color>";
 
-		// Token: 0x04005585 RID: 21893
+		// Token: 0x0400591F RID: 22815
 		public const string _strReagentMode = "<color=orange>reagentMode</color>";
 
-		// Token: 0x04005586 RID: 21894
+		// Token: 0x04005920 RID: 22816
 		public const string _strReagent = "<color=white>reagent</color>";
 
-		// Token: 0x04005587 RID: 21895
+		// Token: 0x04005921 RID: 22817
 		public const string _strType = "<color=white>type</color>";
 
-		// Token: 0x04005588 RID: 21896
+		// Token: 0x04005922 RID: 22818
 		public const string _strBatchMode = "<color=orange>batchMode</color>";
 
-		// Token: 0x04005589 RID: 21897
+		// Token: 0x04005923 RID: 22819
 		public const string _strValues = "<color=lightblue>...</color>";
 
-		// Token: 0x0400558A RID: 21898
+		// Token: 0x04005924 RID: 22820
 		private const string FORMAT_VARIABLE = "<color=orange>{0}</color>";
 
-		// Token: 0x0400558B RID: 21899
+		// Token: 0x04005925 RID: 22821
 		private const string FORMAT_NUMBER = "<color=lightblue>{0}</color>";
 
-		// Token: 0x0400558C RID: 21900
+		// Token: 0x04005926 RID: 22822
 		private const string FORMAT_TEXT = "<color=white>{0}</color>";
 
-		// Token: 0x0400558D RID: 21901
+		// Token: 0x04005927 RID: 22823
 		private static readonly ProgrammableChip.HelpString STRING = new ProgrammableChip.HelpString("str", "white");
 
-		// Token: 0x0400558E RID: 21902
+		// Token: 0x04005928 RID: 22824
 		private static readonly ProgrammableChip.HelpString DEVICE_INDEX = new ProgrammableChip.HelpString("d?", "green");
 
-		// Token: 0x0400558F RID: 21903
+		// Token: 0x04005929 RID: 22825
 		private static readonly ProgrammableChip.HelpString REGISTER = new ProgrammableChip.HelpString("r?", "#0080FFFF");
 
-		// Token: 0x04005590 RID: 21904
+		// Token: 0x0400592A RID: 22826
 		private static readonly ProgrammableChip.HelpString INTEGER = new ProgrammableChip.HelpString("int", "#20B2AA");
 
-		// Token: 0x04005591 RID: 21905
+		// Token: 0x0400592B RID: 22827
 		private static readonly ProgrammableChip.HelpString NUMBER = new ProgrammableChip.HelpString("num", "#20B2AA");
 
-		// Token: 0x04005592 RID: 21906
+		// Token: 0x0400592C RID: 22828
 		private static readonly ProgrammableChip.HelpString REF_ID = new ProgrammableChip.HelpString("id", "#20B2AA");
 
-		// Token: 0x04005593 RID: 21907
+		// Token: 0x0400592D RID: 22829
 		private static readonly ProgrammableChip.HelpString OR = new ProgrammableChip.HelpString("or", "|", "#585858FF");
 
-		// Token: 0x04005594 RID: 21908
+		// Token: 0x0400592E RID: 22830
 		private static readonly ProgrammableChip.HelpString LOGIC_TYPE = new ProgrammableChip.HelpString("logicType", "orange");
 
-		// Token: 0x04005595 RID: 21909
+		// Token: 0x0400592F RID: 22831
 		private static readonly ProgrammableChip.HelpString LOGIC_SLOT_TYPE = new ProgrammableChip.HelpString("logicSlotType", "orange");
 
-		// Token: 0x04005596 RID: 21910
+		// Token: 0x04005930 RID: 22832
 		private static readonly ProgrammableChip.HelpString BATCH_MODE = new ProgrammableChip.HelpString("batchMode", "orange");
 
-		// Token: 0x04005597 RID: 21911
+		// Token: 0x04005931 RID: 22833
 		private static readonly ProgrammableChip.HelpString DEVICE_HASH = new ProgrammableChip.HelpString("deviceHash", "#20B2AA");
 
-		// Token: 0x04005598 RID: 21912
+		// Token: 0x04005932 RID: 22834
 		private static readonly ProgrammableChip.HelpString NAME_HASH = new ProgrammableChip.HelpString("nameHash", "#20B2AA");
 
-		// Token: 0x04005599 RID: 21913
+		// Token: 0x04005933 RID: 22835
 		private static readonly ProgrammableChip.HelpString SLOT_INDEX = new ProgrammableChip.HelpString("slotIndex", "#20B2AA");
 
-		// Token: 0x0400559A RID: 21914
+		// Token: 0x04005934 RID: 22836
 		private static readonly ProgrammableChip.HelpString REAGENT_MODE = new ProgrammableChip.HelpString("reagentMode", "orange");
 
-		// Token: 0x0400559B RID: 21915
+		// Token: 0x04005935 RID: 22837
 		public const char REGISTER_CHAR = 'r';
 
-		// Token: 0x0400559C RID: 21916
+		// Token: 0x04005936 RID: 22838
 		public const char DEVICE_CHAR = 'd';
 
-		// Token: 0x0400559D RID: 21917
+		// Token: 0x04005937 RID: 22839
 		public const string BASE_UNIT_STRING = "db";
 
-		// Token: 0x0400559E RID: 21918
+		// Token: 0x04005938 RID: 22840
 		public const int BASE_UNIT_INDEX = 2147483647;
 
-		// Token: 0x0400559F RID: 21919
+		// Token: 0x04005939 RID: 22841
 		public const int BASE_NETWORK_INDEX = -2147483648;
 
-		// Token: 0x040055A0 RID: 21920
+		// Token: 0x0400593A RID: 22842
 		public const int FIRST_AVAILABLE_NETWORK = 2147483647;
 
-		// Token: 0x040055A1 RID: 21921
+		// Token: 0x0400593B RID: 22843
 		public const string RETURN_ADDRESS_STRING = "ra";
 
-		// Token: 0x040055A2 RID: 21922
+		// Token: 0x0400593C RID: 22844
 		public const string STACK_POINTER_STRING = "sp";
 
-		// Token: 0x040055A3 RID: 21923
+		// Token: 0x0400593D RID: 22845
 		public const char HEX_CHAR = '$';
 
-		// Token: 0x040055A4 RID: 21924
+		// Token: 0x0400593E RID: 22846
 		public const char BINARY_CHAR = '%';
 
-		// Token: 0x040055A5 RID: 21925
+		// Token: 0x0400593F RID: 22847
 		public const char COMMENT_CHAR = '#';
 
-		// Token: 0x040055A6 RID: 21926
+		// Token: 0x04005940 RID: 22848
 		public const char NETWORK_CHAR = ':';
 
-		// Token: 0x040055A7 RID: 21927
+		// Token: 0x04005941 RID: 22849
 		public static ProgrammableChip.Constant[] AllConstants = new ProgrammableChip.Constant[]
 		{
 			new ProgrammableChip.Constant("nan", "A constant representing 'not a number'. This constant technically provides a 'quiet' NaN, a signal NaN from some instructions will result in an exception and halt execution", double.NaN, false),
@@ -1756,7 +1782,13 @@ namespace Assets.Scripts.Objects.Electrical
 			new ProgrammableChip.Constant("rgas", "Universal gas constant (J/(mol*K))", 8.31446261815324, true)
 		};
 
-		// Token: 0x040055A8 RID: 21928
+		// Token: 0x04005942 RID: 22850
+		private const int _RotateWidth = 54;
+
+		// Token: 0x04005943 RID: 22851
+		private const long _RotateMask = 18014398509481983L;
+
+		// Token: 0x04005944 RID: 22852
 		public static List<IScriptEnum> InternalEnums = new List<IScriptEnum>
 		{
 			new ProgrammableChip.ScriptEnum<LogicType>(InstructionInclude.LogicType, new Func<LogicType, bool>(LogicBase.IsDeprecated), new Func<LogicType, string>(LogicBase.GetLogicDescription)),
@@ -1775,6 +1807,7 @@ namespace Assets.Scripts.Objects.Electrical
 			new ProgrammableChip.BasicEnum<ConditionOperation>("", null),
 			new ProgrammableChip.BasicEnum<AirConditioningMode>("AirCon", null),
 			new ProgrammableChip.BasicEnum<VentDirection>("Vent", null),
+			new ProgrammableChip.BasicEnum<FiltrationMode>("FiltrationMode", null),
 			new ProgrammableChip.BasicEnum<PowerMode>("PowerMode", null),
 			new ProgrammableChip.BasicEnum<RobotMode>("RobotMode", null),
 			new ProgrammableChip.BasicEnum<SortingClass>("SortingClass", null),
@@ -1788,53 +1821,52 @@ namespace Assets.Scripts.Objects.Electrical
 			new ProgrammableChip.BasicEnum<ShuttleType>("ShuttleType", null),
 			new ProgrammableChip.BasicEnum<HashType>("HashType", null),
 			new ProgrammableChip.BasicEnum<LogicDisplay.DisplayMode>("DisplayMode", null),
-			new ProgrammableChip.BasicEnum<TraderContact.ContactTier>("ContactTier", null),
 			new ProgrammableChip.BasicEnum<SettingDisplayMode>("SettingDisplayMode", null)
 		};
 
-		// Token: 0x020011D0 RID: 4560
+		// Token: 0x02001276 RID: 4726
 		[Flags]
 		private enum _AliasTarget
 		{
-			// Token: 0x0400724A RID: 29258
+			// Token: 0x0400770A RID: 30474
 			None = 0,
-			// Token: 0x0400724B RID: 29259
+			// Token: 0x0400770B RID: 30475
 			Register = 1,
-			// Token: 0x0400724C RID: 29260
+			// Token: 0x0400770C RID: 30476
 			Device = 2,
-			// Token: 0x0400724D RID: 29261
+			// Token: 0x0400770D RID: 30477
 			Network = 4,
-			// Token: 0x0400724E RID: 29262
+			// Token: 0x0400770E RID: 30478
 			All = 268435455
 		}
 
-		// Token: 0x020011D1 RID: 4561
+		// Token: 0x02001277 RID: 4727
 		private struct _AliasValue
 		{
-			// Token: 0x06008486 RID: 33926 RVA: 0x002922B2 File Offset: 0x002904B2
+			// Token: 0x06008B8F RID: 35727 RVA: 0x002C0D1E File Offset: 0x002BEF1E
 			public _AliasValue(ProgrammableChip._AliasTarget target, int index)
 			{
 				this.Target = target;
 				this.Index = index;
 			}
 
-			// Token: 0x0400724F RID: 29263
+			// Token: 0x0400770F RID: 30479
 			public readonly ProgrammableChip._AliasTarget Target;
 
-			// Token: 0x04007250 RID: 29264
+			// Token: 0x04007710 RID: 30480
 			public readonly int Index;
 		}
 
-		// Token: 0x020011D2 RID: 4562
+		// Token: 0x02001278 RID: 4728
 		private struct HelpString
 		{
-			// Token: 0x06008487 RID: 33927 RVA: 0x002922C2 File Offset: 0x002904C2
+			// Token: 0x06008B90 RID: 35728 RVA: 0x002C0D2E File Offset: 0x002BEF2E
 			public HelpString(string str)
 			{
 				this._string = str;
 			}
 
-			// Token: 0x06008488 RID: 33928 RVA: 0x002922CB File Offset: 0x002904CB
+			// Token: 0x06008B91 RID: 35729 RVA: 0x002C0D37 File Offset: 0x002BEF37
 			public HelpString(string type, string color)
 			{
 				this._string = string.Concat(new string[]
@@ -1847,7 +1879,7 @@ namespace Assets.Scripts.Objects.Electrical
 				});
 			}
 
-			// Token: 0x06008489 RID: 33929 RVA: 0x002922FE File Offset: 0x002904FE
+			// Token: 0x06008B92 RID: 35730 RVA: 0x002C0D6A File Offset: 0x002BEF6A
 			public HelpString(string type, string output, string color)
 			{
 				this._string = string.Concat(new string[]
@@ -1860,44 +1892,44 @@ namespace Assets.Scripts.Objects.Electrical
 				});
 			}
 
-			// Token: 0x0600848A RID: 33930 RVA: 0x00292331 File Offset: 0x00290531
+			// Token: 0x06008B93 RID: 35731 RVA: 0x002C0D9D File Offset: 0x002BEF9D
 			public HelpString(ProgrammableChip.HelpString parent, string format)
 			{
 				this._string = string.Format(format, parent._string);
 			}
 
-			// Token: 0x0600848B RID: 33931 RVA: 0x00292345 File Offset: 0x00290545
+			// Token: 0x06008B94 RID: 35732 RVA: 0x002C0DB1 File Offset: 0x002BEFB1
 			public new readonly string ToString()
 			{
 				return this._string;
 			}
 
-			// Token: 0x0600848C RID: 33932 RVA: 0x0029234D File Offset: 0x0029054D
+			// Token: 0x06008B95 RID: 35733 RVA: 0x002C0DB9 File Offset: 0x002BEFB9
 			public ProgrammableChip.HelpString Var(string variable)
 			{
 				return new ProgrammableChip.HelpString(variable + "(" + this._string + ")");
 			}
 
-			// Token: 0x0600848D RID: 33933 RVA: 0x0029236A File Offset: 0x0029056A
+			// Token: 0x06008B96 RID: 35734 RVA: 0x002C0DD6 File Offset: 0x002BEFD6
 			public static ProgrammableChip.HelpString operator +(ProgrammableChip.HelpString left, ProgrammableChip.HelpString right)
 			{
 				return new ProgrammableChip.HelpString(left._string + ProgrammableChip.OR.ToString() + right._string);
 			}
 
-			// Token: 0x04007251 RID: 29265
+			// Token: 0x04007711 RID: 30481
 			private readonly string _string;
 		}
 
-		// Token: 0x020011D3 RID: 4563
+		// Token: 0x02001279 RID: 4729
 		public readonly struct Constant : IEquatable<ProgrammableChip.Constant>
 		{
-			// Token: 0x0600848E RID: 33934 RVA: 0x0029238C File Offset: 0x0029058C
+			// Token: 0x06008B97 RID: 35735 RVA: 0x002C0DF8 File Offset: 0x002BEFF8
 			public bool Equals(ProgrammableChip.Constant other)
 			{
 				return this.Hash == other.Hash;
 			}
 
-			// Token: 0x0600848F RID: 33935 RVA: 0x0029239C File Offset: 0x0029059C
+			// Token: 0x06008B98 RID: 35736 RVA: 0x002C0E08 File Offset: 0x002BF008
 			public override bool Equals(object obj)
 			{
 				if (obj is ProgrammableChip.Constant)
@@ -1908,25 +1940,25 @@ namespace Assets.Scripts.Objects.Electrical
 				return false;
 			}
 
-			// Token: 0x06008490 RID: 33936 RVA: 0x002923C1 File Offset: 0x002905C1
+			// Token: 0x06008B99 RID: 35737 RVA: 0x002C0E2D File Offset: 0x002BF02D
 			public override int GetHashCode()
 			{
 				return this.Hash;
 			}
 
-			// Token: 0x06008491 RID: 33937 RVA: 0x002923C9 File Offset: 0x002905C9
+			// Token: 0x06008B9A RID: 35738 RVA: 0x002C0E35 File Offset: 0x002BF035
 			public static bool operator ==(ProgrammableChip.Constant a, string b)
 			{
 				return !string.IsNullOrEmpty(b) && b.Equals(a.Literal, StringComparison.OrdinalIgnoreCase);
 			}
 
-			// Token: 0x06008492 RID: 33938 RVA: 0x002923E2 File Offset: 0x002905E2
+			// Token: 0x06008B9B RID: 35739 RVA: 0x002C0E4E File Offset: 0x002BF04E
 			public static bool operator !=(ProgrammableChip.Constant a, string b)
 			{
 				return string.IsNullOrEmpty(b) || !b.Equals(a.Literal, StringComparison.OrdinalIgnoreCase);
 			}
 
-			// Token: 0x06008493 RID: 33939 RVA: 0x00292400 File Offset: 0x00290600
+			// Token: 0x06008B9C RID: 35740 RVA: 0x002C0E6C File Offset: 0x002BF06C
 			public Constant(string literalString, string description, double value, bool addValueToDescription = true)
 			{
 				this.Literal = literalString;
@@ -1942,13 +1974,13 @@ namespace Assets.Scripts.Objects.Electrical
 				this.Hash = Animator.StringToHash(this.Literal);
 			}
 
-			// Token: 0x06008494 RID: 33940 RVA: 0x00292471 File Offset: 0x00290671
+			// Token: 0x06008B9D RID: 35741 RVA: 0x002C0EDD File Offset: 0x002BF0DD
 			public string GetName()
 			{
 				return "<color=#20B2AA>" + this.Literal + "</color>";
 			}
 
-			// Token: 0x06008495 RID: 33941 RVA: 0x00292488 File Offset: 0x00290688
+			// Token: 0x06008B9E RID: 35742 RVA: 0x002C0EF4 File Offset: 0x002BF0F4
 			public string GetValue()
 			{
 				if (RocketMath.Approximately(this.Value - Math.Floor(this.Value), 0.0, 0.01))
@@ -1958,23 +1990,23 @@ namespace Assets.Scripts.Objects.Electrical
 				return this.Value.ToString("0." + new string('#', 8), CultureInfo.CurrentCulture);
 			}
 
-			// Token: 0x04007252 RID: 29266
+			// Token: 0x04007712 RID: 30482
 			public readonly string Literal;
 
-			// Token: 0x04007253 RID: 29267
+			// Token: 0x04007713 RID: 30483
 			public readonly string Description;
 
-			// Token: 0x04007254 RID: 29268
+			// Token: 0x04007714 RID: 30484
 			public readonly double Value;
 
-			// Token: 0x04007255 RID: 29269
+			// Token: 0x04007715 RID: 30485
 			public readonly int Hash;
 		}
 
-		// Token: 0x020011D4 RID: 4564
+		// Token: 0x0200127A RID: 4730
 		private class _LineOfCode
 		{
-			// Token: 0x06008496 RID: 33942 RVA: 0x00292500 File Offset: 0x00290700
+			// Token: 0x06008B9F RID: 35743 RVA: 0x002C0F6C File Offset: 0x002BF16C
 			public _LineOfCode(ProgrammableChip chip, string lineOfCode, int lineNumber)
 			{
 				string text;
@@ -3103,6 +3135,34 @@ namespace Assets.Scripts.Objects.Electrical
 						}
 						this.Operation = new ProgrammableChip._LERP_Operation(chip, lineNumber, array[1], array[2], array[3], array[4]);
 						break;
+					case ScriptCommand.sgn:
+						if (array.Length != 3)
+						{
+							throw new ProgrammableChipException(ProgrammableChipException.ICExceptionType.IncorrectArgumentCount, lineNumber);
+						}
+						this.Operation = new ProgrammableChip._SGN_Operation(chip, lineNumber, array[1], array[2]);
+						break;
+					case ScriptCommand.clamp:
+						if (array.Length != 5)
+						{
+							throw new ProgrammableChipException(ProgrammableChipException.ICExceptionType.IncorrectArgumentCount, lineNumber);
+						}
+						this.Operation = new ProgrammableChip._CLAMP_Operation(chip, lineNumber, array[1], array[2], array[3], array[4]);
+						break;
+					case ScriptCommand.rol:
+						if (array.Length != 4)
+						{
+							throw new ProgrammableChipException(ProgrammableChipException.ICExceptionType.IncorrectArgumentCount, lineNumber);
+						}
+						this.Operation = new ProgrammableChip._ROL_Operation(chip, lineNumber, array[1], array[2], array[3]);
+						break;
+					case ScriptCommand.ror:
+						if (array.Length != 4)
+						{
+							throw new ProgrammableChipException(ProgrammableChipException.ICExceptionType.IncorrectArgumentCount, lineNumber);
+						}
+						this.Operation = new ProgrammableChip._ROR_Operation(chip, lineNumber, array[1], array[2], array[3]);
+						break;
 					default:
 						throw new ProgrammableChipException(ProgrammableChipException.ICExceptionType.UnrecognisedInstruction, lineNumber);
 					}
@@ -3110,30 +3170,30 @@ namespace Assets.Scripts.Objects.Electrical
 				this.LineOfCode = lineOfCode;
 			}
 
-			// Token: 0x06008497 RID: 33943 RVA: 0x0029414C File Offset: 0x0029234C
+			// Token: 0x06008BA0 RID: 35744 RVA: 0x002C2C6C File Offset: 0x002C0E6C
 			public override string ToString()
 			{
 				return this.LineOfCode;
 			}
 
-			// Token: 0x04007256 RID: 29270
+			// Token: 0x04007716 RID: 30486
 			public readonly ProgrammableChip._Operation Operation;
 
-			// Token: 0x04007257 RID: 29271
+			// Token: 0x04007717 RID: 30487
 			public readonly string LineOfCode;
 		}
 
-		// Token: 0x020011D5 RID: 4565
+		// Token: 0x0200127B RID: 4731
 		private abstract class _Operation
 		{
-			// Token: 0x06008498 RID: 33944 RVA: 0x00294154 File Offset: 0x00292354
+			// Token: 0x06008BA1 RID: 35745 RVA: 0x002C2C74 File Offset: 0x002C0E74
 			public _Operation(ProgrammableChip chip, int lineNumber)
 			{
 				this._Chip = chip;
 				this._LineNumber = lineNumber;
 			}
 
-			// Token: 0x06008499 RID: 33945 RVA: 0x0029416A File Offset: 0x0029236A
+			// Token: 0x06008BA2 RID: 35746 RVA: 0x002C2C8A File Offset: 0x002C0E8A
 			protected LogicType _GetLogicType(string logicTypeCode)
 			{
 				if (!Enum.IsDefined(typeof(LogicType), logicTypeCode))
@@ -3143,7 +3203,7 @@ namespace Assets.Scripts.Objects.Electrical
 				return (LogicType)Enum.Parse(typeof(LogicType), logicTypeCode);
 			}
 
-			// Token: 0x0600849A RID: 33946 RVA: 0x002941A0 File Offset: 0x002923A0
+			// Token: 0x06008BA3 RID: 35747 RVA: 0x002C2CC0 File Offset: 0x002C0EC0
 			protected LogicSlotType _GetLogicSlotType(string logicTypeCode)
 			{
 				if (!Enum.IsDefined(typeof(LogicSlotType), logicTypeCode))
@@ -3153,7 +3213,7 @@ namespace Assets.Scripts.Objects.Electrical
 				return (LogicSlotType)Enum.Parse(typeof(LogicSlotType), logicTypeCode);
 			}
 
-			// Token: 0x0600849B RID: 33947 RVA: 0x002941D6 File Offset: 0x002923D6
+			// Token: 0x06008BA4 RID: 35748 RVA: 0x002C2CF6 File Offset: 0x002C0EF6
 			protected LogicReagentMode _GetLogicReagentMode(string logicReagentModeCode)
 			{
 				if (!Enum.IsDefined(typeof(LogicReagentMode), logicReagentModeCode))
@@ -3163,7 +3223,7 @@ namespace Assets.Scripts.Objects.Electrical
 				return (LogicReagentMode)Enum.Parse(typeof(LogicReagentMode), logicReagentModeCode);
 			}
 
-			// Token: 0x0600849C RID: 33948 RVA: 0x0029420D File Offset: 0x0029240D
+			// Token: 0x06008BA5 RID: 35749 RVA: 0x002C2D2D File Offset: 0x002C0F2D
 			protected void _SetDeviceValue(Device device, LogicType logicType, double value)
 			{
 				if (device == null)
@@ -3173,12 +3233,20 @@ namespace Assets.Scripts.Objects.Electrical
 				device.SetLogicValue(logicType, value);
 			}
 
-			// Token: 0x0600849D RID: 33949
+			// Token: 0x06008BA6 RID: 35750
 			public abstract int Execute(int index);
 
-			// Token: 0x0600849E RID: 33950 RVA: 0x00294230 File Offset: 0x00292430
+			// Token: 0x06008BA7 RID: 35751 RVA: 0x002C2D50 File Offset: 0x002C0F50
 			protected static ProgrammableChip._Operation.IDeviceVariable _MakeDeviceVariable(ProgrammableChip chip, int lineNumber, string deviceCode)
 			{
+				if (Regex.IsMatch(deviceCode, "^r+(?:1[0-5]|[0-9])$"))
+				{
+					return new ProgrammableChip._Operation.DirectDeviceVariable(chip, lineNumber, deviceCode, InstructionInclude.RegisterIndex | InstructionInclude.Alias | InstructionInclude.Value | InstructionInclude.JumpTag | InstructionInclude.DeviceIndex | InstructionInclude.Define | InstructionInclude.Enum, false);
+				}
+				if (chip._Defines.ContainsKey(deviceCode))
+				{
+					return new ProgrammableChip._Operation.DirectDeviceVariable(chip, lineNumber, deviceCode, InstructionInclude.MaskDoubleValue, false);
+				}
 				if (deviceCode.Length > 0 && (deviceCode[0] == '$' || deviceCode[0] == '%' || char.IsDigit(deviceCode[0])))
 				{
 					return new ProgrammableChip._Operation.DirectDeviceVariable(chip, lineNumber, deviceCode, InstructionInclude.RegisterIndex | InstructionInclude.Alias | InstructionInclude.Value | InstructionInclude.JumpTag | InstructionInclude.DeviceIndex | InstructionInclude.Define | InstructionInclude.Enum | InstructionInclude.NetworkIndex, false);
@@ -3203,19 +3271,19 @@ namespace Assets.Scripts.Objects.Electrical
 				return new ProgrammableChip._Operation.DeviceAliasVariable(chip, lineNumber, deviceCode, InstructionInclude.RegisterIndex | InstructionInclude.Alias | InstructionInclude.Value | InstructionInclude.JumpTag | InstructionInclude.DeviceIndex | InstructionInclude.Define | InstructionInclude.Enum | InstructionInclude.NetworkIndex, false);
 			}
 
-			// Token: 0x04007258 RID: 29272
+			// Token: 0x04007718 RID: 30488
 			protected readonly ProgrammableChip _Chip;
 
-			// Token: 0x04007259 RID: 29273
+			// Token: 0x04007719 RID: 30489
 			protected readonly int _LineNumber;
 
-			// Token: 0x0400725A RID: 29274
+			// Token: 0x0400771A RID: 30490
 			protected const string _ZeroString = "0";
 
-			// Token: 0x020012E2 RID: 4834
+			// Token: 0x0200138C RID: 5004
 			public class Variable
 			{
-				// Token: 0x0600868D RID: 34445 RVA: 0x0029D1EC File Offset: 0x0029B3EC
+				// Token: 0x06008D8E RID: 36238 RVA: 0x002CBD80 File Offset: 0x002C9F80
 				protected Variable(ProgrammableChip chip, int lineNumber, string code, InstructionInclude propertiesToUse, bool throwException = true)
 				{
 					this._Chip = chip;
@@ -3235,14 +3303,14 @@ namespace Assets.Scripts.Objects.Electrical
 					}
 				}
 
-				// Token: 0x0600868E RID: 34446 RVA: 0x0029D264 File Offset: 0x0029B464
+				// Token: 0x06008D8F RID: 36239 RVA: 0x002CBDF8 File Offset: 0x002C9FF8
 				private int _GetIndex(string rCode, char firstLetter, bool throwException = true)
 				{
 					int num;
 					return this._GetIndex(rCode, firstLetter, out num, throwException);
 				}
 
-				// Token: 0x0600868F RID: 34447 RVA: 0x0029D27C File Offset: 0x0029B47C
+				// Token: 0x06008D90 RID: 36240 RVA: 0x002CBE10 File Offset: 0x002CA010
 				private int _GetIndex(string rCode, char firstLetter, out int recurseCount, bool throwException = true)
 				{
 					int num = 0;
@@ -3281,13 +3349,13 @@ namespace Assets.Scripts.Objects.Electrical
 					}
 				}
 
-				// Token: 0x06008690 RID: 34448 RVA: 0x0029D2F7 File Offset: 0x0029B4F7
+				// Token: 0x06008D91 RID: 36241 RVA: 0x002CBE8B File Offset: 0x002CA08B
 				protected int _GetRegisterIndex(string rCode, out int recurseCount, bool throwException = true)
 				{
 					return this._GetIndex(rCode, 'r', out recurseCount, throwException);
 				}
 
-				// Token: 0x06008691 RID: 34449 RVA: 0x0029D304 File Offset: 0x0029B504
+				// Token: 0x06008D92 RID: 36242 RVA: 0x002CBE98 File Offset: 0x002CA098
 				protected int _GetDeviceIndex(string dCode, out int recurseCount, bool throwException = true)
 				{
 					if (dCode.StartsWith("db", StringComparison.Ordinal))
@@ -3303,7 +3371,7 @@ namespace Assets.Scripts.Objects.Electrical
 					return this._GetIndex(dCode, 'd', throwException);
 				}
 
-				// Token: 0x06008692 RID: 34450 RVA: 0x0029D35C File Offset: 0x0029B55C
+				// Token: 0x06008D93 RID: 36243 RVA: 0x002CBEF0 File Offset: 0x002CA0F0
 				protected int _GetNetworkIndex(string dCode, bool throwException = true)
 				{
 					if (!dCode.Contains(':'))
@@ -3323,7 +3391,7 @@ namespace Assets.Scripts.Objects.Electrical
 					return int.MinValue;
 				}
 
-				// Token: 0x06008693 RID: 34451 RVA: 0x0029D3A8 File Offset: 0x0029B5A8
+				// Token: 0x06008D94 RID: 36244 RVA: 0x002CBF3C File Offset: 0x002CA13C
 				protected ProgrammableChip._AliasTarget GetAliasType(string alias, bool throwException = true)
 				{
 					ProgrammableChip._AliasValue aliasValue;
@@ -3338,7 +3406,7 @@ namespace Assets.Scripts.Objects.Electrical
 					return ProgrammableChip._AliasTarget.None;
 				}
 
-				// Token: 0x06008694 RID: 34452 RVA: 0x0029D3EF File Offset: 0x0029B5EF
+				// Token: 0x06008D95 RID: 36245 RVA: 0x002CBF83 File Offset: 0x002CA183
 				public bool TryParseAliasAsJumpTagValue(out int value, bool throwException = true)
 				{
 					if (this._Alias == null || !this._Chip._JumpTags.ContainsKey(this._Alias))
@@ -3350,34 +3418,34 @@ namespace Assets.Scripts.Objects.Electrical
 					return true;
 				}
 
-				// Token: 0x04007465 RID: 29797
+				// Token: 0x04007928 RID: 31016
 				protected readonly ProgrammableChip _Chip;
 
-				// Token: 0x04007466 RID: 29798
+				// Token: 0x04007929 RID: 31017
 				protected readonly int _LineNumber;
 
-				// Token: 0x04007467 RID: 29799
+				// Token: 0x0400792A RID: 31018
 				protected readonly InstructionInclude _PropertiesToUse;
 
-				// Token: 0x04007468 RID: 29800
+				// Token: 0x0400792B RID: 31019
 				protected readonly int _RegisterIndex = -1;
 
-				// Token: 0x04007469 RID: 29801
+				// Token: 0x0400792C RID: 31020
 				protected readonly int _RegisterRecurse = -1;
 
-				// Token: 0x0400746A RID: 29802
+				// Token: 0x0400792D RID: 31021
 				protected readonly string _Alias;
 			}
 
-			// Token: 0x020012E3 RID: 4835
+			// Token: 0x0200138D RID: 5005
 			protected class IndexVariable : ProgrammableChip._Operation.IntValuedVariable
 			{
-				// Token: 0x06008695 RID: 34453 RVA: 0x0029D42F File Offset: 0x0029B62F
+				// Token: 0x06008D96 RID: 36246 RVA: 0x002CBFC3 File Offset: 0x002CA1C3
 				public IndexVariable(ProgrammableChip chip, int lineNumber, string code, InstructionInclude propertiesToUse, bool throwException = true) : base(chip, lineNumber, code, propertiesToUse, throwException)
 				{
 				}
 
-				// Token: 0x06008696 RID: 34454 RVA: 0x0029D440 File Offset: 0x0029B640
+				// Token: 0x06008D97 RID: 36247 RVA: 0x002CBFD4 File Offset: 0x002CA1D4
 				protected bool TryParseAliasAsIndex(ProgrammableChip._AliasTarget type, out int index)
 				{
 					if (this._Alias == null || !this._Chip._Aliases.ContainsKey(this._Alias))
@@ -3395,7 +3463,7 @@ namespace Assets.Scripts.Objects.Electrical
 					return true;
 				}
 
-				// Token: 0x06008697 RID: 34455 RVA: 0x0029D4A0 File Offset: 0x0029B6A0
+				// Token: 0x06008D98 RID: 36248 RVA: 0x002CC034 File Offset: 0x002CA234
 				protected bool TryParseRegisterIndexAsIndex(out int index, bool throwException = true)
 				{
 					if (this._RegisterIndex < 0 || this._RegisterRecurse < 0)
@@ -3422,7 +3490,7 @@ namespace Assets.Scripts.Objects.Electrical
 					return true;
 				}
 
-				// Token: 0x06008698 RID: 34456 RVA: 0x0029D520 File Offset: 0x0029B720
+				// Token: 0x06008D99 RID: 36249 RVA: 0x002CC0B4 File Offset: 0x002CA2B4
 				public virtual int GetVariableIndex(ProgrammableChip._AliasTarget type, bool throwError = true)
 				{
 					int num = 0;
@@ -3463,15 +3531,15 @@ namespace Assets.Scripts.Objects.Electrical
 				}
 			}
 
-			// Token: 0x020012E4 RID: 4836
+			// Token: 0x0200138E RID: 5006
 			protected class ValueVariable : ProgrammableChip._Operation.Variable
 			{
-				// Token: 0x06008699 RID: 34457 RVA: 0x0029D605 File Offset: 0x0029B805
+				// Token: 0x06008D9A RID: 36250 RVA: 0x002CC199 File Offset: 0x002CA399
 				public ValueVariable(ProgrammableChip chip, int lineNumber, string code, InstructionInclude propertiesToUse, bool throwException = true) : base(chip, lineNumber, code, propertiesToUse, throwException)
 				{
 				}
 
-				// Token: 0x0600869A RID: 34458 RVA: 0x0029D614 File Offset: 0x0029B814
+				// Token: 0x06008D9B RID: 36251 RVA: 0x002CC1A8 File Offset: 0x002CA3A8
 				protected bool TryParseAliasAsValue(ProgrammableChip._AliasTarget type, out double value, bool throwException = true)
 				{
 					if (this._Alias == null || type != ProgrammableChip._AliasTarget.Register || !this._Chip._Aliases.ContainsKey(this._Alias))
@@ -3498,7 +3566,7 @@ namespace Assets.Scripts.Objects.Electrical
 					return false;
 				}
 
-				// Token: 0x0600869B RID: 34459 RVA: 0x0029D6D0 File Offset: 0x0029B8D0
+				// Token: 0x06008D9C RID: 36252 RVA: 0x002CC264 File Offset: 0x002CA464
 				protected bool TryParseRegisterIndexAsValue(out double value, bool throwException = true)
 				{
 					if (this._RegisterIndex < 0 || this._RegisterRecurse < 0)
@@ -3526,16 +3594,16 @@ namespace Assets.Scripts.Objects.Electrical
 				}
 			}
 
-			// Token: 0x020012E5 RID: 4837
+			// Token: 0x0200138F RID: 5007
 			protected class DoubleValueVariable : ProgrammableChip._Operation.ValueVariable
 			{
-				// Token: 0x0600869C RID: 34460 RVA: 0x0029D76A File Offset: 0x0029B96A
+				// Token: 0x06008D9D RID: 36253 RVA: 0x002CC2FE File Offset: 0x002CA4FE
 				public double Get()
 				{
 					return this._Value;
 				}
 
-				// Token: 0x0600869D RID: 34461 RVA: 0x0029D774 File Offset: 0x0029B974
+				// Token: 0x06008D9E RID: 36254 RVA: 0x002CC308 File Offset: 0x002CA508
 				public DoubleValueVariable(ProgrammableChip chip, int lineNumber, string code, InstructionInclude propertiesToUse, bool throwException = true) : base(chip, lineNumber, code, propertiesToUse, throwException)
 				{
 					bool flag = false;
@@ -3563,7 +3631,7 @@ namespace Assets.Scripts.Objects.Electrical
 					}
 				}
 
-				// Token: 0x0600869E RID: 34462 RVA: 0x0029D860 File Offset: 0x0029BA60
+				// Token: 0x06008D9F RID: 36255 RVA: 0x002CC3F4 File Offset: 0x002CA5F4
 				protected bool TryParseValueAsValue(out double value)
 				{
 					if (!this._qNaN && double.IsNaN(this._Value))
@@ -3575,7 +3643,7 @@ namespace Assets.Scripts.Objects.Electrical
 					return true;
 				}
 
-				// Token: 0x0600869F RID: 34463 RVA: 0x0029D890 File Offset: 0x0029BA90
+				// Token: 0x06008DA0 RID: 36256 RVA: 0x002CC424 File Offset: 0x002CA624
 				public long GetVariableLong(ProgrammableChip._AliasTarget type, bool signed = true, bool errorAtEnd = true)
 				{
 					double variableValue = this.GetVariableValue(type, errorAtEnd);
@@ -3590,7 +3658,7 @@ namespace Assets.Scripts.Objects.Electrical
 					throw new ProgrammableChipException(ProgrammableChipException.ICExceptionType.ShiftOverflow, this._LineNumber);
 				}
 
-				// Token: 0x060086A0 RID: 34464 RVA: 0x0029D8E4 File Offset: 0x0029BAE4
+				// Token: 0x06008DA1 RID: 36257 RVA: 0x002CC478 File Offset: 0x002CA678
 				public int GetVariableInt(ProgrammableChip._AliasTarget type, bool errorAtEnd = true)
 				{
 					double variableValue = this.GetVariableValue(type, errorAtEnd);
@@ -3605,7 +3673,7 @@ namespace Assets.Scripts.Objects.Electrical
 					throw new ProgrammableChipException(ProgrammableChipException.ICExceptionType.ShiftOverflow, this._LineNumber);
 				}
 
-				// Token: 0x060086A1 RID: 34465 RVA: 0x0029D934 File Offset: 0x0029BB34
+				// Token: 0x06008DA2 RID: 36258 RVA: 0x002CC4C8 File Offset: 0x002CA6C8
 				public double GetVariableValue(ProgrammableChip._AliasTarget type, bool errorAtEnd = true)
 				{
 					if ((type & ProgrammableChip._AliasTarget.Register) == ProgrammableChip._AliasTarget.None)
@@ -3644,17 +3712,17 @@ namespace Assets.Scripts.Objects.Electrical
 					return double.NaN;
 				}
 
-				// Token: 0x0400746B RID: 29803
+				// Token: 0x0400792E RID: 31022
 				private readonly double _Value = double.NaN;
 
-				// Token: 0x0400746C RID: 29804
+				// Token: 0x0400792F RID: 31023
 				private readonly bool _qNaN;
 			}
 
-			// Token: 0x020012E6 RID: 4838
+			// Token: 0x02001390 RID: 5008
 			protected class LineNumberVariable : ProgrammableChip._Operation.ValueVariable
 			{
-				// Token: 0x060086A2 RID: 34466 RVA: 0x0029D9F5 File Offset: 0x0029BBF5
+				// Token: 0x06008DA3 RID: 36259 RVA: 0x002CC589 File Offset: 0x002CA789
 				public LineNumberVariable(ProgrammableChip chip, int lineNumber, string code, InstructionInclude propertiesToUse, bool throwException = true) : base(chip, lineNumber, code, propertiesToUse, throwException)
 				{
 					if ((propertiesToUse & InstructionInclude.Value) != InstructionInclude.None)
@@ -3669,7 +3737,7 @@ namespace Assets.Scripts.Objects.Electrical
 					}
 				}
 
-				// Token: 0x060086A3 RID: 34467 RVA: 0x0029DA30 File Offset: 0x0029BC30
+				// Token: 0x06008DA4 RID: 36260 RVA: 0x002CC5C4 File Offset: 0x002CA7C4
 				public int GetVariableValue(ProgrammableChip._AliasTarget type, bool throwException = true)
 				{
 					double num;
@@ -3707,27 +3775,27 @@ namespace Assets.Scripts.Objects.Electrical
 					return -1;
 				}
 
-				// Token: 0x0400746D RID: 29805
+				// Token: 0x04007930 RID: 31024
 				private readonly bool _IsValueSet;
 
-				// Token: 0x0400746E RID: 29806
+				// Token: 0x04007931 RID: 31025
 				private readonly int _Value;
 			}
 
-			// Token: 0x020012E7 RID: 4839
+			// Token: 0x02001391 RID: 5009
 			protected interface IDeviceVariable
 			{
-				// Token: 0x060086A4 RID: 34468
+				// Token: 0x06008DA5 RID: 36261
 				int GetNetworkIndex();
 
-				// Token: 0x060086A5 RID: 34469
+				// Token: 0x06008DA6 RID: 36262
 				ILogicable GetDevice(ICircuitHolder chipCircuitHousing);
 			}
 
-			// Token: 0x020012E8 RID: 4840
+			// Token: 0x02001392 RID: 5010
 			protected class DirectDeviceVariable : ProgrammableChip._Operation.IntValuedVariable, ProgrammableChip._Operation.IDeviceVariable
 			{
-				// Token: 0x060086A6 RID: 34470 RVA: 0x0029DAF8 File Offset: 0x0029BCF8
+				// Token: 0x06008DA7 RID: 36263 RVA: 0x002CC68C File Offset: 0x002CA88C
 				public DirectDeviceVariable(ProgrammableChip chip, int lineNumber, string code, InstructionInclude propertiesToUse, bool throwException = true) : base(chip, lineNumber, code, propertiesToUse, throwException)
 				{
 					if ((propertiesToUse & InstructionInclude.NetworkIndex) != InstructionInclude.None)
@@ -3736,27 +3804,27 @@ namespace Assets.Scripts.Objects.Electrical
 					}
 				}
 
-				// Token: 0x060086A7 RID: 34471 RVA: 0x0029DB2B File Offset: 0x0029BD2B
+				// Token: 0x06008DA8 RID: 36264 RVA: 0x002CC6BF File Offset: 0x002CA8BF
 				public int GetNetworkIndex()
 				{
 					return this._DeviceNetwork;
 				}
 
-				// Token: 0x060086A8 RID: 34472 RVA: 0x0029DB34 File Offset: 0x0029BD34
+				// Token: 0x06008DA9 RID: 36265 RVA: 0x002CC6C8 File Offset: 0x002CA8C8
 				public ILogicable GetDevice(ICircuitHolder chipCircuitHousing)
 				{
 					int variableValue = base.GetVariableValue(ProgrammableChip._AliasTarget.Register, true);
 					return chipCircuitHousing.GetLogicableFromId(variableValue, this._DeviceNetwork);
 				}
 
-				// Token: 0x0400746F RID: 29807
+				// Token: 0x04007932 RID: 31026
 				protected readonly int _DeviceNetwork = int.MinValue;
 			}
 
-			// Token: 0x020012E9 RID: 4841
+			// Token: 0x02001393 RID: 5011
 			protected class DeviceAliasVariable : ProgrammableChip._Operation.IndexVariable, ProgrammableChip._Operation.IDeviceVariable
 			{
-				// Token: 0x060086A9 RID: 34473 RVA: 0x0029DB57 File Offset: 0x0029BD57
+				// Token: 0x06008DAA RID: 36266 RVA: 0x002CC6EB File Offset: 0x002CA8EB
 				public DeviceAliasVariable(ProgrammableChip chip, int lineNumber, string code, InstructionInclude propertiesToUse, bool throwException = true) : base(chip, lineNumber, code, propertiesToUse, throwException)
 				{
 					if ((propertiesToUse & InstructionInclude.NetworkIndex) != InstructionInclude.None)
@@ -3765,13 +3833,13 @@ namespace Assets.Scripts.Objects.Electrical
 					}
 				}
 
-				// Token: 0x060086AA RID: 34474 RVA: 0x0029DB8A File Offset: 0x0029BD8A
+				// Token: 0x06008DAB RID: 36267 RVA: 0x002CC71E File Offset: 0x002CA91E
 				public int GetNetworkIndex()
 				{
 					return this._DeviceNetwork;
 				}
 
-				// Token: 0x060086AB RID: 34475 RVA: 0x0029DB94 File Offset: 0x0029BD94
+				// Token: 0x06008DAC RID: 36268 RVA: 0x002CC728 File Offset: 0x002CA928
 				public ILogicable GetDevice(ICircuitHolder chipCircuitHousing)
 				{
 					if (string.IsNullOrEmpty(this._Alias))
@@ -3793,14 +3861,14 @@ namespace Assets.Scripts.Objects.Electrical
 					throw new ProgrammableChipException(ProgrammableChipException.ICExceptionType.AliasNotFound, this._LineNumber);
 				}
 
-				// Token: 0x04007470 RID: 29808
+				// Token: 0x04007933 RID: 31027
 				protected readonly int _DeviceNetwork = int.MinValue;
 			}
 
-			// Token: 0x020012EA RID: 4842
+			// Token: 0x02001394 RID: 5012
 			protected class DeviceIndexVariable : ProgrammableChip._Operation.IndexVariable, ProgrammableChip._Operation.IDeviceVariable
 			{
-				// Token: 0x060086AC RID: 34476 RVA: 0x0029DC18 File Offset: 0x0029BE18
+				// Token: 0x06008DAD RID: 36269 RVA: 0x002CC7AC File Offset: 0x002CA9AC
 				public DeviceIndexVariable(ProgrammableChip chip, int lineNumber, string code, InstructionInclude propertiesToUse, bool throwException = true) : base(chip, lineNumber, code, propertiesToUse, throwException)
 				{
 					if ((propertiesToUse & InstructionInclude.DeviceIndex) != InstructionInclude.None)
@@ -3813,20 +3881,20 @@ namespace Assets.Scripts.Objects.Electrical
 					}
 				}
 
-				// Token: 0x060086AD RID: 34477 RVA: 0x0029DC80 File Offset: 0x0029BE80
+				// Token: 0x06008DAE RID: 36270 RVA: 0x002CC814 File Offset: 0x002CAA14
 				public int GetNetworkIndex()
 				{
 					return this._DeviceNetwork;
 				}
 
-				// Token: 0x060086AE RID: 34478 RVA: 0x0029DC88 File Offset: 0x0029BE88
+				// Token: 0x06008DAF RID: 36271 RVA: 0x002CC81C File Offset: 0x002CAA1C
 				public ILogicable GetDevice(ICircuitHolder chipCircuitHousing)
 				{
 					int variableIndex = this.GetVariableIndex(ProgrammableChip._AliasTarget.Device, false);
 					return chipCircuitHousing.GetLogicableFromIndex(variableIndex, this._DeviceNetwork);
 				}
 
-				// Token: 0x060086AF RID: 34479 RVA: 0x0029DCAC File Offset: 0x0029BEAC
+				// Token: 0x06008DB0 RID: 36272 RVA: 0x002CC840 File Offset: 0x002CAA40
 				public override int GetVariableIndex(ProgrammableChip._AliasTarget type, bool throwError = true)
 				{
 					int result;
@@ -3850,7 +3918,7 @@ namespace Assets.Scripts.Objects.Electrical
 					return 0;
 				}
 
-				// Token: 0x060086B0 RID: 34480 RVA: 0x0029DD10 File Offset: 0x0029BF10
+				// Token: 0x06008DB1 RID: 36273 RVA: 0x002CC8A4 File Offset: 0x002CAAA4
 				protected bool TryParseDeviceIndexAsIndex(out int index, bool throwException = true)
 				{
 					if (this._DeviceIndex < 0 || this._DeviceRecurse < 0)
@@ -3877,20 +3945,20 @@ namespace Assets.Scripts.Objects.Electrical
 					return true;
 				}
 
-				// Token: 0x04007471 RID: 29809
+				// Token: 0x04007934 RID: 31028
 				protected readonly int _DeviceIndex = -1;
 
-				// Token: 0x04007472 RID: 29810
+				// Token: 0x04007935 RID: 31029
 				protected readonly int _DeviceRecurse = -1;
 
-				// Token: 0x04007473 RID: 29811
+				// Token: 0x04007936 RID: 31030
 				protected readonly int _DeviceNetwork = int.MinValue;
 			}
 
-			// Token: 0x020012EB RID: 4843
+			// Token: 0x02001395 RID: 5013
 			protected class IntValuedVariable : ProgrammableChip._Operation.ValueVariable
 			{
-				// Token: 0x060086B1 RID: 34481 RVA: 0x0029DD90 File Offset: 0x0029BF90
+				// Token: 0x06008DB2 RID: 36274 RVA: 0x002CC924 File Offset: 0x002CAB24
 				public IntValuedVariable(ProgrammableChip chip, int lineNumber, string code, InstructionInclude propertiesToUse, bool throwException = true) : base(chip, lineNumber, code, propertiesToUse, throwException)
 				{
 					this._IsValueSet = false;
@@ -3920,7 +3988,7 @@ namespace Assets.Scripts.Objects.Electrical
 					}
 				}
 
-				// Token: 0x060086B2 RID: 34482 RVA: 0x0029DE84 File Offset: 0x0029C084
+				// Token: 0x06008DB3 RID: 36275 RVA: 0x002CCA18 File Offset: 0x002CAC18
 				public int GetVariableValue(ProgrammableChip._AliasTarget type, bool throwException = true)
 				{
 					double num;
@@ -3954,17 +4022,17 @@ namespace Assets.Scripts.Objects.Electrical
 					return 0;
 				}
 
-				// Token: 0x04007474 RID: 29812
+				// Token: 0x04007937 RID: 31031
 				private readonly bool _IsValueSet;
 
-				// Token: 0x04007475 RID: 29813
+				// Token: 0x04007938 RID: 31032
 				private readonly int _Value = -1;
 			}
 
-			// Token: 0x020012EC RID: 4844
+			// Token: 0x02001396 RID: 5014
 			protected class EnumValuedVariable<T> : ProgrammableChip._Operation.ValueVariable where T : Enum, IConvertible, new()
 			{
-				// Token: 0x060086B3 RID: 34483 RVA: 0x0029DF30 File Offset: 0x0029C130
+				// Token: 0x06008DB4 RID: 36276 RVA: 0x002CCAC4 File Offset: 0x002CACC4
 				public EnumValuedVariable(ProgrammableChip chip, int lineNumber, string code, InstructionInclude propertiesToUse, bool throwException = true) : base(chip, lineNumber, code, propertiesToUse, throwException)
 				{
 					this._IsValueSet = false;
@@ -3997,7 +4065,7 @@ namespace Assets.Scripts.Objects.Electrical
 					}
 				}
 
-				// Token: 0x060086B4 RID: 34484 RVA: 0x0029DFFC File Offset: 0x0029C1FC
+				// Token: 0x06008DB5 RID: 36277 RVA: 0x002CCB90 File Offset: 0x002CAD90
 				private T GetTypeOf(string logicTypeCode)
 				{
 					if (!Enum.IsDefined(typeof(T), logicTypeCode))
@@ -4007,7 +4075,7 @@ namespace Assets.Scripts.Objects.Electrical
 					return (T)((object)Enum.Parse(typeof(T), logicTypeCode));
 				}
 
-				// Token: 0x060086B5 RID: 34485 RVA: 0x0029E034 File Offset: 0x0029C234
+				// Token: 0x06008DB6 RID: 36278 RVA: 0x002CCBC8 File Offset: 0x002CADC8
 				public T GetVariableValue(ProgrammableChip._AliasTarget type, bool throwException = true)
 				{
 					double num;
@@ -4045,142 +4113,142 @@ namespace Assets.Scripts.Objects.Electrical
 					return default(T);
 				}
 
-				// Token: 0x04007476 RID: 29814
+				// Token: 0x04007939 RID: 31033
 				private readonly bool _IsValueSet;
 
-				// Token: 0x04007477 RID: 29815
+				// Token: 0x0400793A RID: 31034
 				private readonly int _Value = -1;
 			}
 		}
 
-		// Token: 0x020011D6 RID: 4566
+		// Token: 0x0200127C RID: 4732
 		private abstract class _Operation_I : ProgrammableChip._Operation_1_0
 		{
-			// Token: 0x0600849F RID: 33951 RVA: 0x0029430E File Offset: 0x0029250E
+			// Token: 0x06008BA8 RID: 35752 RVA: 0x002C2E61 File Offset: 0x002C1061
 			public _Operation_I(ProgrammableChip chip, int lineNumber, string registerStoreCode, string referenceId) : base(chip, lineNumber, registerStoreCode)
 			{
 				this._DeviceId = new ProgrammableChip._Operation.IntValuedVariable(chip, lineNumber, referenceId, InstructionInclude.MaskDoubleValue, false);
 			}
 
-			// Token: 0x0400725B RID: 29275
+			// Token: 0x0400771B RID: 30491
 			protected readonly ProgrammableChip._Operation.IntValuedVariable _DeviceId;
 		}
 
-		// Token: 0x020011D7 RID: 4567
+		// Token: 0x0200127D RID: 4733
 		private abstract class _Operation_1_0 : ProgrammableChip._Operation
 		{
-			// Token: 0x060084A0 RID: 33952 RVA: 0x0029432B File Offset: 0x0029252B
+			// Token: 0x06008BA9 RID: 35753 RVA: 0x002C2E7E File Offset: 0x002C107E
 			public _Operation_1_0(ProgrammableChip chip, int lineNumber, string registerStoreCode) : base(chip, lineNumber)
 			{
 				this._Store = new ProgrammableChip._Operation.IndexVariable(chip, lineNumber, registerStoreCode, InstructionInclude.MaskStoreIndex, false);
 			}
 
-			// Token: 0x0400725C RID: 29276
+			// Token: 0x0400771C RID: 30492
 			protected ProgrammableChip._Operation.IndexVariable _Store;
 		}
 
-		// Token: 0x020011D8 RID: 4568
+		// Token: 0x0200127E RID: 4734
 		private abstract class _Operation_1_1 : ProgrammableChip._Operation_1_0
 		{
-			// Token: 0x060084A1 RID: 33953 RVA: 0x00294345 File Offset: 0x00292545
+			// Token: 0x06008BAA RID: 35754 RVA: 0x002C2E98 File Offset: 0x002C1098
 			public _Operation_1_1(ProgrammableChip chip, int lineNumber, string registerStoreCode, string argument1Code) : base(chip, lineNumber, registerStoreCode)
 			{
 				this._Argument1 = new ProgrammableChip._Operation.DoubleValueVariable(chip, lineNumber, argument1Code, InstructionInclude.MaskDoubleValue, false);
 			}
 
-			// Token: 0x0400725D RID: 29277
+			// Token: 0x0400771D RID: 30493
 			protected ProgrammableChip._Operation.DoubleValueVariable _Argument1;
 		}
 
-		// Token: 0x020011D9 RID: 4569
+		// Token: 0x0200127F RID: 4735
 		private abstract class _Operation_1_2 : ProgrammableChip._Operation_1_1
 		{
-			// Token: 0x060084A2 RID: 33954 RVA: 0x00294362 File Offset: 0x00292562
+			// Token: 0x06008BAB RID: 35755 RVA: 0x002C2EB5 File Offset: 0x002C10B5
 			public _Operation_1_2(ProgrammableChip chip, int lineNumber, string registerStoreCode, string argument1Code, string argument2Code) : base(chip, lineNumber, registerStoreCode, argument1Code)
 			{
 				this._Argument2 = new ProgrammableChip._Operation.DoubleValueVariable(chip, lineNumber, argument2Code, InstructionInclude.MaskDoubleValue, false);
 			}
 
-			// Token: 0x0400725E RID: 29278
+			// Token: 0x0400771E RID: 30494
 			protected ProgrammableChip._Operation.DoubleValueVariable _Argument2;
 		}
 
-		// Token: 0x020011DA RID: 4570
+		// Token: 0x02001280 RID: 4736
 		private abstract class _Operation_1_3 : ProgrammableChip._Operation_1_2
 		{
-			// Token: 0x060084A3 RID: 33955 RVA: 0x00294381 File Offset: 0x00292581
+			// Token: 0x06008BAC RID: 35756 RVA: 0x002C2ED4 File Offset: 0x002C10D4
 			public _Operation_1_3(ProgrammableChip chip, int lineNumber, string registerStoreCode, string argument1Code, string argument2Code, string argument3Code) : base(chip, lineNumber, registerStoreCode, argument1Code, argument2Code)
 			{
 				this._Argument3 = new ProgrammableChip._Operation.DoubleValueVariable(chip, lineNumber, argument3Code, InstructionInclude.MaskDoubleValue, false);
 			}
 
-			// Token: 0x0400725F RID: 29279
+			// Token: 0x0400771F RID: 30495
 			protected ProgrammableChip._Operation.DoubleValueVariable _Argument3;
 		}
 
-		// Token: 0x020011DB RID: 4571
+		// Token: 0x02001281 RID: 4737
 		private abstract class _Operation_J_0 : ProgrammableChip._Operation
 		{
-			// Token: 0x060084A4 RID: 33956 RVA: 0x002943A2 File Offset: 0x002925A2
+			// Token: 0x06008BAD RID: 35757 RVA: 0x002C2EF5 File Offset: 0x002C10F5
 			public _Operation_J_0(ProgrammableChip chip, int lineNumber, string jumpAddressCode) : base(chip, lineNumber)
 			{
 				this._JumpIndex = new ProgrammableChip._Operation.LineNumberVariable(chip, lineNumber, jumpAddressCode, InstructionInclude.MaskDoubleValue, false);
 			}
 
-			// Token: 0x04007260 RID: 29280
+			// Token: 0x04007720 RID: 30496
 			protected readonly ProgrammableChip._Operation.LineNumberVariable _JumpIndex;
 		}
 
-		// Token: 0x020011DC RID: 4572
+		// Token: 0x02001282 RID: 4738
 		private abstract class _Operation_J_1 : ProgrammableChip._Operation_J_0
 		{
-			// Token: 0x060084A5 RID: 33957 RVA: 0x002943BD File Offset: 0x002925BD
+			// Token: 0x06008BAE RID: 35758 RVA: 0x002C2F10 File Offset: 0x002C1110
 			public _Operation_J_1(ProgrammableChip chip, int lineNumber, string argument1Code, string jumpAddressCode) : base(chip, lineNumber, jumpAddressCode)
 			{
 				this._Argument1 = new ProgrammableChip._Operation.DoubleValueVariable(chip, lineNumber, argument1Code, InstructionInclude.MaskDoubleValue, false);
 			}
 
-			// Token: 0x04007261 RID: 29281
+			// Token: 0x04007721 RID: 30497
 			protected ProgrammableChip._Operation.DoubleValueVariable _Argument1;
 		}
 
-		// Token: 0x020011DD RID: 4573
+		// Token: 0x02001283 RID: 4739
 		private abstract class _Operation_J_2 : ProgrammableChip._Operation_J_1
 		{
-			// Token: 0x060084A6 RID: 33958 RVA: 0x002943DA File Offset: 0x002925DA
+			// Token: 0x06008BAF RID: 35759 RVA: 0x002C2F2D File Offset: 0x002C112D
 			public _Operation_J_2(ProgrammableChip chip, int lineNumber, string argument1Code, string argument2Code, string jumpAddressCode) : base(chip, lineNumber, argument1Code, jumpAddressCode)
 			{
 				this._Argument2 = new ProgrammableChip._Operation.DoubleValueVariable(chip, lineNumber, argument2Code, InstructionInclude.MaskDoubleValue, false);
 			}
 
-			// Token: 0x04007262 RID: 29282
+			// Token: 0x04007722 RID: 30498
 			protected ProgrammableChip._Operation.DoubleValueVariable _Argument2;
 		}
 
-		// Token: 0x020011DE RID: 4574
+		// Token: 0x02001284 RID: 4740
 		private abstract class _Operation_J_3 : ProgrammableChip._Operation_J_2
 		{
-			// Token: 0x060084A7 RID: 33959 RVA: 0x002943F9 File Offset: 0x002925F9
+			// Token: 0x06008BB0 RID: 35760 RVA: 0x002C2F4C File Offset: 0x002C114C
 			public _Operation_J_3(ProgrammableChip chip, int lineNumber, string argument1Code, string argument2Code, string argument3Code, string jumpAddressCode) : base(chip, lineNumber, argument1Code, argument2Code, jumpAddressCode)
 			{
 				this._Argument3 = new ProgrammableChip._Operation.DoubleValueVariable(chip, lineNumber, argument3Code, InstructionInclude.MaskDoubleValue, false);
 			}
 
-			// Token: 0x04007263 RID: 29283
+			// Token: 0x04007723 RID: 30499
 			protected ProgrammableChip._Operation.DoubleValueVariable _Argument3;
 		}
 
-		// Token: 0x020011DF RID: 4575
+		// Token: 0x02001285 RID: 4741
 		private class _L_Operation : ProgrammableChip._Operation_1_0
 		{
-			// Token: 0x060084A8 RID: 33960 RVA: 0x0029441A File Offset: 0x0029261A
+			// Token: 0x06008BB1 RID: 35761 RVA: 0x002C2F6D File Offset: 0x002C116D
 			public _L_Operation(ProgrammableChip chip, int lineNumber, string registerCode, string deviceCode, string logicTypeCode) : base(chip, lineNumber, registerCode)
 			{
 				this._DeviceIndex = ProgrammableChip._Operation._MakeDeviceVariable(chip, lineNumber, deviceCode);
 				this._LogicType = new ProgrammableChip._Operation.EnumValuedVariable<LogicType>(chip, lineNumber, logicTypeCode, InstructionInclude.RegisterIndex | InstructionInclude.Alias | InstructionInclude.Value | InstructionInclude.JumpTag | InstructionInclude.Define | InstructionInclude.Enum | InstructionInclude.LogicType, false);
 			}
 
-			// Token: 0x060084A9 RID: 33961 RVA: 0x0029444C File Offset: 0x0029264C
+			// Token: 0x06008BB2 RID: 35762 RVA: 0x002C2F9C File Offset: 0x002C119C
 			public override int Execute(int index)
 			{
 				int variableIndex = this._Store.GetVariableIndex(ProgrammableChip._AliasTarget.Register, true);
@@ -4202,23 +4270,23 @@ namespace Assets.Scripts.Objects.Electrical
 				return index + 1;
 			}
 
-			// Token: 0x04007264 RID: 29284
+			// Token: 0x04007724 RID: 30500
 			protected readonly ProgrammableChip._Operation.IDeviceVariable _DeviceIndex;
 
-			// Token: 0x04007265 RID: 29285
+			// Token: 0x04007725 RID: 30501
 			protected readonly ProgrammableChip._Operation.EnumValuedVariable<LogicType> _LogicType;
 		}
 
-		// Token: 0x020011E0 RID: 4576
+		// Token: 0x02001286 RID: 4742
 		private class _LD_Operation : ProgrammableChip._Operation_I
 		{
-			// Token: 0x060084AA RID: 33962 RVA: 0x002944DC File Offset: 0x002926DC
+			// Token: 0x06008BB3 RID: 35763 RVA: 0x002C302C File Offset: 0x002C122C
 			public _LD_Operation(ProgrammableChip chip, int lineNumber, string registerCode, string referenceId, string logicTypeCode) : base(chip, lineNumber, registerCode, referenceId)
 			{
 				this._LogicType = new ProgrammableChip._Operation.EnumValuedVariable<LogicType>(chip, lineNumber, logicTypeCode, InstructionInclude.RegisterIndex | InstructionInclude.Alias | InstructionInclude.Value | InstructionInclude.JumpTag | InstructionInclude.Define | InstructionInclude.Enum | InstructionInclude.LogicType, false);
 			}
 
-			// Token: 0x060084AB RID: 33963 RVA: 0x00294500 File Offset: 0x00292700
+			// Token: 0x06008BB4 RID: 35764 RVA: 0x002C3050 File Offset: 0x002C1250
 			public override int Execute(int index)
 			{
 				int variableIndex = this._Store.GetVariableIndex(ProgrammableChip._AliasTarget.Register, true);
@@ -4237,14 +4305,14 @@ namespace Assets.Scripts.Objects.Electrical
 				return index + 1;
 			}
 
-			// Token: 0x04007266 RID: 29286
+			// Token: 0x04007726 RID: 30502
 			protected readonly ProgrammableChip._Operation.EnumValuedVariable<LogicType> _LogicType;
 		}
 
-		// Token: 0x020011E1 RID: 4577
+		// Token: 0x02001287 RID: 4743
 		private class _S_Operation : ProgrammableChip._Operation
 		{
-			// Token: 0x060084AC RID: 33964 RVA: 0x0029458D File Offset: 0x0029278D
+			// Token: 0x06008BB5 RID: 35765 RVA: 0x002C30DD File Offset: 0x002C12DD
 			public _S_Operation(ProgrammableChip chip, int lineNumber, string deviceCode, string logicTypeCode, string registerOrValueCode) : base(chip, lineNumber)
 			{
 				this._DeviceIndex = ProgrammableChip._Operation._MakeDeviceVariable(chip, lineNumber, deviceCode);
@@ -4252,7 +4320,7 @@ namespace Assets.Scripts.Objects.Electrical
 				this._LogicType = new ProgrammableChip._Operation.EnumValuedVariable<LogicType>(chip, lineNumber, logicTypeCode, InstructionInclude.RegisterIndex | InstructionInclude.Alias | InstructionInclude.Value | InstructionInclude.JumpTag | InstructionInclude.Define | InstructionInclude.Enum | InstructionInclude.LogicType, false);
 			}
 
-			// Token: 0x060084AD RID: 33965 RVA: 0x002945CC File Offset: 0x002927CC
+			// Token: 0x06008BB6 RID: 35766 RVA: 0x002C311C File Offset: 0x002C131C
 			public override int Execute(int index)
 			{
 				double variableValue = this._Argument1.GetVariableValue(ProgrammableChip._AliasTarget.Register, true);
@@ -4278,20 +4346,20 @@ namespace Assets.Scripts.Objects.Electrical
 				return index + 1;
 			}
 
-			// Token: 0x04007267 RID: 29287
+			// Token: 0x04007727 RID: 30503
 			protected readonly ProgrammableChip._Operation.IDeviceVariable _DeviceIndex;
 
-			// Token: 0x04007268 RID: 29288
+			// Token: 0x04007728 RID: 30504
 			protected readonly ProgrammableChip._Operation.DoubleValueVariable _Argument1;
 
-			// Token: 0x04007269 RID: 29289
+			// Token: 0x04007729 RID: 30505
 			protected readonly ProgrammableChip._Operation.EnumValuedVariable<LogicType> _LogicType;
 		}
 
-		// Token: 0x020011E2 RID: 4578
+		// Token: 0x02001288 RID: 4744
 		private class _SD_Operation : ProgrammableChip._Operation
 		{
-			// Token: 0x060084AE RID: 33966 RVA: 0x0029465C File Offset: 0x0029285C
+			// Token: 0x06008BB7 RID: 35767 RVA: 0x002C31AC File Offset: 0x002C13AC
 			public _SD_Operation(ProgrammableChip chip, int lineNumber, string deviceCode, string logicTypeCode, string registerOrValueCode) : base(chip, lineNumber)
 			{
 				this._DeviceId = new ProgrammableChip._Operation.IntValuedVariable(chip, lineNumber, deviceCode, InstructionInclude.MaskDoubleValue, false);
@@ -4299,7 +4367,7 @@ namespace Assets.Scripts.Objects.Electrical
 				this._LogicType = new ProgrammableChip._Operation.EnumValuedVariable<LogicType>(chip, lineNumber, logicTypeCode, InstructionInclude.RegisterIndex | InstructionInclude.Alias | InstructionInclude.Value | InstructionInclude.JumpTag | InstructionInclude.Define | InstructionInclude.Enum | InstructionInclude.LogicType, false);
 			}
 
-			// Token: 0x060084AF RID: 33967 RVA: 0x002946AC File Offset: 0x002928AC
+			// Token: 0x06008BB8 RID: 35768 RVA: 0x002C31FC File Offset: 0x002C13FC
 			public override int Execute(int index)
 			{
 				int variableValue = this._DeviceId.GetVariableValue(ProgrammableChip._AliasTarget.Register, true);
@@ -4322,20 +4390,20 @@ namespace Assets.Scripts.Objects.Electrical
 				return index + 1;
 			}
 
-			// Token: 0x0400726A RID: 29290
+			// Token: 0x0400772A RID: 30506
 			protected readonly ProgrammableChip._Operation.IntValuedVariable _DeviceId;
 
-			// Token: 0x0400726B RID: 29291
+			// Token: 0x0400772B RID: 30507
 			protected readonly ProgrammableChip._Operation.DoubleValueVariable _Argument1;
 
-			// Token: 0x0400726C RID: 29292
+			// Token: 0x0400772C RID: 30508
 			protected readonly ProgrammableChip._Operation.EnumValuedVariable<LogicType> _LogicType;
 		}
 
-		// Token: 0x020011E3 RID: 4579
+		// Token: 0x02001289 RID: 4745
 		private class _SS_Operation : ProgrammableChip._Operation
 		{
-			// Token: 0x060084B0 RID: 33968 RVA: 0x0029473C File Offset: 0x0029293C
+			// Token: 0x06008BB9 RID: 35769 RVA: 0x002C328C File Offset: 0x002C148C
 			public _SS_Operation(ProgrammableChip chip, int lineNumber, string deviceCode, string slotIndex, string logicTypeCode, string registerOrValueCode) : base(chip, lineNumber)
 			{
 				this._DeviceRef = ProgrammableChip._Operation._MakeDeviceVariable(chip, lineNumber, deviceCode);
@@ -4344,7 +4412,7 @@ namespace Assets.Scripts.Objects.Electrical
 				this._LogicType = new ProgrammableChip._Operation.EnumValuedVariable<LogicSlotType>(chip, lineNumber, logicTypeCode, InstructionInclude.RegisterIndex | InstructionInclude.Alias | InstructionInclude.Value | InstructionInclude.JumpTag | InstructionInclude.Define | InstructionInclude.Enum | InstructionInclude.LogicType, false);
 			}
 
-			// Token: 0x060084B1 RID: 33969 RVA: 0x00294798 File Offset: 0x00292998
+			// Token: 0x06008BBA RID: 35770 RVA: 0x002C32E8 File Offset: 0x002C14E8
 			public override int Execute(int index)
 			{
 				double variableValue = this._Argument1.GetVariableValue(ProgrammableChip._AliasTarget.Register, true);
@@ -4371,23 +4439,23 @@ namespace Assets.Scripts.Objects.Electrical
 				return index + 1;
 			}
 
-			// Token: 0x0400726D RID: 29293
+			// Token: 0x0400772D RID: 30509
 			protected readonly ProgrammableChip._Operation.IDeviceVariable _DeviceRef;
 
-			// Token: 0x0400726E RID: 29294
+			// Token: 0x0400772E RID: 30510
 			protected readonly ProgrammableChip._Operation.DoubleValueVariable _Argument1;
 
-			// Token: 0x0400726F RID: 29295
+			// Token: 0x0400772F RID: 30511
 			protected readonly ProgrammableChip._Operation.EnumValuedVariable<LogicSlotType> _LogicType;
 
-			// Token: 0x04007270 RID: 29296
+			// Token: 0x04007730 RID: 30512
 			protected readonly ProgrammableChip._Operation.IntValuedVariable _SlotIndex;
 		}
 
-		// Token: 0x020011E4 RID: 4580
+		// Token: 0x0200128A RID: 4746
 		private class _SBS_Operation : ProgrammableChip._Operation
 		{
-			// Token: 0x060084B2 RID: 33970 RVA: 0x0029483C File Offset: 0x00292A3C
+			// Token: 0x06008BBB RID: 35771 RVA: 0x002C338C File Offset: 0x002C158C
 			public _SBS_Operation(ProgrammableChip chip, int lineNumber, string deviceHash, string slotIndex, string logicTypeCode, string registerOrValueCode) : base(chip, lineNumber)
 			{
 				this._DeviceHash = new ProgrammableChip._Operation.IntValuedVariable(chip, lineNumber, deviceHash, InstructionInclude.MaskDoubleValue, false);
@@ -4396,7 +4464,7 @@ namespace Assets.Scripts.Objects.Electrical
 				this._LogicType = new ProgrammableChip._Operation.EnumValuedVariable<LogicSlotType>(chip, lineNumber, logicTypeCode, InstructionInclude.RegisterIndex | InstructionInclude.Alias | InstructionInclude.Value | InstructionInclude.JumpTag | InstructionInclude.Define | InstructionInclude.Enum | InstructionInclude.LogicType, false);
 			}
 
-			// Token: 0x060084B3 RID: 33971 RVA: 0x0029489C File Offset: 0x00292A9C
+			// Token: 0x06008BBC RID: 35772 RVA: 0x002C33EC File Offset: 0x002C15EC
 			public override int Execute(int index)
 			{
 				int variableValue = this._DeviceHash.GetVariableValue(ProgrammableChip._AliasTarget.Register, true);
@@ -4432,23 +4500,23 @@ namespace Assets.Scripts.Objects.Electrical
 				return index + 1;
 			}
 
-			// Token: 0x04007271 RID: 29297
+			// Token: 0x04007731 RID: 30513
 			protected readonly ProgrammableChip._Operation.IntValuedVariable _DeviceHash;
 
-			// Token: 0x04007272 RID: 29298
+			// Token: 0x04007732 RID: 30514
 			protected readonly ProgrammableChip._Operation.DoubleValueVariable _Argument1;
 
-			// Token: 0x04007273 RID: 29299
+			// Token: 0x04007733 RID: 30515
 			protected readonly ProgrammableChip._Operation.EnumValuedVariable<LogicSlotType> _LogicType;
 
-			// Token: 0x04007274 RID: 29300
+			// Token: 0x04007734 RID: 30516
 			protected readonly ProgrammableChip._Operation.IntValuedVariable _SlotIndex;
 		}
 
-		// Token: 0x020011E5 RID: 4581
+		// Token: 0x0200128B RID: 4747
 		private class _LB_Operation : ProgrammableChip._Operation_1_0
 		{
-			// Token: 0x060084B4 RID: 33972 RVA: 0x00294980 File Offset: 0x00292B80
+			// Token: 0x06008BBD RID: 35773 RVA: 0x002C34D0 File Offset: 0x002C16D0
 			public _LB_Operation(ProgrammableChip chip, int lineNumber, string registerCode, string deviceCode, string logicTypeCode, string logicBatchMode) : base(chip, lineNumber, registerCode)
 			{
 				this._DeviceHash = new ProgrammableChip._Operation.IntValuedVariable(chip, lineNumber, deviceCode, InstructionInclude.MaskDoubleValue, false);
@@ -4456,7 +4524,7 @@ namespace Assets.Scripts.Objects.Electrical
 				this._BatchMode = new ProgrammableChip._Operation.EnumValuedVariable<LogicBatchMethod>(chip, lineNumber, logicBatchMode, InstructionInclude.RegisterIndex | InstructionInclude.Alias | InstructionInclude.Value | InstructionInclude.JumpTag | InstructionInclude.Define | InstructionInclude.Enum | InstructionInclude.LogicBatchMethod, false);
 			}
 
-			// Token: 0x060084B5 RID: 33973 RVA: 0x002949D4 File Offset: 0x00292BD4
+			// Token: 0x06008BBE RID: 35774 RVA: 0x002C3524 File Offset: 0x002C1724
 			public override int Execute(int index)
 			{
 				int variableIndex = this._Store.GetVariableIndex(ProgrammableChip._AliasTarget.Register, true);
@@ -4485,20 +4553,20 @@ namespace Assets.Scripts.Objects.Electrical
 				return index + 1;
 			}
 
-			// Token: 0x04007275 RID: 29301
+			// Token: 0x04007735 RID: 30517
 			protected readonly ProgrammableChip._Operation.IntValuedVariable _DeviceHash;
 
-			// Token: 0x04007276 RID: 29302
+			// Token: 0x04007736 RID: 30518
 			protected readonly ProgrammableChip._Operation.EnumValuedVariable<LogicType> _LogicType;
 
-			// Token: 0x04007277 RID: 29303
+			// Token: 0x04007737 RID: 30519
 			protected readonly ProgrammableChip._Operation.EnumValuedVariable<LogicBatchMethod> _BatchMode;
 		}
 
-		// Token: 0x020011E6 RID: 4582
+		// Token: 0x0200128C RID: 4748
 		private class _LBN_Operation : ProgrammableChip._Operation_1_0
 		{
-			// Token: 0x060084B6 RID: 33974 RVA: 0x00294AB0 File Offset: 0x00292CB0
+			// Token: 0x06008BBF RID: 35775 RVA: 0x002C3600 File Offset: 0x002C1800
 			public _LBN_Operation(ProgrammableChip chip, int lineNumber, string registerCode, string deviceCode, string nameCode, string logicTypeCode, string logicBatchMode) : base(chip, lineNumber, registerCode)
 			{
 				this._DeviceHash = new ProgrammableChip._Operation.IntValuedVariable(chip, lineNumber, deviceCode, InstructionInclude.MaskDoubleValue, false);
@@ -4507,7 +4575,7 @@ namespace Assets.Scripts.Objects.Electrical
 				this._BatchMode = new ProgrammableChip._Operation.EnumValuedVariable<LogicBatchMethod>(chip, lineNumber, logicBatchMode, InstructionInclude.RegisterIndex | InstructionInclude.Alias | InstructionInclude.Value | InstructionInclude.JumpTag | InstructionInclude.Define | InstructionInclude.Enum | InstructionInclude.LogicBatchMethod, false);
 			}
 
-			// Token: 0x060084B7 RID: 33975 RVA: 0x00294B14 File Offset: 0x00292D14
+			// Token: 0x06008BC0 RID: 35776 RVA: 0x002C3664 File Offset: 0x002C1864
 			public override int Execute(int index)
 			{
 				int variableIndex = this._Store.GetVariableIndex(ProgrammableChip._AliasTarget.Register, true);
@@ -4533,23 +4601,23 @@ namespace Assets.Scripts.Objects.Electrical
 				return index + 1;
 			}
 
-			// Token: 0x04007278 RID: 29304
+			// Token: 0x04007738 RID: 30520
 			protected readonly ProgrammableChip._Operation.IntValuedVariable _DeviceHash;
 
-			// Token: 0x04007279 RID: 29305
+			// Token: 0x04007739 RID: 30521
 			protected readonly ProgrammableChip._Operation.IntValuedVariable _NameHash;
 
-			// Token: 0x0400727A RID: 29306
+			// Token: 0x0400773A RID: 30522
 			protected readonly ProgrammableChip._Operation.EnumValuedVariable<LogicType> _LogicType;
 
-			// Token: 0x0400727B RID: 29307
+			// Token: 0x0400773B RID: 30523
 			protected readonly ProgrammableChip._Operation.EnumValuedVariable<LogicBatchMethod> _BatchMode;
 		}
 
-		// Token: 0x020011E7 RID: 4583
+		// Token: 0x0200128D RID: 4749
 		private class _SB_Operation : ProgrammableChip._Operation
 		{
-			// Token: 0x060084B8 RID: 33976 RVA: 0x00294BF8 File Offset: 0x00292DF8
+			// Token: 0x06008BC1 RID: 35777 RVA: 0x002C3748 File Offset: 0x002C1948
 			public _SB_Operation(ProgrammableChip chip, int lineNumber, string deviceCode, string logicTypeCode, string registerOrValueCode) : base(chip, lineNumber)
 			{
 				this._DeviceHash = new ProgrammableChip._Operation.IntValuedVariable(chip, lineNumber, deviceCode, InstructionInclude.MaskDoubleValue, false);
@@ -4557,7 +4625,7 @@ namespace Assets.Scripts.Objects.Electrical
 				this._LogicType = new ProgrammableChip._Operation.EnumValuedVariable<LogicType>(chip, lineNumber, logicTypeCode, InstructionInclude.RegisterIndex | InstructionInclude.Alias | InstructionInclude.Value | InstructionInclude.JumpTag | InstructionInclude.Define | InstructionInclude.Enum | InstructionInclude.LogicType, false);
 			}
 
-			// Token: 0x060084B9 RID: 33977 RVA: 0x00294C48 File Offset: 0x00292E48
+			// Token: 0x06008BC2 RID: 35778 RVA: 0x002C3798 File Offset: 0x002C1998
 			public override int Execute(int index)
 			{
 				int variableValue = this._DeviceHash.GetVariableValue(ProgrammableChip._AliasTarget.Register, true);
@@ -4591,20 +4659,20 @@ namespace Assets.Scripts.Objects.Electrical
 				return index + 1;
 			}
 
-			// Token: 0x0400727C RID: 29308
+			// Token: 0x0400773C RID: 30524
 			protected readonly ProgrammableChip._Operation.IntValuedVariable _DeviceHash;
 
-			// Token: 0x0400727D RID: 29309
+			// Token: 0x0400773D RID: 30525
 			protected readonly ProgrammableChip._Operation.DoubleValueVariable _Argument1;
 
-			// Token: 0x0400727E RID: 29310
+			// Token: 0x0400773E RID: 30526
 			protected readonly ProgrammableChip._Operation.EnumValuedVariable<LogicType> _LogicType;
 		}
 
-		// Token: 0x020011E8 RID: 4584
+		// Token: 0x0200128E RID: 4750
 		private class _SBN_Operation : ProgrammableChip._Operation
 		{
-			// Token: 0x060084BA RID: 33978 RVA: 0x00294D10 File Offset: 0x00292F10
+			// Token: 0x06008BC3 RID: 35779 RVA: 0x002C3860 File Offset: 0x002C1A60
 			public _SBN_Operation(ProgrammableChip chip, int lineNumber, string deviceCode, string nameHash, string logicTypeCode, string registerOrValueCode) : base(chip, lineNumber)
 			{
 				this._DeviceHash = new ProgrammableChip._Operation.IntValuedVariable(chip, lineNumber, deviceCode, InstructionInclude.MaskDoubleValue, false);
@@ -4613,7 +4681,7 @@ namespace Assets.Scripts.Objects.Electrical
 				this._LogicType = new ProgrammableChip._Operation.EnumValuedVariable<LogicType>(chip, lineNumber, logicTypeCode, InstructionInclude.RegisterIndex | InstructionInclude.Alias | InstructionInclude.Value | InstructionInclude.JumpTag | InstructionInclude.Define | InstructionInclude.Enum | InstructionInclude.LogicType, false);
 			}
 
-			// Token: 0x060084BB RID: 33979 RVA: 0x00294D70 File Offset: 0x00292F70
+			// Token: 0x06008BC4 RID: 35780 RVA: 0x002C38C0 File Offset: 0x002C1AC0
 			public override int Execute(int index)
 			{
 				int variableValue = this._DeviceHash.GetVariableValue(ProgrammableChip._AliasTarget.Register, true);
@@ -4648,23 +4716,23 @@ namespace Assets.Scripts.Objects.Electrical
 				return index + 1;
 			}
 
-			// Token: 0x0400727F RID: 29311
+			// Token: 0x0400773F RID: 30527
 			protected readonly ProgrammableChip._Operation.IntValuedVariable _DeviceHash;
 
-			// Token: 0x04007280 RID: 29312
+			// Token: 0x04007740 RID: 30528
 			protected readonly ProgrammableChip._Operation.IntValuedVariable _NameHash;
 
-			// Token: 0x04007281 RID: 29313
+			// Token: 0x04007741 RID: 30529
 			protected readonly ProgrammableChip._Operation.DoubleValueVariable _Argument1;
 
-			// Token: 0x04007282 RID: 29314
+			// Token: 0x04007742 RID: 30530
 			protected readonly ProgrammableChip._Operation.EnumValuedVariable<LogicType> _LogicType;
 		}
 
-		// Token: 0x020011E9 RID: 4585
+		// Token: 0x0200128F RID: 4751
 		private class _LS_Operation : ProgrammableChip._Operation_1_0
 		{
-			// Token: 0x060084BC RID: 33980 RVA: 0x00294E54 File Offset: 0x00293054
+			// Token: 0x06008BC5 RID: 35781 RVA: 0x002C39A4 File Offset: 0x002C1BA4
 			public _LS_Operation(ProgrammableChip chip, int lineNumber, string registerCode, string deviceCode, string slotCode, string logicTypeCode) : base(chip, lineNumber, registerCode)
 			{
 				this._DeviceRef = ProgrammableChip._Operation._MakeDeviceVariable(chip, lineNumber, deviceCode);
@@ -4672,7 +4740,7 @@ namespace Assets.Scripts.Objects.Electrical
 				this._LogicType = new ProgrammableChip._Operation.EnumValuedVariable<LogicSlotType>(chip, lineNumber, logicTypeCode, InstructionInclude.RegisterIndex | InstructionInclude.Alias | InstructionInclude.Value | InstructionInclude.JumpTag | InstructionInclude.Define | InstructionInclude.Enum | InstructionInclude.LogicSlotType, false);
 			}
 
-			// Token: 0x060084BD RID: 33981 RVA: 0x00294EA0 File Offset: 0x002930A0
+			// Token: 0x06008BC6 RID: 35782 RVA: 0x002C39F0 File Offset: 0x002C1BF0
 			public override int Execute(int index)
 			{
 				int variableIndex = this._Store.GetVariableIndex(ProgrammableChip._AliasTarget.Register, true);
@@ -4691,20 +4759,20 @@ namespace Assets.Scripts.Objects.Electrical
 				return index + 1;
 			}
 
-			// Token: 0x04007283 RID: 29315
+			// Token: 0x04007743 RID: 30531
 			protected readonly ProgrammableChip._Operation.IDeviceVariable _DeviceRef;
 
-			// Token: 0x04007284 RID: 29316
+			// Token: 0x04007744 RID: 30532
 			protected readonly ProgrammableChip._Operation.IntValuedVariable _SlotIndex;
 
-			// Token: 0x04007285 RID: 29317
+			// Token: 0x04007745 RID: 30533
 			protected readonly ProgrammableChip._Operation.EnumValuedVariable<LogicSlotType> _LogicType;
 		}
 
-		// Token: 0x020011EA RID: 4586
+		// Token: 0x02001290 RID: 4752
 		private class _LBS_Operation : ProgrammableChip._Operation_1_0
 		{
-			// Token: 0x060084BE RID: 33982 RVA: 0x00294F30 File Offset: 0x00293130
+			// Token: 0x06008BC7 RID: 35783 RVA: 0x002C3A80 File Offset: 0x002C1C80
 			public _LBS_Operation(ProgrammableChip chip, int lineNumber, string registerCode, string deviceCode, string slotCode, string logicTypeCode, string logicBatchMode) : base(chip, lineNumber, registerCode)
 			{
 				this._DeviceHash = new ProgrammableChip._Operation.IntValuedVariable(chip, lineNumber, deviceCode, InstructionInclude.MaskDoubleValue, false);
@@ -4713,7 +4781,7 @@ namespace Assets.Scripts.Objects.Electrical
 				this._BatchMode = new ProgrammableChip._Operation.EnumValuedVariable<LogicBatchMethod>(chip, lineNumber, logicBatchMode, InstructionInclude.RegisterIndex | InstructionInclude.Alias | InstructionInclude.Value | InstructionInclude.JumpTag | InstructionInclude.Define | InstructionInclude.Enum | InstructionInclude.LogicBatchMethod, false);
 			}
 
-			// Token: 0x060084BF RID: 33983 RVA: 0x00294F94 File Offset: 0x00293194
+			// Token: 0x06008BC8 RID: 35784 RVA: 0x002C3AE4 File Offset: 0x002C1CE4
 			public override int Execute(int index)
 			{
 				int variableIndex = this._Store.GetVariableIndex(ProgrammableChip._AliasTarget.Register, true);
@@ -4739,23 +4807,23 @@ namespace Assets.Scripts.Objects.Electrical
 				return index + 1;
 			}
 
-			// Token: 0x04007286 RID: 29318
+			// Token: 0x04007746 RID: 30534
 			protected readonly ProgrammableChip._Operation.IntValuedVariable _DeviceHash;
 
-			// Token: 0x04007287 RID: 29319
+			// Token: 0x04007747 RID: 30535
 			protected readonly ProgrammableChip._Operation.IntValuedVariable _SlotIndex;
 
-			// Token: 0x04007288 RID: 29320
+			// Token: 0x04007748 RID: 30536
 			protected readonly ProgrammableChip._Operation.EnumValuedVariable<LogicSlotType> _LogicType;
 
-			// Token: 0x04007289 RID: 29321
+			// Token: 0x04007749 RID: 30537
 			protected readonly ProgrammableChip._Operation.EnumValuedVariable<LogicBatchMethod> _BatchMode;
 		}
 
-		// Token: 0x020011EB RID: 4587
+		// Token: 0x02001291 RID: 4753
 		private class _LBNS_Operation : ProgrammableChip._Operation_1_0
 		{
-			// Token: 0x060084C0 RID: 33984 RVA: 0x00295070 File Offset: 0x00293270
+			// Token: 0x06008BC9 RID: 35785 RVA: 0x002C3BC0 File Offset: 0x002C1DC0
 			public _LBNS_Operation(ProgrammableChip chip, int lineNumber, string registerCode, string deviceCode, string nameCode, string slotCode, string logicTypeCode, string logicBatchMode) : base(chip, lineNumber, registerCode)
 			{
 				this._DeviceHash = new ProgrammableChip._Operation.IntValuedVariable(chip, lineNumber, deviceCode, InstructionInclude.MaskDoubleValue, false);
@@ -4765,7 +4833,7 @@ namespace Assets.Scripts.Objects.Electrical
 				this._BatchMode = new ProgrammableChip._Operation.EnumValuedVariable<LogicBatchMethod>(chip, lineNumber, logicBatchMode, InstructionInclude.RegisterIndex | InstructionInclude.Alias | InstructionInclude.Value | InstructionInclude.JumpTag | InstructionInclude.Define | InstructionInclude.Enum | InstructionInclude.LogicBatchMethod, false);
 			}
 
-			// Token: 0x060084C1 RID: 33985 RVA: 0x002950E8 File Offset: 0x002932E8
+			// Token: 0x06008BCA RID: 35786 RVA: 0x002C3C38 File Offset: 0x002C1E38
 			public override int Execute(int index)
 			{
 				int variableIndex = this._Store.GetVariableIndex(ProgrammableChip._AliasTarget.Register, true);
@@ -4792,26 +4860,26 @@ namespace Assets.Scripts.Objects.Electrical
 				return index + 1;
 			}
 
-			// Token: 0x0400728A RID: 29322
+			// Token: 0x0400774A RID: 30538
 			protected readonly ProgrammableChip._Operation.IntValuedVariable _DeviceHash;
 
-			// Token: 0x0400728B RID: 29323
+			// Token: 0x0400774B RID: 30539
 			protected readonly ProgrammableChip._Operation.IntValuedVariable _NameHash;
 
-			// Token: 0x0400728C RID: 29324
+			// Token: 0x0400774C RID: 30540
 			protected readonly ProgrammableChip._Operation.IntValuedVariable _SlotIndex;
 
-			// Token: 0x0400728D RID: 29325
+			// Token: 0x0400774D RID: 30541
 			protected readonly ProgrammableChip._Operation.EnumValuedVariable<LogicSlotType> _LogicType;
 
-			// Token: 0x0400728E RID: 29326
+			// Token: 0x0400774E RID: 30542
 			protected readonly ProgrammableChip._Operation.EnumValuedVariable<LogicBatchMethod> _BatchMode;
 		}
 
-		// Token: 0x020011EC RID: 4588
+		// Token: 0x02001292 RID: 4754
 		private class _LR_Operation : ProgrammableChip._Operation_1_0
 		{
-			// Token: 0x060084C2 RID: 33986 RVA: 0x002951E0 File Offset: 0x002933E0
+			// Token: 0x06008BCB RID: 35787 RVA: 0x002C3D30 File Offset: 0x002C1F30
 			public _LR_Operation(ProgrammableChip chip, int lineNumber, string registerCode, string deviceCode, string logicReagentModeCode, string reagentCode) : base(chip, lineNumber, registerCode)
 			{
 				this._DeviceRef = ProgrammableChip._Operation._MakeDeviceVariable(chip, lineNumber, deviceCode);
@@ -4819,7 +4887,7 @@ namespace Assets.Scripts.Objects.Electrical
 				this._ReagentInt = new ProgrammableChip._Operation.IntValuedVariable(chip, lineNumber, reagentCode, InstructionInclude.MaskDoubleValue, false);
 			}
 
-			// Token: 0x060084C3 RID: 33987 RVA: 0x0029522C File Offset: 0x0029342C
+			// Token: 0x06008BCC RID: 35788 RVA: 0x002C3D7C File Offset: 0x002C1F7C
 			public override int Execute(int index)
 			{
 				int variableIndex = this._Store.GetVariableIndex(ProgrammableChip._AliasTarget.Register, true);
@@ -4877,29 +4945,29 @@ namespace Assets.Scripts.Objects.Electrical
 				return index + 1;
 			}
 
-			// Token: 0x0400728F RID: 29327
+			// Token: 0x0400774F RID: 30543
 			protected readonly ProgrammableChip._Operation.IDeviceVariable _DeviceRef;
 
-			// Token: 0x04007290 RID: 29328
+			// Token: 0x04007750 RID: 30544
 			protected readonly ProgrammableChip._Operation.EnumValuedVariable<LogicReagentMode> _LogicReagentMode;
 
-			// Token: 0x04007291 RID: 29329
+			// Token: 0x04007751 RID: 30545
 			protected readonly ProgrammableChip._Operation.IntValuedVariable _ReagentInt;
 		}
 
-		// Token: 0x020011ED RID: 4589
+		// Token: 0x02001293 RID: 4755
 		private class _LABEL_Operation : ProgrammableChip._ALIAS_Operation
 		{
-			// Token: 0x060084C4 RID: 33988 RVA: 0x002953BE File Offset: 0x002935BE
+			// Token: 0x06008BCD RID: 35789 RVA: 0x002C3F0E File Offset: 0x002C210E
 			public _LABEL_Operation(ProgrammableChip chip, int lineNumber, string deviceCode, string labelCode) : base(chip, lineNumber, labelCode, deviceCode)
 			{
 			}
 		}
 
-		// Token: 0x020011EE RID: 4590
+		// Token: 0x02001294 RID: 4756
 		private class _ALIAS_Operation : ProgrammableChip._Operation
 		{
-			// Token: 0x060084C5 RID: 33989 RVA: 0x002953CC File Offset: 0x002935CC
+			// Token: 0x06008BCE RID: 35790 RVA: 0x002C3F1C File Offset: 0x002C211C
 			public _ALIAS_Operation(ProgrammableChip chip, int lineNumber, string aliasCode, string targetCode) : base(chip, lineNumber)
 			{
 				this._AliasCode = aliasCode;
@@ -4916,13 +4984,13 @@ namespace Assets.Scripts.Objects.Electrical
 				}
 			}
 
-			// Token: 0x060084C6 RID: 33990 RVA: 0x00295433 File Offset: 0x00293633
+			// Token: 0x06008BCF RID: 35791 RVA: 0x002C3F83 File Offset: 0x002C2183
 			public override int Execute(int index)
 			{
 				return this.Execute(index, true);
 			}
 
-			// Token: 0x060084C7 RID: 33991 RVA: 0x00295440 File Offset: 0x00293640
+			// Token: 0x06008BD0 RID: 35792 RVA: 0x002C3F90 File Offset: 0x002C2190
 			public int Execute(int index, bool updateLabels)
 			{
 				int variableIndex = this._Target.GetVariableIndex(this._TargetType, true);
@@ -4951,20 +5019,20 @@ namespace Assets.Scripts.Objects.Electrical
 				return index + 1;
 			}
 
-			// Token: 0x04007292 RID: 29330
+			// Token: 0x04007752 RID: 30546
 			private readonly string _AliasCode;
 
-			// Token: 0x04007293 RID: 29331
+			// Token: 0x04007753 RID: 30547
 			private readonly ProgrammableChip._AliasTarget _TargetType;
 
-			// Token: 0x04007294 RID: 29332
+			// Token: 0x04007754 RID: 30548
 			private readonly ProgrammableChip._Operation.IndexVariable _Target;
 		}
 
-		// Token: 0x020011EF RID: 4591
+		// Token: 0x02001295 RID: 4757
 		private class _DEFINE_Operation : ProgrammableChip._Operation
 		{
-			// Token: 0x060084C8 RID: 33992 RVA: 0x00295584 File Offset: 0x00293784
+			// Token: 0x06008BD1 RID: 35793 RVA: 0x002C40D4 File Offset: 0x002C22D4
 			public _DEFINE_Operation(ProgrammableChip chip, int lineNumber, string defineCode, string floatCode) : base(chip, lineNumber)
 			{
 				ProgrammableChip._Operation.DoubleValueVariable doubleValueVariable = new ProgrammableChip._Operation.DoubleValueVariable(chip, lineNumber, floatCode, InstructionInclude.MaskDefineValue, true);
@@ -4975,22 +5043,22 @@ namespace Assets.Scripts.Objects.Electrical
 				chip._Defines.Add(defineCode, doubleValueVariable.Get());
 			}
 
-			// Token: 0x060084C9 RID: 33993 RVA: 0x002955CF File Offset: 0x002937CF
+			// Token: 0x06008BD2 RID: 35794 RVA: 0x002C411F File Offset: 0x002C231F
 			public override int Execute(int index)
 			{
 				return index + 1;
 			}
 		}
 
-		// Token: 0x020011F0 RID: 4592
+		// Token: 0x02001296 RID: 4758
 		private class _MOVE_Operation : ProgrammableChip._Operation_1_1
 		{
-			// Token: 0x060084CA RID: 33994 RVA: 0x002955D4 File Offset: 0x002937D4
+			// Token: 0x06008BD3 RID: 35795 RVA: 0x002C4124 File Offset: 0x002C2324
 			public _MOVE_Operation(ProgrammableChip chip, int lineNumber, string registerStoreCode, string registerArgument1Code) : base(chip, lineNumber, registerStoreCode, registerArgument1Code)
 			{
 			}
 
-			// Token: 0x060084CB RID: 33995 RVA: 0x002955E4 File Offset: 0x002937E4
+			// Token: 0x06008BD4 RID: 35796 RVA: 0x002C4134 File Offset: 0x002C2334
 			public override int Execute(int index)
 			{
 				int variableIndex = this._Store.GetVariableIndex(ProgrammableChip._AliasTarget.Register, true);
@@ -5000,15 +5068,15 @@ namespace Assets.Scripts.Objects.Electrical
 			}
 		}
 
-		// Token: 0x020011F1 RID: 4593
+		// Token: 0x02001297 RID: 4759
 		private class _ADD_Operation : ProgrammableChip._Operation_1_2
 		{
-			// Token: 0x060084CC RID: 33996 RVA: 0x0029561E File Offset: 0x0029381E
+			// Token: 0x06008BD5 RID: 35797 RVA: 0x002C416E File Offset: 0x002C236E
 			public _ADD_Operation(ProgrammableChip chip, int lineNumber, string registerStoreCode, string registerArgument1Code, string registerArgument2Code) : base(chip, lineNumber, registerStoreCode, registerArgument1Code, registerArgument2Code)
 			{
 			}
 
-			// Token: 0x060084CD RID: 33997 RVA: 0x00295630 File Offset: 0x00293830
+			// Token: 0x06008BD6 RID: 35798 RVA: 0x002C4180 File Offset: 0x002C2380
 			public override int Execute(int index)
 			{
 				int variableIndex = this._Store.GetVariableIndex(ProgrammableChip._AliasTarget.Register, true);
@@ -5019,15 +5087,15 @@ namespace Assets.Scripts.Objects.Electrical
 			}
 		}
 
-		// Token: 0x020011F2 RID: 4594
+		// Token: 0x02001298 RID: 4760
 		private class _SUB_Operation : ProgrammableChip._Operation_1_2
 		{
-			// Token: 0x060084CE RID: 33998 RVA: 0x0029567A File Offset: 0x0029387A
+			// Token: 0x06008BD7 RID: 35799 RVA: 0x002C41CA File Offset: 0x002C23CA
 			public _SUB_Operation(ProgrammableChip chip, int lineNumber, string registerStoreCode, string registerArgument1Code, string registerArgument2Code) : base(chip, lineNumber, registerStoreCode, registerArgument1Code, registerArgument2Code)
 			{
 			}
 
-			// Token: 0x060084CF RID: 33999 RVA: 0x0029568C File Offset: 0x0029388C
+			// Token: 0x06008BD8 RID: 35800 RVA: 0x002C41DC File Offset: 0x002C23DC
 			public override int Execute(int index)
 			{
 				int variableIndex = this._Store.GetVariableIndex(ProgrammableChip._AliasTarget.Register, true);
@@ -5038,16 +5106,16 @@ namespace Assets.Scripts.Objects.Electrical
 			}
 		}
 
-		// Token: 0x020011F3 RID: 4595
+		// Token: 0x02001299 RID: 4761
 		private class _SDSE_Operation : ProgrammableChip._Operation_1_0
 		{
-			// Token: 0x060084D0 RID: 34000 RVA: 0x002956D6 File Offset: 0x002938D6
+			// Token: 0x06008BD9 RID: 35801 RVA: 0x002C4226 File Offset: 0x002C2426
 			public _SDSE_Operation(ProgrammableChip chip, int lineNumber, string registerCode, string deviceCode) : base(chip, lineNumber, registerCode)
 			{
 				this._DeviceRef = ProgrammableChip._Operation._MakeDeviceVariable(chip, lineNumber, deviceCode);
 			}
 
-			// Token: 0x060084D1 RID: 34001 RVA: 0x002956F0 File Offset: 0x002938F0
+			// Token: 0x06008BDA RID: 35802 RVA: 0x002C4240 File Offset: 0x002C2440
 			public override int Execute(int index)
 			{
 				int variableIndex = this._Store.GetVariableIndex(ProgrammableChip._AliasTarget.Register, true);
@@ -5056,20 +5124,20 @@ namespace Assets.Scripts.Objects.Electrical
 				return index + 1;
 			}
 
-			// Token: 0x04007295 RID: 29333
+			// Token: 0x04007755 RID: 30549
 			protected readonly ProgrammableChip._Operation.IDeviceVariable _DeviceRef;
 		}
 
-		// Token: 0x020011F4 RID: 4596
+		// Token: 0x0200129A RID: 4762
 		private class _SDNS_Operation : ProgrammableChip._Operation_1_0
 		{
-			// Token: 0x060084D2 RID: 34002 RVA: 0x00295742 File Offset: 0x00293942
+			// Token: 0x06008BDB RID: 35803 RVA: 0x002C4292 File Offset: 0x002C2492
 			public _SDNS_Operation(ProgrammableChip chip, int lineNumber, string registerCode, string deviceCode) : base(chip, lineNumber, registerCode)
 			{
 				this._DeviceRef = ProgrammableChip._Operation._MakeDeviceVariable(chip, lineNumber, deviceCode);
 			}
 
-			// Token: 0x060084D3 RID: 34003 RVA: 0x0029575C File Offset: 0x0029395C
+			// Token: 0x06008BDC RID: 35804 RVA: 0x002C42AC File Offset: 0x002C24AC
 			public override int Execute(int index)
 			{
 				int variableIndex = this._Store.GetVariableIndex(ProgrammableChip._AliasTarget.Register, true);
@@ -5078,19 +5146,19 @@ namespace Assets.Scripts.Objects.Electrical
 				return index + 1;
 			}
 
-			// Token: 0x04007296 RID: 29334
+			// Token: 0x04007756 RID: 30550
 			protected readonly ProgrammableChip._Operation.IDeviceVariable _DeviceRef;
 		}
 
-		// Token: 0x020011F5 RID: 4597
+		// Token: 0x0200129B RID: 4763
 		private class _SLT_Operation : ProgrammableChip._Operation_1_2
 		{
-			// Token: 0x060084D4 RID: 34004 RVA: 0x002957AE File Offset: 0x002939AE
+			// Token: 0x06008BDD RID: 35805 RVA: 0x002C42FE File Offset: 0x002C24FE
 			public _SLT_Operation(ProgrammableChip chip, int lineNumber, string registerStoreCode, string registerArgument1Code, string registerArgument2Code) : base(chip, lineNumber, registerStoreCode, registerArgument1Code, registerArgument2Code)
 			{
 			}
 
-			// Token: 0x060084D5 RID: 34005 RVA: 0x002957C0 File Offset: 0x002939C0
+			// Token: 0x06008BDE RID: 35806 RVA: 0x002C4310 File Offset: 0x002C2510
 			public override int Execute(int index)
 			{
 				int variableIndex = this._Store.GetVariableIndex(ProgrammableChip._AliasTarget.Register, true);
@@ -5101,15 +5169,15 @@ namespace Assets.Scripts.Objects.Electrical
 			}
 		}
 
-		// Token: 0x020011F6 RID: 4598
+		// Token: 0x0200129C RID: 4764
 		private class _SGT_Operation : ProgrammableChip._Operation_1_2
 		{
-			// Token: 0x060084D6 RID: 34006 RVA: 0x0029581F File Offset: 0x00293A1F
+			// Token: 0x06008BDF RID: 35807 RVA: 0x002C436F File Offset: 0x002C256F
 			public _SGT_Operation(ProgrammableChip chip, int lineNumber, string registerStoreCode, string registerArgument1Code, string registerArgument2Code) : base(chip, lineNumber, registerStoreCode, registerArgument1Code, registerArgument2Code)
 			{
 			}
 
-			// Token: 0x060084D7 RID: 34007 RVA: 0x00295830 File Offset: 0x00293A30
+			// Token: 0x06008BE0 RID: 35808 RVA: 0x002C4380 File Offset: 0x002C2580
 			public override int Execute(int index)
 			{
 				int variableIndex = this._Store.GetVariableIndex(ProgrammableChip._AliasTarget.Register, true);
@@ -5120,15 +5188,15 @@ namespace Assets.Scripts.Objects.Electrical
 			}
 		}
 
-		// Token: 0x020011F7 RID: 4599
+		// Token: 0x0200129D RID: 4765
 		private class _SLE_Operation : ProgrammableChip._Operation_1_2
 		{
-			// Token: 0x060084D8 RID: 34008 RVA: 0x0029588F File Offset: 0x00293A8F
+			// Token: 0x06008BE1 RID: 35809 RVA: 0x002C43DF File Offset: 0x002C25DF
 			public _SLE_Operation(ProgrammableChip chip, int lineNumber, string registerStoreCode, string registerArgument1Code, string registerArgument2Code) : base(chip, lineNumber, registerStoreCode, registerArgument1Code, registerArgument2Code)
 			{
 			}
 
-			// Token: 0x060084D9 RID: 34009 RVA: 0x002958A0 File Offset: 0x00293AA0
+			// Token: 0x06008BE2 RID: 35810 RVA: 0x002C43F0 File Offset: 0x002C25F0
 			public override int Execute(int index)
 			{
 				int variableIndex = this._Store.GetVariableIndex(ProgrammableChip._AliasTarget.Register, true);
@@ -5139,15 +5207,15 @@ namespace Assets.Scripts.Objects.Electrical
 			}
 		}
 
-		// Token: 0x020011F8 RID: 4600
+		// Token: 0x0200129E RID: 4766
 		private class _SGE_Operation : ProgrammableChip._Operation_1_2
 		{
-			// Token: 0x060084DA RID: 34010 RVA: 0x002958FF File Offset: 0x00293AFF
+			// Token: 0x06008BE3 RID: 35811 RVA: 0x002C444F File Offset: 0x002C264F
 			public _SGE_Operation(ProgrammableChip chip, int lineNumber, string registerStoreCode, string registerArgument1Code, string registerArgument2Code) : base(chip, lineNumber, registerStoreCode, registerArgument1Code, registerArgument2Code)
 			{
 			}
 
-			// Token: 0x060084DB RID: 34011 RVA: 0x00295910 File Offset: 0x00293B10
+			// Token: 0x06008BE4 RID: 35812 RVA: 0x002C4460 File Offset: 0x002C2660
 			public override int Execute(int index)
 			{
 				int variableIndex = this._Store.GetVariableIndex(ProgrammableChip._AliasTarget.Register, true);
@@ -5158,15 +5226,15 @@ namespace Assets.Scripts.Objects.Electrical
 			}
 		}
 
-		// Token: 0x020011F9 RID: 4601
+		// Token: 0x0200129F RID: 4767
 		private class _SEQ_Operation : ProgrammableChip._Operation_1_2
 		{
-			// Token: 0x060084DC RID: 34012 RVA: 0x0029596F File Offset: 0x00293B6F
+			// Token: 0x06008BE5 RID: 35813 RVA: 0x002C44BF File Offset: 0x002C26BF
 			public _SEQ_Operation(ProgrammableChip chip, int lineNumber, string registerStoreCode, string registerArgument1Code, string registerArgument2Code) : base(chip, lineNumber, registerStoreCode, registerArgument1Code, registerArgument2Code)
 			{
 			}
 
-			// Token: 0x060084DD RID: 34013 RVA: 0x00295980 File Offset: 0x00293B80
+			// Token: 0x06008BE6 RID: 35814 RVA: 0x002C44D0 File Offset: 0x002C26D0
 			public override int Execute(int index)
 			{
 				int variableIndex = this._Store.GetVariableIndex(ProgrammableChip._AliasTarget.Register, true);
@@ -5177,15 +5245,15 @@ namespace Assets.Scripts.Objects.Electrical
 			}
 		}
 
-		// Token: 0x020011FA RID: 4602
+		// Token: 0x020012A0 RID: 4768
 		private class _SNE_Operation : ProgrammableChip._Operation_1_2
 		{
-			// Token: 0x060084DE RID: 34014 RVA: 0x002959DF File Offset: 0x00293BDF
+			// Token: 0x06008BE7 RID: 35815 RVA: 0x002C452F File Offset: 0x002C272F
 			public _SNE_Operation(ProgrammableChip chip, int lineNumber, string registerStoreCode, string registerArgument1Code, string registerArgument2Code) : base(chip, lineNumber, registerStoreCode, registerArgument1Code, registerArgument2Code)
 			{
 			}
 
-			// Token: 0x060084DF RID: 34015 RVA: 0x002959F0 File Offset: 0x00293BF0
+			// Token: 0x06008BE8 RID: 35816 RVA: 0x002C4540 File Offset: 0x002C2740
 			public override int Execute(int index)
 			{
 				int variableIndex = this._Store.GetVariableIndex(ProgrammableChip._AliasTarget.Register, true);
@@ -5196,15 +5264,15 @@ namespace Assets.Scripts.Objects.Electrical
 			}
 		}
 
-		// Token: 0x020011FB RID: 4603
+		// Token: 0x020012A1 RID: 4769
 		private class _SAP_Operation : ProgrammableChip._Operation_1_3
 		{
-			// Token: 0x060084E0 RID: 34016 RVA: 0x00295A4F File Offset: 0x00293C4F
+			// Token: 0x06008BE9 RID: 35817 RVA: 0x002C459F File Offset: 0x002C279F
 			public _SAP_Operation(ProgrammableChip chip, int lineNumber, string registerStoreCode, string registerArgument1Code, string registerArgument2Code, string registerArgument3Code) : base(chip, lineNumber, registerStoreCode, registerArgument1Code, registerArgument2Code, registerArgument3Code)
 			{
 			}
 
-			// Token: 0x060084E1 RID: 34017 RVA: 0x00295A60 File Offset: 0x00293C60
+			// Token: 0x06008BEA RID: 35818 RVA: 0x002C45B0 File Offset: 0x002C27B0
 			public override int Execute(int index)
 			{
 				int variableIndex = this._Store.GetVariableIndex(ProgrammableChip._AliasTarget.Register, true);
@@ -5216,15 +5284,15 @@ namespace Assets.Scripts.Objects.Electrical
 			}
 		}
 
-		// Token: 0x020011FC RID: 4604
+		// Token: 0x020012A2 RID: 4770
 		private class _SNA_Operation : ProgrammableChip._Operation_1_3
 		{
-			// Token: 0x060084E2 RID: 34018 RVA: 0x00295AF4 File Offset: 0x00293CF4
+			// Token: 0x06008BEB RID: 35819 RVA: 0x002C4644 File Offset: 0x002C2844
 			public _SNA_Operation(ProgrammableChip chip, int lineNumber, string registerStoreCode, string registerArgument1Code, string registerArgument2Code, string registerArgument3Code) : base(chip, lineNumber, registerStoreCode, registerArgument1Code, registerArgument2Code, registerArgument3Code)
 			{
 			}
 
-			// Token: 0x060084E3 RID: 34019 RVA: 0x00295B08 File Offset: 0x00293D08
+			// Token: 0x06008BEC RID: 35820 RVA: 0x002C4658 File Offset: 0x002C2858
 			public override int Execute(int index)
 			{
 				int variableIndex = this._Store.GetVariableIndex(ProgrammableChip._AliasTarget.Register, true);
@@ -5236,15 +5304,15 @@ namespace Assets.Scripts.Objects.Electrical
 			}
 		}
 
-		// Token: 0x020011FD RID: 4605
+		// Token: 0x020012A3 RID: 4771
 		private class _SNAN_Operation : ProgrammableChip._Operation_1_1
 		{
-			// Token: 0x060084E4 RID: 34020 RVA: 0x00295B9C File Offset: 0x00293D9C
+			// Token: 0x06008BED RID: 35821 RVA: 0x002C46EC File Offset: 0x002C28EC
 			public _SNAN_Operation(ProgrammableChip chip, int lineNumber, string registerStoreCode, string registerArgument1Code) : base(chip, lineNumber, registerStoreCode, registerArgument1Code)
 			{
 			}
 
-			// Token: 0x060084E5 RID: 34021 RVA: 0x00295BAC File Offset: 0x00293DAC
+			// Token: 0x06008BEE RID: 35822 RVA: 0x002C46FC File Offset: 0x002C28FC
 			public override int Execute(int index)
 			{
 				int variableIndex = this._Store.GetVariableIndex(ProgrammableChip._AliasTarget.Register, true);
@@ -5254,15 +5322,15 @@ namespace Assets.Scripts.Objects.Electrical
 			}
 		}
 
-		// Token: 0x020011FE RID: 4606
+		// Token: 0x020012A4 RID: 4772
 		private class _SNANZ_Operation : ProgrammableChip._Operation_1_1
 		{
-			// Token: 0x060084E6 RID: 34022 RVA: 0x00295C01 File Offset: 0x00293E01
+			// Token: 0x06008BEF RID: 35823 RVA: 0x002C4751 File Offset: 0x002C2951
 			public _SNANZ_Operation(ProgrammableChip chip, int lineNumber, string registerStoreCode, string registerArgument1Code) : base(chip, lineNumber, registerStoreCode, registerArgument1Code)
 			{
 			}
 
-			// Token: 0x060084E7 RID: 34023 RVA: 0x00295C10 File Offset: 0x00293E10
+			// Token: 0x06008BF0 RID: 35824 RVA: 0x002C4760 File Offset: 0x002C2960
 			public override int Execute(int index)
 			{
 				int variableIndex = this._Store.GetVariableIndex(ProgrammableChip._AliasTarget.Register, true);
@@ -5272,87 +5340,87 @@ namespace Assets.Scripts.Objects.Electrical
 			}
 		}
 
-		// Token: 0x020011FF RID: 4607
+		// Token: 0x020012A5 RID: 4773
 		private class _SLTZ_Operation : ProgrammableChip._SLT_Operation
 		{
-			// Token: 0x060084E8 RID: 34024 RVA: 0x00295C65 File Offset: 0x00293E65
+			// Token: 0x06008BF1 RID: 35825 RVA: 0x002C47B5 File Offset: 0x002C29B5
 			public _SLTZ_Operation(ProgrammableChip chip, int lineNumber, string registerStoreCode, string registerArgument1Code) : base(chip, lineNumber, registerStoreCode, registerArgument1Code, "0")
 			{
 			}
 		}
 
-		// Token: 0x02001200 RID: 4608
+		// Token: 0x020012A6 RID: 4774
 		private class _SGTZ_Operation : ProgrammableChip._SGT_Operation
 		{
-			// Token: 0x060084E9 RID: 34025 RVA: 0x00295C77 File Offset: 0x00293E77
+			// Token: 0x06008BF2 RID: 35826 RVA: 0x002C47C7 File Offset: 0x002C29C7
 			public _SGTZ_Operation(ProgrammableChip chip, int lineNumber, string registerStoreCode, string registerArgument1Code) : base(chip, lineNumber, registerStoreCode, registerArgument1Code, "0")
 			{
 			}
 		}
 
-		// Token: 0x02001201 RID: 4609
+		// Token: 0x020012A7 RID: 4775
 		private class _SLEZ_Operation : ProgrammableChip._SLE_Operation
 		{
-			// Token: 0x060084EA RID: 34026 RVA: 0x00295C89 File Offset: 0x00293E89
+			// Token: 0x06008BF3 RID: 35827 RVA: 0x002C47D9 File Offset: 0x002C29D9
 			public _SLEZ_Operation(ProgrammableChip chip, int lineNumber, string registerStoreCode, string registerArgument1Code) : base(chip, lineNumber, registerStoreCode, registerArgument1Code, "0")
 			{
 			}
 		}
 
-		// Token: 0x02001202 RID: 4610
+		// Token: 0x020012A8 RID: 4776
 		private class _SGEZ_Operation : ProgrammableChip._SGE_Operation
 		{
-			// Token: 0x060084EB RID: 34027 RVA: 0x00295C9B File Offset: 0x00293E9B
+			// Token: 0x06008BF4 RID: 35828 RVA: 0x002C47EB File Offset: 0x002C29EB
 			public _SGEZ_Operation(ProgrammableChip chip, int lineNumber, string registerStoreCode, string registerArgument1Code) : base(chip, lineNumber, registerStoreCode, registerArgument1Code, "0")
 			{
 			}
 		}
 
-		// Token: 0x02001203 RID: 4611
+		// Token: 0x020012A9 RID: 4777
 		private class _SEQZ_Operation : ProgrammableChip._SEQ_Operation
 		{
-			// Token: 0x060084EC RID: 34028 RVA: 0x00295CAD File Offset: 0x00293EAD
+			// Token: 0x06008BF5 RID: 35829 RVA: 0x002C47FD File Offset: 0x002C29FD
 			public _SEQZ_Operation(ProgrammableChip chip, int lineNumber, string registerStoreCode, string registerArgument1Code) : base(chip, lineNumber, registerStoreCode, registerArgument1Code, "0")
 			{
 			}
 		}
 
-		// Token: 0x02001204 RID: 4612
+		// Token: 0x020012AA RID: 4778
 		private class _SNEZ_Operation : ProgrammableChip._SNE_Operation
 		{
-			// Token: 0x060084ED RID: 34029 RVA: 0x00295CBF File Offset: 0x00293EBF
+			// Token: 0x06008BF6 RID: 35830 RVA: 0x002C480F File Offset: 0x002C2A0F
 			public _SNEZ_Operation(ProgrammableChip chip, int lineNumber, string registerStoreCode, string registerArgument1Code) : base(chip, lineNumber, registerStoreCode, registerArgument1Code, "0")
 			{
 			}
 		}
 
-		// Token: 0x02001205 RID: 4613
+		// Token: 0x020012AB RID: 4779
 		private class _SAPZ_Operation : ProgrammableChip._SAP_Operation
 		{
-			// Token: 0x060084EE RID: 34030 RVA: 0x00295CD1 File Offset: 0x00293ED1
+			// Token: 0x06008BF7 RID: 35831 RVA: 0x002C4821 File Offset: 0x002C2A21
 			public _SAPZ_Operation(ProgrammableChip chip, int lineNumber, string registerStoreCode, string registerArgument1Code, string registerArgument2Code) : base(chip, lineNumber, registerStoreCode, registerArgument1Code, "0", registerArgument2Code)
 			{
 			}
 		}
 
-		// Token: 0x02001206 RID: 4614
+		// Token: 0x020012AC RID: 4780
 		private class _SNAZ_Operation : ProgrammableChip._SNA_Operation
 		{
-			// Token: 0x060084EF RID: 34031 RVA: 0x00295CE5 File Offset: 0x00293EE5
+			// Token: 0x06008BF8 RID: 35832 RVA: 0x002C4835 File Offset: 0x002C2A35
 			public _SNAZ_Operation(ProgrammableChip chip, int lineNumber, string registerStoreCode, string registerArgument1Code, string registerArgument2Code) : base(chip, lineNumber, registerStoreCode, registerArgument1Code, "0", registerArgument2Code)
 			{
 			}
 		}
 
-		// Token: 0x02001207 RID: 4615
+		// Token: 0x020012AD RID: 4781
 		private class _EXT_Operation : ProgrammableChip._Operation_1_3
 		{
-			// Token: 0x060084F0 RID: 34032 RVA: 0x00295CF9 File Offset: 0x00293EF9
+			// Token: 0x06008BF9 RID: 35833 RVA: 0x002C4849 File Offset: 0x002C2A49
 			public _EXT_Operation(ProgrammableChip chip, int lineNumber, string registerStoreCode, string arg1Code, string arg2Code, string arg3Code) : base(chip, lineNumber, registerStoreCode, arg1Code, arg2Code, arg3Code)
 			{
 			}
 
-			// Token: 0x060084F1 RID: 34033 RVA: 0x00295D0C File Offset: 0x00293F0C
+			// Token: 0x06008BFA RID: 35834 RVA: 0x002C485C File Offset: 0x002C2A5C
 			public override int Execute(int index)
 			{
 				int variableIndex = this._Store.GetVariableIndex(ProgrammableChip._AliasTarget.Register, true);
@@ -5383,21 +5451,21 @@ namespace Assets.Scripts.Objects.Electrical
 			}
 		}
 
-		// Token: 0x02001208 RID: 4616
+		// Token: 0x020012AE RID: 4782
 		private class _INS_Operation : ProgrammableChip._Operation_1_3
 		{
-			// Token: 0x060084F2 RID: 34034 RVA: 0x00295DEC File Offset: 0x00293FEC
+			// Token: 0x06008BFB RID: 35835 RVA: 0x002C493C File Offset: 0x002C2B3C
 			public _INS_Operation(ProgrammableChip chip, int lineNumber, string registerStoreCode, string arg1Code, string arg2Code, string arg3Code) : base(chip, lineNumber, registerStoreCode, arg1Code, arg2Code, arg3Code)
 			{
 			}
 
-			// Token: 0x060084F3 RID: 34035 RVA: 0x00295E00 File Offset: 0x00294000
+			// Token: 0x06008BFC RID: 35836 RVA: 0x002C4950 File Offset: 0x002C2B50
 			public override int Execute(int index)
 			{
 				int variableIndex = this._Store.GetVariableIndex(ProgrammableChip._AliasTarget.Register, true);
-				int variableInt = this._Argument1.GetVariableInt(ProgrammableChip._AliasTarget.Register, true);
-				int variableInt2 = this._Argument2.GetVariableInt(ProgrammableChip._AliasTarget.Register, true);
-				long variableLong = this._Argument3.GetVariableLong(ProgrammableChip._AliasTarget.Register, false, true);
+				long variableLong = this._Argument1.GetVariableLong(ProgrammableChip._AliasTarget.Register, false, true);
+				int variableInt = this._Argument2.GetVariableInt(ProgrammableChip._AliasTarget.Register, true);
+				int variableInt2 = this._Argument3.GetVariableInt(ProgrammableChip._AliasTarget.Register, true);
 				if (variableInt2 <= 0)
 				{
 					throw new ProgrammableChipException(ProgrammableChipException.ICExceptionType.ShiftUnderflow, this._LineNumber);
@@ -5427,15 +5495,15 @@ namespace Assets.Scripts.Objects.Electrical
 			}
 		}
 
-		// Token: 0x02001209 RID: 4617
+		// Token: 0x020012AF RID: 4783
 		private class _AND_Operation : ProgrammableChip._Operation_1_2
 		{
-			// Token: 0x060084F4 RID: 34036 RVA: 0x00295F0E File Offset: 0x0029410E
+			// Token: 0x06008BFD RID: 35837 RVA: 0x002C4A5E File Offset: 0x002C2C5E
 			public _AND_Operation(ProgrammableChip chip, int lineNumber, string registerStoreCode, string registerArgument1Code, string registerArgument2Code) : base(chip, lineNumber, registerStoreCode, registerArgument1Code, registerArgument2Code)
 			{
 			}
 
-			// Token: 0x060084F5 RID: 34037 RVA: 0x00295F20 File Offset: 0x00294120
+			// Token: 0x06008BFE RID: 35838 RVA: 0x002C4A70 File Offset: 0x002C2C70
 			public override int Execute(int index)
 			{
 				int variableIndex = this._Store.GetVariableIndex(ProgrammableChip._AliasTarget.Register, true);
@@ -5446,15 +5514,15 @@ namespace Assets.Scripts.Objects.Electrical
 			}
 		}
 
-		// Token: 0x0200120A RID: 4618
+		// Token: 0x020012B0 RID: 4784
 		private class _OR_Operation : ProgrammableChip._Operation_1_2
 		{
-			// Token: 0x060084F6 RID: 34038 RVA: 0x00295F71 File Offset: 0x00294171
+			// Token: 0x06008BFF RID: 35839 RVA: 0x002C4AC1 File Offset: 0x002C2CC1
 			public _OR_Operation(ProgrammableChip chip, int lineNumber, string registerStoreCode, string registerArgument1Code, string registerArgument2Code) : base(chip, lineNumber, registerStoreCode, registerArgument1Code, registerArgument2Code)
 			{
 			}
 
-			// Token: 0x060084F7 RID: 34039 RVA: 0x00295F80 File Offset: 0x00294180
+			// Token: 0x06008C00 RID: 35840 RVA: 0x002C4AD0 File Offset: 0x002C2CD0
 			public override int Execute(int index)
 			{
 				int variableIndex = this._Store.GetVariableIndex(ProgrammableChip._AliasTarget.Register, true);
@@ -5468,15 +5536,15 @@ namespace Assets.Scripts.Objects.Electrical
 			}
 		}
 
-		// Token: 0x0200120B RID: 4619
+		// Token: 0x020012B1 RID: 4785
 		private class _XOR_Operation : ProgrammableChip._Operation_1_2
 		{
-			// Token: 0x060084F8 RID: 34040 RVA: 0x00295FD7 File Offset: 0x002941D7
+			// Token: 0x06008C01 RID: 35841 RVA: 0x002C4B27 File Offset: 0x002C2D27
 			public _XOR_Operation(ProgrammableChip chip, int lineNumber, string registerStoreCode, string registerArgument1Code, string registerArgument2Code) : base(chip, lineNumber, registerStoreCode, registerArgument1Code, registerArgument2Code)
 			{
 			}
 
-			// Token: 0x060084F9 RID: 34041 RVA: 0x00295FE8 File Offset: 0x002941E8
+			// Token: 0x06008C02 RID: 35842 RVA: 0x002C4B38 File Offset: 0x002C2D38
 			public override int Execute(int index)
 			{
 				int variableIndex = this._Store.GetVariableIndex(ProgrammableChip._AliasTarget.Register, true);
@@ -5489,15 +5557,15 @@ namespace Assets.Scripts.Objects.Electrical
 			}
 		}
 
-		// Token: 0x0200120C RID: 4620
+		// Token: 0x020012B2 RID: 4786
 		private class _NOR_Operation : ProgrammableChip._Operation_1_2
 		{
-			// Token: 0x060084FA RID: 34042 RVA: 0x0029603B File Offset: 0x0029423B
+			// Token: 0x06008C03 RID: 35843 RVA: 0x002C4B8B File Offset: 0x002C2D8B
 			public _NOR_Operation(ProgrammableChip chip, int lineNumber, string registerStoreCode, string registerArgument1Code, string registerArgument2Code) : base(chip, lineNumber, registerStoreCode, registerArgument1Code, registerArgument2Code)
 			{
 			}
 
-			// Token: 0x060084FB RID: 34043 RVA: 0x0029604C File Offset: 0x0029424C
+			// Token: 0x06008C04 RID: 35844 RVA: 0x002C4B9C File Offset: 0x002C2D9C
 			public override int Execute(int index)
 			{
 				int variableIndex = this._Store.GetVariableIndex(ProgrammableChip._AliasTarget.Register, true);
@@ -5510,15 +5578,15 @@ namespace Assets.Scripts.Objects.Electrical
 			}
 		}
 
-		// Token: 0x0200120D RID: 4621
+		// Token: 0x020012B3 RID: 4787
 		private class _NOT_Operation : ProgrammableChip._Operation_1_1
 		{
-			// Token: 0x060084FC RID: 34044 RVA: 0x002960A0 File Offset: 0x002942A0
+			// Token: 0x06008C05 RID: 35845 RVA: 0x002C4BF0 File Offset: 0x002C2DF0
 			public _NOT_Operation(ProgrammableChip chip, int lineNumber, string registerStoreCode, string registerArgumentCode) : base(chip, lineNumber, registerStoreCode, registerArgumentCode)
 			{
 			}
 
-			// Token: 0x060084FD RID: 34045 RVA: 0x002960B0 File Offset: 0x002942B0
+			// Token: 0x06008C06 RID: 35846 RVA: 0x002C4C00 File Offset: 0x002C2E00
 			public override int Execute(int index)
 			{
 				int variableIndex = this._Store.GetVariableIndex(ProgrammableChip._AliasTarget.Register, true);
@@ -5528,15 +5596,15 @@ namespace Assets.Scripts.Objects.Electrical
 			}
 		}
 
-		// Token: 0x0200120E RID: 4622
+		// Token: 0x020012B4 RID: 4788
 		private class _MUL_Operation : ProgrammableChip._Operation_1_2
 		{
-			// Token: 0x060084FE RID: 34046 RVA: 0x002960F1 File Offset: 0x002942F1
+			// Token: 0x06008C07 RID: 35847 RVA: 0x002C4C41 File Offset: 0x002C2E41
 			public _MUL_Operation(ProgrammableChip chip, int lineNumber, string registerStoreCode, string registerArgument1Code, string registerArgument2Code) : base(chip, lineNumber, registerStoreCode, registerArgument1Code, registerArgument2Code)
 			{
 			}
 
-			// Token: 0x060084FF RID: 34047 RVA: 0x00296100 File Offset: 0x00294300
+			// Token: 0x06008C08 RID: 35848 RVA: 0x002C4C50 File Offset: 0x002C2E50
 			public override int Execute(int index)
 			{
 				int variableIndex = this._Store.GetVariableIndex(ProgrammableChip._AliasTarget.Register, true);
@@ -5547,15 +5615,15 @@ namespace Assets.Scripts.Objects.Electrical
 			}
 		}
 
-		// Token: 0x0200120F RID: 4623
+		// Token: 0x020012B5 RID: 4789
 		private class _DIV_Operation : ProgrammableChip._Operation_1_2
 		{
-			// Token: 0x06008500 RID: 34048 RVA: 0x0029614A File Offset: 0x0029434A
+			// Token: 0x06008C09 RID: 35849 RVA: 0x002C4C9A File Offset: 0x002C2E9A
 			public _DIV_Operation(ProgrammableChip chip, int lineNumber, string registerStoreCode, string registerArgument1Code, string registerArgument2Code) : base(chip, lineNumber, registerStoreCode, registerArgument1Code, registerArgument2Code)
 			{
 			}
 
-			// Token: 0x06008501 RID: 34049 RVA: 0x0029615C File Offset: 0x0029435C
+			// Token: 0x06008C0A RID: 35850 RVA: 0x002C4CAC File Offset: 0x002C2EAC
 			public override int Execute(int index)
 			{
 				int variableIndex = this._Store.GetVariableIndex(ProgrammableChip._AliasTarget.Register, true);
@@ -5566,15 +5634,15 @@ namespace Assets.Scripts.Objects.Electrical
 			}
 		}
 
-		// Token: 0x02001210 RID: 4624
+		// Token: 0x020012B6 RID: 4790
 		private class _MOD_Operation : ProgrammableChip._Operation_1_2
 		{
-			// Token: 0x06008502 RID: 34050 RVA: 0x002961A6 File Offset: 0x002943A6
+			// Token: 0x06008C0B RID: 35851 RVA: 0x002C4CF6 File Offset: 0x002C2EF6
 			public _MOD_Operation(ProgrammableChip chip, int lineNumber, string registerStoreCode, string registerArgument1Code, string registerArgument2Code) : base(chip, lineNumber, registerStoreCode, registerArgument1Code, registerArgument2Code)
 			{
 			}
 
-			// Token: 0x06008503 RID: 34051 RVA: 0x002961B8 File Offset: 0x002943B8
+			// Token: 0x06008C0C RID: 35852 RVA: 0x002C4D08 File Offset: 0x002C2F08
 			public override int Execute(int index)
 			{
 				int variableIndex = this._Store.GetVariableIndex(ProgrammableChip._AliasTarget.Register, true);
@@ -5592,252 +5660,252 @@ namespace Assets.Scripts.Objects.Electrical
 			}
 		}
 
-		// Token: 0x02001211 RID: 4625
+		// Token: 0x020012B7 RID: 4791
 		private class _J_Operation : ProgrammableChip._JR_Operation
 		{
-			// Token: 0x06008504 RID: 34052 RVA: 0x0029621B File Offset: 0x0029441B
+			// Token: 0x06008C0D RID: 35853 RVA: 0x002C4D6B File Offset: 0x002C2F6B
 			public _J_Operation(ProgrammableChip chip, int lineNumber, string jumpAddressCode) : base(chip, lineNumber, jumpAddressCode)
 			{
 			}
 
-			// Token: 0x06008505 RID: 34053 RVA: 0x00296226 File Offset: 0x00294426
+			// Token: 0x06008C0E RID: 35854 RVA: 0x002C4D76 File Offset: 0x002C2F76
 			public override int Execute(int index)
 			{
 				return base.Execute(index, -index);
 			}
 		}
 
-		// Token: 0x02001212 RID: 4626
+		// Token: 0x020012B8 RID: 4792
 		private class _BLT_Operation : ProgrammableChip._BRLT_Operation
 		{
-			// Token: 0x06008506 RID: 34054 RVA: 0x00296231 File Offset: 0x00294431
+			// Token: 0x06008C0F RID: 35855 RVA: 0x002C4D81 File Offset: 0x002C2F81
 			public _BLT_Operation(ProgrammableChip chip, int lineNumber, string registerArgument1Code, string registerArgument2Code, string jumpAddressCode) : base(chip, lineNumber, registerArgument1Code, registerArgument2Code, jumpAddressCode)
 			{
 			}
 
-			// Token: 0x06008507 RID: 34055 RVA: 0x00296240 File Offset: 0x00294440
+			// Token: 0x06008C10 RID: 35856 RVA: 0x002C4D90 File Offset: 0x002C2F90
 			public override int Execute(int index)
 			{
 				return base.Execute(index, -index);
 			}
 		}
 
-		// Token: 0x02001213 RID: 4627
+		// Token: 0x020012B9 RID: 4793
 		private class _BGT_Operation : ProgrammableChip._BRGT_Operation
 		{
-			// Token: 0x06008508 RID: 34056 RVA: 0x0029624B File Offset: 0x0029444B
+			// Token: 0x06008C11 RID: 35857 RVA: 0x002C4D9B File Offset: 0x002C2F9B
 			public _BGT_Operation(ProgrammableChip chip, int lineNumber, string registerArgument1Code, string registerArgument2Code, string jumpAddressCode) : base(chip, lineNumber, registerArgument1Code, registerArgument2Code, jumpAddressCode)
 			{
 			}
 
-			// Token: 0x06008509 RID: 34057 RVA: 0x0029625A File Offset: 0x0029445A
+			// Token: 0x06008C12 RID: 35858 RVA: 0x002C4DAA File Offset: 0x002C2FAA
 			public override int Execute(int index)
 			{
 				return base.Execute(index, -index);
 			}
 		}
 
-		// Token: 0x02001214 RID: 4628
+		// Token: 0x020012BA RID: 4794
 		private class _BLE_Operation : ProgrammableChip._BRLE_Operation
 		{
-			// Token: 0x0600850A RID: 34058 RVA: 0x00296265 File Offset: 0x00294465
+			// Token: 0x06008C13 RID: 35859 RVA: 0x002C4DB5 File Offset: 0x002C2FB5
 			public _BLE_Operation(ProgrammableChip chip, int lineNumber, string registerArgument1Code, string registerArgument2Code, string jumpAddressCode) : base(chip, lineNumber, registerArgument1Code, registerArgument2Code, jumpAddressCode)
 			{
 			}
 
-			// Token: 0x0600850B RID: 34059 RVA: 0x00296274 File Offset: 0x00294474
+			// Token: 0x06008C14 RID: 35860 RVA: 0x002C4DC4 File Offset: 0x002C2FC4
 			public override int Execute(int index)
 			{
 				return base.Execute(index, -index);
 			}
 		}
 
-		// Token: 0x02001215 RID: 4629
+		// Token: 0x020012BB RID: 4795
 		private class _BGE_Operation : ProgrammableChip._BRGE_Operation
 		{
-			// Token: 0x0600850C RID: 34060 RVA: 0x0029627F File Offset: 0x0029447F
+			// Token: 0x06008C15 RID: 35861 RVA: 0x002C4DCF File Offset: 0x002C2FCF
 			public _BGE_Operation(ProgrammableChip chip, int lineNumber, string registerArgument1Code, string registerArgument2Code, string jumpAddressCode) : base(chip, lineNumber, registerArgument1Code, registerArgument2Code, jumpAddressCode)
 			{
 			}
 
-			// Token: 0x0600850D RID: 34061 RVA: 0x0029628E File Offset: 0x0029448E
+			// Token: 0x06008C16 RID: 35862 RVA: 0x002C4DDE File Offset: 0x002C2FDE
 			public override int Execute(int index)
 			{
 				return base.Execute(index, -index);
 			}
 		}
 
-		// Token: 0x02001216 RID: 4630
+		// Token: 0x020012BC RID: 4796
 		private class _BLTZ_Operation : ProgrammableChip._BLT_Operation
 		{
-			// Token: 0x0600850E RID: 34062 RVA: 0x00296299 File Offset: 0x00294499
+			// Token: 0x06008C17 RID: 35863 RVA: 0x002C4DE9 File Offset: 0x002C2FE9
 			public _BLTZ_Operation(ProgrammableChip chip, int lineNumber, string registerArgument1Code, string jumpAddressCode) : base(chip, lineNumber, registerArgument1Code, "0", jumpAddressCode)
 			{
 			}
 		}
 
-		// Token: 0x02001217 RID: 4631
+		// Token: 0x020012BD RID: 4797
 		private class _BGEZ_Operation : ProgrammableChip._BGE_Operation
 		{
-			// Token: 0x0600850F RID: 34063 RVA: 0x002962AB File Offset: 0x002944AB
+			// Token: 0x06008C18 RID: 35864 RVA: 0x002C4DFB File Offset: 0x002C2FFB
 			public _BGEZ_Operation(ProgrammableChip chip, int lineNumber, string registerArgument1Code, string jumpAddressCode) : base(chip, lineNumber, registerArgument1Code, "0", jumpAddressCode)
 			{
 			}
 		}
 
-		// Token: 0x02001218 RID: 4632
+		// Token: 0x020012BE RID: 4798
 		private class _BLEZ_Operation : ProgrammableChip._BLE_Operation
 		{
-			// Token: 0x06008510 RID: 34064 RVA: 0x002962BD File Offset: 0x002944BD
+			// Token: 0x06008C19 RID: 35865 RVA: 0x002C4E0D File Offset: 0x002C300D
 			public _BLEZ_Operation(ProgrammableChip chip, int lineNumber, string registerArgument1Code, string jumpAddressCode) : base(chip, lineNumber, registerArgument1Code, "0", jumpAddressCode)
 			{
 			}
 		}
 
-		// Token: 0x02001219 RID: 4633
+		// Token: 0x020012BF RID: 4799
 		private class _BGTZ_Operation : ProgrammableChip._BGT_Operation
 		{
-			// Token: 0x06008511 RID: 34065 RVA: 0x002962CF File Offset: 0x002944CF
+			// Token: 0x06008C1A RID: 35866 RVA: 0x002C4E1F File Offset: 0x002C301F
 			public _BGTZ_Operation(ProgrammableChip chip, int lineNumber, string registerArgument1Code, string jumpAddressCode) : base(chip, lineNumber, registerArgument1Code, "0", jumpAddressCode)
 			{
 			}
 		}
 
-		// Token: 0x0200121A RID: 4634
+		// Token: 0x020012C0 RID: 4800
 		private class _BDSE_Operation : ProgrammableChip._BRDSE_Operation
 		{
-			// Token: 0x06008512 RID: 34066 RVA: 0x002962E1 File Offset: 0x002944E1
+			// Token: 0x06008C1B RID: 35867 RVA: 0x002C4E31 File Offset: 0x002C3031
 			public _BDSE_Operation(ProgrammableChip chip, int lineNumber, string deviceCode, string jumpAddressCode) : base(chip, lineNumber, deviceCode, jumpAddressCode)
 			{
 			}
 
-			// Token: 0x06008513 RID: 34067 RVA: 0x002962EE File Offset: 0x002944EE
+			// Token: 0x06008C1C RID: 35868 RVA: 0x002C4E3E File Offset: 0x002C303E
 			public override int Execute(int index)
 			{
 				return base.Execute(index, -index);
 			}
 		}
 
-		// Token: 0x0200121B RID: 4635
+		// Token: 0x020012C1 RID: 4801
 		private class _BDNS_Operation : ProgrammableChip._BRDNS_Operation
 		{
-			// Token: 0x06008514 RID: 34068 RVA: 0x002962F9 File Offset: 0x002944F9
+			// Token: 0x06008C1D RID: 35869 RVA: 0x002C4E49 File Offset: 0x002C3049
 			public _BDNS_Operation(ProgrammableChip chip, int lineNumber, string deviceCode, string jumpAddressCode) : base(chip, lineNumber, deviceCode, jumpAddressCode)
 			{
 			}
 
-			// Token: 0x06008515 RID: 34069 RVA: 0x00296306 File Offset: 0x00294506
+			// Token: 0x06008C1E RID: 35870 RVA: 0x002C4E56 File Offset: 0x002C3056
 			public override int Execute(int index)
 			{
 				return base.Execute(index, -index);
 			}
 		}
 
-		// Token: 0x0200121C RID: 4636
+		// Token: 0x020012C2 RID: 4802
 		private class _BEQ_Operation : ProgrammableChip._BREQ_Operation
 		{
-			// Token: 0x06008516 RID: 34070 RVA: 0x00296311 File Offset: 0x00294511
+			// Token: 0x06008C1F RID: 35871 RVA: 0x002C4E61 File Offset: 0x002C3061
 			public _BEQ_Operation(ProgrammableChip chip, int lineNumber, string registerArgument1Code, string registerArgument2Code, string jumpAddressCode) : base(chip, lineNumber, registerArgument1Code, registerArgument2Code, jumpAddressCode)
 			{
 			}
 
-			// Token: 0x06008517 RID: 34071 RVA: 0x00296320 File Offset: 0x00294520
+			// Token: 0x06008C20 RID: 35872 RVA: 0x002C4E70 File Offset: 0x002C3070
 			public override int Execute(int index)
 			{
 				return base.Execute(index, -index);
 			}
 		}
 
-		// Token: 0x0200121D RID: 4637
+		// Token: 0x020012C3 RID: 4803
 		private class _BNE_Operation : ProgrammableChip._BRNE_Operation
 		{
-			// Token: 0x06008518 RID: 34072 RVA: 0x0029632B File Offset: 0x0029452B
+			// Token: 0x06008C21 RID: 35873 RVA: 0x002C4E7B File Offset: 0x002C307B
 			public _BNE_Operation(ProgrammableChip chip, int lineNumber, string registerArgument1Code, string registerArgument2Code, string jumpAddressCode) : base(chip, lineNumber, registerArgument1Code, registerArgument2Code, jumpAddressCode)
 			{
 			}
 
-			// Token: 0x06008519 RID: 34073 RVA: 0x0029633A File Offset: 0x0029453A
+			// Token: 0x06008C22 RID: 35874 RVA: 0x002C4E8A File Offset: 0x002C308A
 			public override int Execute(int index)
 			{
 				return base.Execute(index, -index);
 			}
 		}
 
-		// Token: 0x0200121E RID: 4638
+		// Token: 0x020012C4 RID: 4804
 		private class _BAP_Operation : ProgrammableChip._BRAP_Operation
 		{
-			// Token: 0x0600851A RID: 34074 RVA: 0x00296345 File Offset: 0x00294545
+			// Token: 0x06008C23 RID: 35875 RVA: 0x002C4E95 File Offset: 0x002C3095
 			public _BAP_Operation(ProgrammableChip chip, int lineNumber, string registerArgument1Code, string registerArgument2Code, string registerArgument3Code, string jumpAddressCode) : base(chip, lineNumber, registerArgument1Code, registerArgument2Code, registerArgument3Code, jumpAddressCode)
 			{
 			}
 
-			// Token: 0x0600851B RID: 34075 RVA: 0x00296356 File Offset: 0x00294556
+			// Token: 0x06008C24 RID: 35876 RVA: 0x002C4EA6 File Offset: 0x002C30A6
 			public override int Execute(int index)
 			{
 				return base.Execute(index, -index);
 			}
 		}
 
-		// Token: 0x0200121F RID: 4639
+		// Token: 0x020012C5 RID: 4805
 		private class _BNA_Operation : ProgrammableChip._BRNA_Operation
 		{
-			// Token: 0x0600851C RID: 34076 RVA: 0x00296361 File Offset: 0x00294561
+			// Token: 0x06008C25 RID: 35877 RVA: 0x002C4EB1 File Offset: 0x002C30B1
 			public _BNA_Operation(ProgrammableChip chip, int lineNumber, string registerArgument1Code, string registerArgument2Code, string registerArgument3Code, string jumpAddressCode) : base(chip, lineNumber, registerArgument1Code, registerArgument2Code, registerArgument3Code, jumpAddressCode)
 			{
 			}
 
-			// Token: 0x0600851D RID: 34077 RVA: 0x00296372 File Offset: 0x00294572
+			// Token: 0x06008C26 RID: 35878 RVA: 0x002C4EC2 File Offset: 0x002C30C2
 			public override int Execute(int index)
 			{
 				return base.Execute(index, -index);
 			}
 		}
 
-		// Token: 0x02001220 RID: 4640
+		// Token: 0x020012C6 RID: 4806
 		private class _BEQZ_Operation : ProgrammableChip._BEQ_Operation
 		{
-			// Token: 0x0600851E RID: 34078 RVA: 0x0029637D File Offset: 0x0029457D
+			// Token: 0x06008C27 RID: 35879 RVA: 0x002C4ECD File Offset: 0x002C30CD
 			public _BEQZ_Operation(ProgrammableChip chip, int lineNumber, string registerArgument1Code, string jumpAddressCode) : base(chip, lineNumber, registerArgument1Code, "0", jumpAddressCode)
 			{
 			}
 		}
 
-		// Token: 0x02001221 RID: 4641
+		// Token: 0x020012C7 RID: 4807
 		private class _BNEZ_Operation : ProgrammableChip._BNE_Operation
 		{
-			// Token: 0x0600851F RID: 34079 RVA: 0x0029638F File Offset: 0x0029458F
+			// Token: 0x06008C28 RID: 35880 RVA: 0x002C4EDF File Offset: 0x002C30DF
 			public _BNEZ_Operation(ProgrammableChip chip, int lineNumber, string registerArgument1Code, string jumpAddressCode) : base(chip, lineNumber, registerArgument1Code, "0", jumpAddressCode)
 			{
 			}
 		}
 
-		// Token: 0x02001222 RID: 4642
+		// Token: 0x020012C8 RID: 4808
 		private class _BAPZ_Operation : ProgrammableChip._BAP_Operation
 		{
-			// Token: 0x06008520 RID: 34080 RVA: 0x002963A1 File Offset: 0x002945A1
+			// Token: 0x06008C29 RID: 35881 RVA: 0x002C4EF1 File Offset: 0x002C30F1
 			public _BAPZ_Operation(ProgrammableChip chip, int lineNumber, string registerArgument1Code, string registerArgument2Code, string jumpAddressCode) : base(chip, lineNumber, registerArgument1Code, "0", registerArgument2Code, jumpAddressCode)
 			{
 			}
 		}
 
-		// Token: 0x02001223 RID: 4643
+		// Token: 0x020012C9 RID: 4809
 		private class _BNAZ_Operation : ProgrammableChip._BNA_Operation
 		{
-			// Token: 0x06008521 RID: 34081 RVA: 0x002963B5 File Offset: 0x002945B5
+			// Token: 0x06008C2A RID: 35882 RVA: 0x002C4F05 File Offset: 0x002C3105
 			public _BNAZ_Operation(ProgrammableChip chip, int lineNumber, string registerArgument1Code, string registerArgument2Code, string jumpAddressCode) : base(chip, lineNumber, registerArgument1Code, "0", registerArgument2Code, jumpAddressCode)
 			{
 			}
 		}
 
-		// Token: 0x02001224 RID: 4644
+		// Token: 0x020012CA RID: 4810
 		private class _JAL_Operation : ProgrammableChip._J_Operation
 		{
-			// Token: 0x06008522 RID: 34082 RVA: 0x002963C9 File Offset: 0x002945C9
+			// Token: 0x06008C2B RID: 35883 RVA: 0x002C4F19 File Offset: 0x002C3119
 			public _JAL_Operation(ProgrammableChip chip, int lineNumber, string jumpAddressCode) : base(chip, lineNumber, jumpAddressCode)
 			{
 			}
 
-			// Token: 0x06008523 RID: 34083 RVA: 0x002963D4 File Offset: 0x002945D4
+			// Token: 0x06008C2C RID: 35884 RVA: 0x002C4F24 File Offset: 0x002C3124
 			public override int Execute(int index)
 			{
 				this._Chip._Registers[this._Chip._ReturnAddressIndex] = (double)(index + 1);
@@ -5845,15 +5913,15 @@ namespace Assets.Scripts.Objects.Electrical
 			}
 		}
 
-		// Token: 0x02001225 RID: 4645
+		// Token: 0x020012CB RID: 4811
 		private class _BDSEAL_Operation : ProgrammableChip._BDSE_Operation
 		{
-			// Token: 0x06008524 RID: 34084 RVA: 0x002963F8 File Offset: 0x002945F8
+			// Token: 0x06008C2D RID: 35885 RVA: 0x002C4F48 File Offset: 0x002C3148
 			public _BDSEAL_Operation(ProgrammableChip chip, int lineNumber, string deviceCode, string jumpAddressCode) : base(chip, lineNumber, deviceCode, jumpAddressCode)
 			{
 			}
 
-			// Token: 0x06008525 RID: 34085 RVA: 0x00296408 File Offset: 0x00294608
+			// Token: 0x06008C2E RID: 35886 RVA: 0x002C4F58 File Offset: 0x002C3158
 			public override int Execute(int index)
 			{
 				bool flag;
@@ -5866,15 +5934,15 @@ namespace Assets.Scripts.Objects.Electrical
 			}
 		}
 
-		// Token: 0x02001226 RID: 4646
+		// Token: 0x020012CC RID: 4812
 		private class _BDNSAL_Operation : ProgrammableChip._BDNS_Operation
 		{
-			// Token: 0x06008526 RID: 34086 RVA: 0x0029643E File Offset: 0x0029463E
+			// Token: 0x06008C2F RID: 35887 RVA: 0x002C4F8E File Offset: 0x002C318E
 			public _BDNSAL_Operation(ProgrammableChip chip, int lineNumber, string deviceCode, string jumpAddressCode) : base(chip, lineNumber, deviceCode, jumpAddressCode)
 			{
 			}
 
-			// Token: 0x06008527 RID: 34087 RVA: 0x0029644C File Offset: 0x0029464C
+			// Token: 0x06008C30 RID: 35888 RVA: 0x002C4F9C File Offset: 0x002C319C
 			public override int Execute(int index)
 			{
 				bool flag;
@@ -5887,15 +5955,15 @@ namespace Assets.Scripts.Objects.Electrical
 			}
 		}
 
-		// Token: 0x02001227 RID: 4647
+		// Token: 0x020012CD RID: 4813
 		private class _BLTAL_Operation : ProgrammableChip._BLT_Operation
 		{
-			// Token: 0x06008528 RID: 34088 RVA: 0x00296482 File Offset: 0x00294682
+			// Token: 0x06008C31 RID: 35889 RVA: 0x002C4FD2 File Offset: 0x002C31D2
 			public _BLTAL_Operation(ProgrammableChip chip, int lineNumber, string registerArgument1Code, string registerArgument2Code, string jumpAddressCode) : base(chip, lineNumber, registerArgument1Code, registerArgument2Code, jumpAddressCode)
 			{
 			}
 
-			// Token: 0x06008529 RID: 34089 RVA: 0x00296494 File Offset: 0x00294694
+			// Token: 0x06008C32 RID: 35890 RVA: 0x002C4FE4 File Offset: 0x002C31E4
 			public override int Execute(int index)
 			{
 				bool flag;
@@ -5908,15 +5976,15 @@ namespace Assets.Scripts.Objects.Electrical
 			}
 		}
 
-		// Token: 0x02001228 RID: 4648
+		// Token: 0x020012CE RID: 4814
 		private class _BGEAL_Operation : ProgrammableChip._BGE_Operation
 		{
-			// Token: 0x0600852A RID: 34090 RVA: 0x002964CA File Offset: 0x002946CA
+			// Token: 0x06008C33 RID: 35891 RVA: 0x002C501A File Offset: 0x002C321A
 			public _BGEAL_Operation(ProgrammableChip chip, int lineNumber, string registerArgument1Code, string registerArgument2Code, string jumpAddressCode) : base(chip, lineNumber, registerArgument1Code, registerArgument2Code, jumpAddressCode)
 			{
 			}
 
-			// Token: 0x0600852B RID: 34091 RVA: 0x002964DC File Offset: 0x002946DC
+			// Token: 0x06008C34 RID: 35892 RVA: 0x002C502C File Offset: 0x002C322C
 			public override int Execute(int index)
 			{
 				bool flag;
@@ -5929,15 +5997,15 @@ namespace Assets.Scripts.Objects.Electrical
 			}
 		}
 
-		// Token: 0x02001229 RID: 4649
+		// Token: 0x020012CF RID: 4815
 		private class _BLEAL_Operation : ProgrammableChip._BLE_Operation
 		{
-			// Token: 0x0600852C RID: 34092 RVA: 0x00296512 File Offset: 0x00294712
+			// Token: 0x06008C35 RID: 35893 RVA: 0x002C5062 File Offset: 0x002C3262
 			public _BLEAL_Operation(ProgrammableChip chip, int lineNumber, string registerArgument1Code, string registerArgument2Code, string jumpAddressCode) : base(chip, lineNumber, registerArgument1Code, registerArgument2Code, jumpAddressCode)
 			{
 			}
 
-			// Token: 0x0600852D RID: 34093 RVA: 0x00296524 File Offset: 0x00294724
+			// Token: 0x06008C36 RID: 35894 RVA: 0x002C5074 File Offset: 0x002C3274
 			public override int Execute(int index)
 			{
 				bool flag;
@@ -5950,15 +6018,15 @@ namespace Assets.Scripts.Objects.Electrical
 			}
 		}
 
-		// Token: 0x0200122A RID: 4650
+		// Token: 0x020012D0 RID: 4816
 		private class _BGTAL_Operation : ProgrammableChip._BGT_Operation
 		{
-			// Token: 0x0600852E RID: 34094 RVA: 0x0029655A File Offset: 0x0029475A
+			// Token: 0x06008C37 RID: 35895 RVA: 0x002C50AA File Offset: 0x002C32AA
 			public _BGTAL_Operation(ProgrammableChip chip, int lineNumber, string registerArgument1Code, string registerArgument2Code, string jumpAddressCode) : base(chip, lineNumber, registerArgument1Code, registerArgument2Code, jumpAddressCode)
 			{
 			}
 
-			// Token: 0x0600852F RID: 34095 RVA: 0x0029656C File Offset: 0x0029476C
+			// Token: 0x06008C38 RID: 35896 RVA: 0x002C50BC File Offset: 0x002C32BC
 			public override int Execute(int index)
 			{
 				bool flag;
@@ -5971,51 +6039,51 @@ namespace Assets.Scripts.Objects.Electrical
 			}
 		}
 
-		// Token: 0x0200122B RID: 4651
+		// Token: 0x020012D1 RID: 4817
 		private class _BLTZAL_Operation : ProgrammableChip._BLTAL_Operation
 		{
-			// Token: 0x06008530 RID: 34096 RVA: 0x002965A2 File Offset: 0x002947A2
+			// Token: 0x06008C39 RID: 35897 RVA: 0x002C50F2 File Offset: 0x002C32F2
 			public _BLTZAL_Operation(ProgrammableChip chip, int lineNumber, string registerArgument1Code, string jumpAddressCode) : base(chip, lineNumber, registerArgument1Code, "0", jumpAddressCode)
 			{
 			}
 		}
 
-		// Token: 0x0200122C RID: 4652
+		// Token: 0x020012D2 RID: 4818
 		private class _BGEZAL_Operation : ProgrammableChip._BGEAL_Operation
 		{
-			// Token: 0x06008531 RID: 34097 RVA: 0x002965B4 File Offset: 0x002947B4
+			// Token: 0x06008C3A RID: 35898 RVA: 0x002C5104 File Offset: 0x002C3304
 			public _BGEZAL_Operation(ProgrammableChip chip, int lineNumber, string registerArgument1Code, string jumpAddressCode) : base(chip, lineNumber, registerArgument1Code, "0", jumpAddressCode)
 			{
 			}
 		}
 
-		// Token: 0x0200122D RID: 4653
+		// Token: 0x020012D3 RID: 4819
 		private class _BLEZAL_Operation : ProgrammableChip._BLEAL_Operation
 		{
-			// Token: 0x06008532 RID: 34098 RVA: 0x002965C6 File Offset: 0x002947C6
+			// Token: 0x06008C3B RID: 35899 RVA: 0x002C5116 File Offset: 0x002C3316
 			public _BLEZAL_Operation(ProgrammableChip chip, int lineNumber, string registerArgument1Code, string jumpAddressCode) : base(chip, lineNumber, registerArgument1Code, "0", jumpAddressCode)
 			{
 			}
 		}
 
-		// Token: 0x0200122E RID: 4654
+		// Token: 0x020012D4 RID: 4820
 		private class _BGTZAL_Operation : ProgrammableChip._BGTAL_Operation
 		{
-			// Token: 0x06008533 RID: 34099 RVA: 0x002965D8 File Offset: 0x002947D8
+			// Token: 0x06008C3C RID: 35900 RVA: 0x002C5128 File Offset: 0x002C3328
 			public _BGTZAL_Operation(ProgrammableChip chip, int lineNumber, string registerArgument1Code, string jumpAddressCode) : base(chip, lineNumber, registerArgument1Code, "0", jumpAddressCode)
 			{
 			}
 		}
 
-		// Token: 0x0200122F RID: 4655
+		// Token: 0x020012D5 RID: 4821
 		private class _BEQAL_Operation : ProgrammableChip._BEQ_Operation
 		{
-			// Token: 0x06008534 RID: 34100 RVA: 0x002965EA File Offset: 0x002947EA
+			// Token: 0x06008C3D RID: 35901 RVA: 0x002C513A File Offset: 0x002C333A
 			public _BEQAL_Operation(ProgrammableChip chip, int lineNumber, string registerArgument1Code, string registerArgument2Code, string jumpAddressCode) : base(chip, lineNumber, registerArgument1Code, registerArgument2Code, jumpAddressCode)
 			{
 			}
 
-			// Token: 0x06008535 RID: 34101 RVA: 0x002965FC File Offset: 0x002947FC
+			// Token: 0x06008C3E RID: 35902 RVA: 0x002C514C File Offset: 0x002C334C
 			public override int Execute(int index)
 			{
 				bool flag;
@@ -6028,15 +6096,15 @@ namespace Assets.Scripts.Objects.Electrical
 			}
 		}
 
-		// Token: 0x02001230 RID: 4656
+		// Token: 0x020012D6 RID: 4822
 		private class _BNEAL_Operation : ProgrammableChip._BNE_Operation
 		{
-			// Token: 0x06008536 RID: 34102 RVA: 0x00296632 File Offset: 0x00294832
+			// Token: 0x06008C3F RID: 35903 RVA: 0x002C5182 File Offset: 0x002C3382
 			public _BNEAL_Operation(ProgrammableChip chip, int lineNumber, string registerArgument1Code, string registerArgument2Code, string jumpAddressCode) : base(chip, lineNumber, registerArgument1Code, registerArgument2Code, jumpAddressCode)
 			{
 			}
 
-			// Token: 0x06008537 RID: 34103 RVA: 0x00296644 File Offset: 0x00294844
+			// Token: 0x06008C40 RID: 35904 RVA: 0x002C5194 File Offset: 0x002C3394
 			public override int Execute(int index)
 			{
 				bool flag;
@@ -6049,15 +6117,15 @@ namespace Assets.Scripts.Objects.Electrical
 			}
 		}
 
-		// Token: 0x02001231 RID: 4657
+		// Token: 0x020012D7 RID: 4823
 		private class _BAPAL_Operation : ProgrammableChip._BAP_Operation
 		{
-			// Token: 0x06008538 RID: 34104 RVA: 0x0029667A File Offset: 0x0029487A
+			// Token: 0x06008C41 RID: 35905 RVA: 0x002C51CA File Offset: 0x002C33CA
 			public _BAPAL_Operation(ProgrammableChip chip, int lineNumber, string registerArgument1Code, string registerArgument2Code, string registerArgument3Code, string jumpAddressCode) : base(chip, lineNumber, registerArgument1Code, registerArgument2Code, registerArgument3Code, jumpAddressCode)
 			{
 			}
 
-			// Token: 0x06008539 RID: 34105 RVA: 0x0029668C File Offset: 0x0029488C
+			// Token: 0x06008C42 RID: 35906 RVA: 0x002C51DC File Offset: 0x002C33DC
 			public override int Execute(int index)
 			{
 				bool flag;
@@ -6070,15 +6138,15 @@ namespace Assets.Scripts.Objects.Electrical
 			}
 		}
 
-		// Token: 0x02001232 RID: 4658
+		// Token: 0x020012D8 RID: 4824
 		private class _BNAAL_Operation : ProgrammableChip._BNA_Operation
 		{
-			// Token: 0x0600853A RID: 34106 RVA: 0x002966C2 File Offset: 0x002948C2
+			// Token: 0x06008C43 RID: 35907 RVA: 0x002C5212 File Offset: 0x002C3412
 			public _BNAAL_Operation(ProgrammableChip chip, int lineNumber, string registerArgument1Code, string registerArgument2Code, string registerArgument3Code, string jumpAddressCode) : base(chip, lineNumber, registerArgument1Code, registerArgument2Code, registerArgument3Code, jumpAddressCode)
 			{
 			}
 
-			// Token: 0x0600853B RID: 34107 RVA: 0x002966D4 File Offset: 0x002948D4
+			// Token: 0x06008C44 RID: 35908 RVA: 0x002C5224 File Offset: 0x002C3424
 			public override int Execute(int index)
 			{
 				bool flag;
@@ -6091,42 +6159,42 @@ namespace Assets.Scripts.Objects.Electrical
 			}
 		}
 
-		// Token: 0x02001233 RID: 4659
+		// Token: 0x020012D9 RID: 4825
 		private class _BEQZAL_Operation : ProgrammableChip._BEQAL_Operation
 		{
-			// Token: 0x0600853C RID: 34108 RVA: 0x0029670A File Offset: 0x0029490A
+			// Token: 0x06008C45 RID: 35909 RVA: 0x002C525A File Offset: 0x002C345A
 			public _BEQZAL_Operation(ProgrammableChip chip, int lineNumber, string registerArgument1Code, string jumpAddressCode) : base(chip, lineNumber, registerArgument1Code, "0", jumpAddressCode)
 			{
 			}
 		}
 
-		// Token: 0x02001234 RID: 4660
+		// Token: 0x020012DA RID: 4826
 		private class _BNEZAL_Operation : ProgrammableChip._BNEAL_Operation
 		{
-			// Token: 0x0600853D RID: 34109 RVA: 0x0029671C File Offset: 0x0029491C
+			// Token: 0x06008C46 RID: 35910 RVA: 0x002C526C File Offset: 0x002C346C
 			public _BNEZAL_Operation(ProgrammableChip chip, int lineNumber, string registerArgument1Code, string jumpAddressCode) : base(chip, lineNumber, registerArgument1Code, "0", jumpAddressCode)
 			{
 			}
 		}
 
-		// Token: 0x02001235 RID: 4661
+		// Token: 0x020012DB RID: 4827
 		private class _BAPZAL_Operation : ProgrammableChip._BAPAL_Operation
 		{
-			// Token: 0x0600853E RID: 34110 RVA: 0x0029672E File Offset: 0x0029492E
+			// Token: 0x06008C47 RID: 35911 RVA: 0x002C527E File Offset: 0x002C347E
 			public _BAPZAL_Operation(ProgrammableChip chip, int lineNumber, string registerArgument1Code, string registerArgument2Code, string jumpAddressCode) : base(chip, lineNumber, registerArgument1Code, "0", registerArgument2Code, jumpAddressCode)
 			{
 			}
 		}
 
-		// Token: 0x02001236 RID: 4662
+		// Token: 0x020012DC RID: 4828
 		private class _BNAZAL_Operation : ProgrammableChip._BNAAL_Operation
 		{
-			// Token: 0x0600853F RID: 34111 RVA: 0x00296742 File Offset: 0x00294942
+			// Token: 0x06008C48 RID: 35912 RVA: 0x002C5292 File Offset: 0x002C3492
 			public _BNAZAL_Operation(ProgrammableChip chip, int lineNumber, string registerArgument1Code, string registerArgument2Code, string jumpAddressCode) : base(chip, lineNumber, registerArgument1Code, "0", registerArgument2Code, jumpAddressCode)
 			{
 			}
 
-			// Token: 0x06008540 RID: 34112 RVA: 0x00296758 File Offset: 0x00294958
+			// Token: 0x06008C49 RID: 35913 RVA: 0x002C52A8 File Offset: 0x002C34A8
 			public override int Execute(int index)
 			{
 				bool flag;
@@ -6139,50 +6207,50 @@ namespace Assets.Scripts.Objects.Electrical
 			}
 		}
 
-		// Token: 0x02001237 RID: 4663
+		// Token: 0x020012DD RID: 4829
 		private class _JR_Operation : ProgrammableChip._Operation_J_0
 		{
-			// Token: 0x06008541 RID: 34113 RVA: 0x0029678E File Offset: 0x0029498E
+			// Token: 0x06008C4A RID: 35914 RVA: 0x002C52DE File Offset: 0x002C34DE
 			public _JR_Operation(ProgrammableChip chip, int lineNumber, string jumpAddressCode) : base(chip, lineNumber, jumpAddressCode)
 			{
 			}
 
-			// Token: 0x06008542 RID: 34114 RVA: 0x00296799 File Offset: 0x00294999
+			// Token: 0x06008C4B RID: 35915 RVA: 0x002C52E9 File Offset: 0x002C34E9
 			public override int Execute(int index)
 			{
 				return this.Execute(index, 0);
 			}
 
-			// Token: 0x06008543 RID: 34115 RVA: 0x002967A3 File Offset: 0x002949A3
+			// Token: 0x06008C4C RID: 35916 RVA: 0x002C52F3 File Offset: 0x002C34F3
 			public int Execute(int index, int offset)
 			{
 				return index + offset + this._JumpIndex.GetVariableValue(ProgrammableChip._AliasTarget.Register, true);
 			}
 		}
 
-		// Token: 0x02001238 RID: 4664
+		// Token: 0x020012DE RID: 4830
 		private class _BRLT_Operation : ProgrammableChip._Operation_J_2
 		{
-			// Token: 0x06008544 RID: 34116 RVA: 0x002967B6 File Offset: 0x002949B6
+			// Token: 0x06008C4D RID: 35917 RVA: 0x002C5306 File Offset: 0x002C3506
 			public _BRLT_Operation(ProgrammableChip chip, int lineNumber, string registerArgument1Code, string registerArgument2Code, string jumpAddressCode) : base(chip, lineNumber, registerArgument1Code, registerArgument2Code, jumpAddressCode)
 			{
 			}
 
-			// Token: 0x06008545 RID: 34117 RVA: 0x002967C8 File Offset: 0x002949C8
+			// Token: 0x06008C4E RID: 35918 RVA: 0x002C5318 File Offset: 0x002C3518
 			public override int Execute(int index)
 			{
 				bool flag;
 				return this.Execute(index, out flag, 0);
 			}
 
-			// Token: 0x06008546 RID: 34118 RVA: 0x002967E0 File Offset: 0x002949E0
+			// Token: 0x06008C4F RID: 35919 RVA: 0x002C5330 File Offset: 0x002C3530
 			public int Execute(int index, int offset)
 			{
 				bool flag;
 				return this.Execute(index, out flag, offset);
 			}
 
-			// Token: 0x06008547 RID: 34119 RVA: 0x002967F8 File Offset: 0x002949F8
+			// Token: 0x06008C50 RID: 35920 RVA: 0x002C5348 File Offset: 0x002C3548
 			public int Execute(int index, out bool hasJumped, int offset = 0)
 			{
 				double variableValue = this._Argument1.GetVariableValue(ProgrammableChip._AliasTarget.Register, true);
@@ -6197,29 +6265,29 @@ namespace Assets.Scripts.Objects.Electrical
 			}
 		}
 
-		// Token: 0x02001239 RID: 4665
+		// Token: 0x020012DF RID: 4831
 		private class _BRGT_Operation : ProgrammableChip._Operation_J_2
 		{
-			// Token: 0x06008548 RID: 34120 RVA: 0x0029683E File Offset: 0x00294A3E
+			// Token: 0x06008C51 RID: 35921 RVA: 0x002C538E File Offset: 0x002C358E
 			public _BRGT_Operation(ProgrammableChip chip, int lineNumber, string registerArgument1Code, string registerArgument2Code, string jumpAddressCode) : base(chip, lineNumber, registerArgument1Code, registerArgument2Code, jumpAddressCode)
 			{
 			}
 
-			// Token: 0x06008549 RID: 34121 RVA: 0x00296850 File Offset: 0x00294A50
+			// Token: 0x06008C52 RID: 35922 RVA: 0x002C53A0 File Offset: 0x002C35A0
 			public override int Execute(int index)
 			{
 				bool flag;
 				return this.Execute(index, out flag, 0);
 			}
 
-			// Token: 0x0600854A RID: 34122 RVA: 0x00296868 File Offset: 0x00294A68
+			// Token: 0x06008C53 RID: 35923 RVA: 0x002C53B8 File Offset: 0x002C35B8
 			public int Execute(int index, int offset)
 			{
 				bool flag;
 				return this.Execute(index, out flag, offset);
 			}
 
-			// Token: 0x0600854B RID: 34123 RVA: 0x00296880 File Offset: 0x00294A80
+			// Token: 0x06008C54 RID: 35924 RVA: 0x002C53D0 File Offset: 0x002C35D0
 			public int Execute(int index, out bool hasJumped, int offset = 0)
 			{
 				double variableValue = this._Argument1.GetVariableValue(ProgrammableChip._AliasTarget.Register, true);
@@ -6234,29 +6302,29 @@ namespace Assets.Scripts.Objects.Electrical
 			}
 		}
 
-		// Token: 0x0200123A RID: 4666
+		// Token: 0x020012E0 RID: 4832
 		private class _BRLE_Operation : ProgrammableChip._Operation_J_2
 		{
-			// Token: 0x0600854C RID: 34124 RVA: 0x002968C6 File Offset: 0x00294AC6
+			// Token: 0x06008C55 RID: 35925 RVA: 0x002C5416 File Offset: 0x002C3616
 			public _BRLE_Operation(ProgrammableChip chip, int lineNumber, string registerArgument1Code, string registerArgument2Code, string jumpAddressCode) : base(chip, lineNumber, registerArgument1Code, registerArgument2Code, jumpAddressCode)
 			{
 			}
 
-			// Token: 0x0600854D RID: 34125 RVA: 0x002968D8 File Offset: 0x00294AD8
+			// Token: 0x06008C56 RID: 35926 RVA: 0x002C5428 File Offset: 0x002C3628
 			public override int Execute(int index)
 			{
 				bool flag;
 				return this.Execute(index, out flag, 0);
 			}
 
-			// Token: 0x0600854E RID: 34126 RVA: 0x002968F0 File Offset: 0x00294AF0
+			// Token: 0x06008C57 RID: 35927 RVA: 0x002C5440 File Offset: 0x002C3640
 			public int Execute(int index, int offset)
 			{
 				bool flag;
 				return this.Execute(index, out flag, offset);
 			}
 
-			// Token: 0x0600854F RID: 34127 RVA: 0x00296908 File Offset: 0x00294B08
+			// Token: 0x06008C58 RID: 35928 RVA: 0x002C5458 File Offset: 0x002C3658
 			public int Execute(int index, out bool hasJumped, int offset = 0)
 			{
 				double variableValue = this._Argument1.GetVariableValue(ProgrammableChip._AliasTarget.Register, true);
@@ -6271,29 +6339,29 @@ namespace Assets.Scripts.Objects.Electrical
 			}
 		}
 
-		// Token: 0x0200123B RID: 4667
+		// Token: 0x020012E1 RID: 4833
 		private class _BRGE_Operation : ProgrammableChip._Operation_J_2
 		{
-			// Token: 0x06008550 RID: 34128 RVA: 0x0029694E File Offset: 0x00294B4E
+			// Token: 0x06008C59 RID: 35929 RVA: 0x002C549E File Offset: 0x002C369E
 			public _BRGE_Operation(ProgrammableChip chip, int lineNumber, string registerArgument1Code, string registerArgument2Code, string jumpAddressCode) : base(chip, lineNumber, registerArgument1Code, registerArgument2Code, jumpAddressCode)
 			{
 			}
 
-			// Token: 0x06008551 RID: 34129 RVA: 0x00296960 File Offset: 0x00294B60
+			// Token: 0x06008C5A RID: 35930 RVA: 0x002C54B0 File Offset: 0x002C36B0
 			public override int Execute(int index)
 			{
 				bool flag;
 				return this.Execute(index, out flag, 0);
 			}
 
-			// Token: 0x06008552 RID: 34130 RVA: 0x00296978 File Offset: 0x00294B78
+			// Token: 0x06008C5B RID: 35931 RVA: 0x002C54C8 File Offset: 0x002C36C8
 			public int Execute(int index, int offset)
 			{
 				bool flag;
 				return this.Execute(index, out flag, offset);
 			}
 
-			// Token: 0x06008553 RID: 34131 RVA: 0x00296990 File Offset: 0x00294B90
+			// Token: 0x06008C5C RID: 35932 RVA: 0x002C54E0 File Offset: 0x002C36E0
 			public int Execute(int index, out bool hasJumped, int offset = 0)
 			{
 				double variableValue = this._Argument1.GetVariableValue(ProgrammableChip._AliasTarget.Register, true);
@@ -6308,66 +6376,66 @@ namespace Assets.Scripts.Objects.Electrical
 			}
 		}
 
-		// Token: 0x0200123C RID: 4668
+		// Token: 0x020012E2 RID: 4834
 		private class _BRLTZ_Operation : ProgrammableChip._BRLT_Operation
 		{
-			// Token: 0x06008554 RID: 34132 RVA: 0x002969D6 File Offset: 0x00294BD6
+			// Token: 0x06008C5D RID: 35933 RVA: 0x002C5526 File Offset: 0x002C3726
 			public _BRLTZ_Operation(ProgrammableChip chip, int lineNumber, string registerArgument1Code, string jumpAddressCode) : base(chip, lineNumber, registerArgument1Code, "0", jumpAddressCode)
 			{
 			}
 		}
 
-		// Token: 0x0200123D RID: 4669
+		// Token: 0x020012E3 RID: 4835
 		private class _BRGEZ_Operation : ProgrammableChip._BRGE_Operation
 		{
-			// Token: 0x06008555 RID: 34133 RVA: 0x002969E8 File Offset: 0x00294BE8
+			// Token: 0x06008C5E RID: 35934 RVA: 0x002C5538 File Offset: 0x002C3738
 			public _BRGEZ_Operation(ProgrammableChip chip, int lineNumber, string registerArgument1Code, string jumpAddressCode) : base(chip, lineNumber, registerArgument1Code, "0", jumpAddressCode)
 			{
 			}
 		}
 
-		// Token: 0x0200123E RID: 4670
+		// Token: 0x020012E4 RID: 4836
 		private class _BRLEZ_Operation : ProgrammableChip._BRLE_Operation
 		{
-			// Token: 0x06008556 RID: 34134 RVA: 0x002969FA File Offset: 0x00294BFA
+			// Token: 0x06008C5F RID: 35935 RVA: 0x002C554A File Offset: 0x002C374A
 			public _BRLEZ_Operation(ProgrammableChip chip, int lineNumber, string registerArgument1Code, string jumpAddressCode) : base(chip, lineNumber, registerArgument1Code, "0", jumpAddressCode)
 			{
 			}
 		}
 
-		// Token: 0x0200123F RID: 4671
+		// Token: 0x020012E5 RID: 4837
 		private class _BRGTZ_Operation : ProgrammableChip._BRGT_Operation
 		{
-			// Token: 0x06008557 RID: 34135 RVA: 0x00296A0C File Offset: 0x00294C0C
+			// Token: 0x06008C60 RID: 35936 RVA: 0x002C555C File Offset: 0x002C375C
 			public _BRGTZ_Operation(ProgrammableChip chip, int lineNumber, string registerArgument1Code, string jumpAddressCode) : base(chip, lineNumber, registerArgument1Code, "0", jumpAddressCode)
 			{
 			}
 		}
 
-		// Token: 0x02001240 RID: 4672
+		// Token: 0x020012E6 RID: 4838
 		private class _BRDSE_Operation : ProgrammableChip._Operation_J_0
 		{
-			// Token: 0x06008558 RID: 34136 RVA: 0x00296A1E File Offset: 0x00294C1E
+			// Token: 0x06008C61 RID: 35937 RVA: 0x002C556E File Offset: 0x002C376E
 			public _BRDSE_Operation(ProgrammableChip chip, int lineNumber, string deviceCode, string jumpAddressCode) : base(chip, lineNumber, jumpAddressCode)
 			{
 				this._DeviceIndex = ProgrammableChip._Operation._MakeDeviceVariable(chip, lineNumber, deviceCode);
 			}
 
-			// Token: 0x06008559 RID: 34137 RVA: 0x00296A38 File Offset: 0x00294C38
+			// Token: 0x06008C62 RID: 35938 RVA: 0x002C5588 File Offset: 0x002C3788
 			public override int Execute(int index)
 			{
 				bool flag;
 				return this.Execute(index, out flag, 0);
 			}
 
-			// Token: 0x0600855A RID: 34138 RVA: 0x00296A50 File Offset: 0x00294C50
+			// Token: 0x06008C63 RID: 35939 RVA: 0x002C55A0 File Offset: 0x002C37A0
 			public int Execute(int index, int offset)
 			{
 				bool flag;
 				return this.Execute(index, out flag, offset);
 			}
 
-			// Token: 0x0600855B RID: 34139 RVA: 0x00296A67 File Offset: 0x00294C67
+			// Token: 0x06008C64 RID: 35940 RVA: 0x002C55B7 File Offset: 0x002C37B7
 			public int Execute(int index, out bool hasJumped, int offset = 0)
 			{
 				if (this._DeviceIndex.GetDevice(this._Chip.CircuitHousing) == null)
@@ -6379,34 +6447,34 @@ namespace Assets.Scripts.Objects.Electrical
 				return index + offset + this._JumpIndex.GetVariableValue(ProgrammableChip._AliasTarget.Register, true);
 			}
 
-			// Token: 0x04007297 RID: 29335
+			// Token: 0x04007757 RID: 30551
 			protected readonly ProgrammableChip._Operation.IDeviceVariable _DeviceIndex;
 		}
 
-		// Token: 0x02001241 RID: 4673
+		// Token: 0x020012E7 RID: 4839
 		private class _BRDNS_Operation : ProgrammableChip._Operation_J_0
 		{
-			// Token: 0x0600855C RID: 34140 RVA: 0x00296A9C File Offset: 0x00294C9C
+			// Token: 0x06008C65 RID: 35941 RVA: 0x002C55EC File Offset: 0x002C37EC
 			public _BRDNS_Operation(ProgrammableChip chip, int lineNumber, string deviceCode, string jumpAddressCode) : base(chip, lineNumber, jumpAddressCode)
 			{
 				this._DeviceIndex = ProgrammableChip._Operation._MakeDeviceVariable(chip, lineNumber, deviceCode);
 			}
 
-			// Token: 0x0600855D RID: 34141 RVA: 0x00296AB8 File Offset: 0x00294CB8
+			// Token: 0x06008C66 RID: 35942 RVA: 0x002C5608 File Offset: 0x002C3808
 			public override int Execute(int index)
 			{
 				bool flag;
 				return this.Execute(index, out flag, 0);
 			}
 
-			// Token: 0x0600855E RID: 34142 RVA: 0x00296AD0 File Offset: 0x00294CD0
+			// Token: 0x06008C67 RID: 35943 RVA: 0x002C5620 File Offset: 0x002C3820
 			public int Execute(int index, int offset)
 			{
 				bool flag;
 				return this.Execute(index, out flag, offset);
 			}
 
-			// Token: 0x0600855F RID: 34143 RVA: 0x00296AE7 File Offset: 0x00294CE7
+			// Token: 0x06008C68 RID: 35944 RVA: 0x002C5637 File Offset: 0x002C3837
 			public int Execute(int index, out bool hasJumped, int offset = 0)
 			{
 				if (this._DeviceIndex.GetDevice(this._Chip.CircuitHousing) == null)
@@ -6418,33 +6486,33 @@ namespace Assets.Scripts.Objects.Electrical
 				return index + 1;
 			}
 
-			// Token: 0x04007298 RID: 29336
+			// Token: 0x04007758 RID: 30552
 			protected readonly ProgrammableChip._Operation.IDeviceVariable _DeviceIndex;
 		}
 
-		// Token: 0x02001242 RID: 4674
+		// Token: 0x020012E8 RID: 4840
 		private class _BREQ_Operation : ProgrammableChip._Operation_J_2
 		{
-			// Token: 0x06008560 RID: 34144 RVA: 0x00296B1C File Offset: 0x00294D1C
+			// Token: 0x06008C69 RID: 35945 RVA: 0x002C566C File Offset: 0x002C386C
 			public _BREQ_Operation(ProgrammableChip chip, int lineNumber, string registerArgument1Code, string registerArgument2Code, string jumpAddressCode) : base(chip, lineNumber, registerArgument1Code, registerArgument2Code, jumpAddressCode)
 			{
 			}
 
-			// Token: 0x06008561 RID: 34145 RVA: 0x00296B2C File Offset: 0x00294D2C
+			// Token: 0x06008C6A RID: 35946 RVA: 0x002C567C File Offset: 0x002C387C
 			public override int Execute(int index)
 			{
 				bool flag;
 				return this.Execute(index, out flag, 0);
 			}
 
-			// Token: 0x06008562 RID: 34146 RVA: 0x00296B44 File Offset: 0x00294D44
+			// Token: 0x06008C6B RID: 35947 RVA: 0x002C5694 File Offset: 0x002C3894
 			public int Execute(int index, int offset)
 			{
 				bool flag;
 				return this.Execute(index, out flag, offset);
 			}
 
-			// Token: 0x06008563 RID: 34147 RVA: 0x00296B5C File Offset: 0x00294D5C
+			// Token: 0x06008C6C RID: 35948 RVA: 0x002C56AC File Offset: 0x002C38AC
 			public int Execute(int index, out bool hasJumped, int offset = 0)
 			{
 				double variableValue = this._Argument1.GetVariableValue(ProgrammableChip._AliasTarget.Register, true);
@@ -6459,29 +6527,29 @@ namespace Assets.Scripts.Objects.Electrical
 			}
 		}
 
-		// Token: 0x02001243 RID: 4675
+		// Token: 0x020012E9 RID: 4841
 		private class _BRNE_Operation : ProgrammableChip._Operation_J_2
 		{
-			// Token: 0x06008564 RID: 34148 RVA: 0x00296BA2 File Offset: 0x00294DA2
+			// Token: 0x06008C6D RID: 35949 RVA: 0x002C56F2 File Offset: 0x002C38F2
 			public _BRNE_Operation(ProgrammableChip chip, int lineNumber, string registerArgument1Code, string registerArgument2Code, string jumpAddressCode) : base(chip, lineNumber, registerArgument1Code, registerArgument2Code, jumpAddressCode)
 			{
 			}
 
-			// Token: 0x06008565 RID: 34149 RVA: 0x00296BB4 File Offset: 0x00294DB4
+			// Token: 0x06008C6E RID: 35950 RVA: 0x002C5704 File Offset: 0x002C3904
 			public override int Execute(int index)
 			{
 				bool flag;
 				return this.Execute(index, out flag, 0);
 			}
 
-			// Token: 0x06008566 RID: 34150 RVA: 0x00296BCC File Offset: 0x00294DCC
+			// Token: 0x06008C6F RID: 35951 RVA: 0x002C571C File Offset: 0x002C391C
 			public int Execute(int index, int offset)
 			{
 				bool flag;
 				return this.Execute(index, out flag, offset);
 			}
 
-			// Token: 0x06008567 RID: 34151 RVA: 0x00296BE4 File Offset: 0x00294DE4
+			// Token: 0x06008C70 RID: 35952 RVA: 0x002C5734 File Offset: 0x002C3934
 			public int Execute(int index, out bool hasJumped, int offset = 0)
 			{
 				double variableValue = this._Argument1.GetVariableValue(ProgrammableChip._AliasTarget.Register, true);
@@ -6496,29 +6564,29 @@ namespace Assets.Scripts.Objects.Electrical
 			}
 		}
 
-		// Token: 0x02001244 RID: 4676
+		// Token: 0x020012EA RID: 4842
 		private class _BRAP_Operation : ProgrammableChip._Operation_J_3
 		{
-			// Token: 0x06008568 RID: 34152 RVA: 0x00296C2A File Offset: 0x00294E2A
+			// Token: 0x06008C71 RID: 35953 RVA: 0x002C577A File Offset: 0x002C397A
 			public _BRAP_Operation(ProgrammableChip chip, int lineNumber, string registerArgument1Code, string registerArgument2Code, string registerArgument3Code, string jumpAddressCode) : base(chip, lineNumber, registerArgument1Code, registerArgument2Code, registerArgument3Code, jumpAddressCode)
 			{
 			}
 
-			// Token: 0x06008569 RID: 34153 RVA: 0x00296C3C File Offset: 0x00294E3C
+			// Token: 0x06008C72 RID: 35954 RVA: 0x002C578C File Offset: 0x002C398C
 			public override int Execute(int index)
 			{
 				bool flag;
 				return this.Execute(index, out flag, 0);
 			}
 
-			// Token: 0x0600856A RID: 34154 RVA: 0x00296C54 File Offset: 0x00294E54
+			// Token: 0x06008C73 RID: 35955 RVA: 0x002C57A4 File Offset: 0x002C39A4
 			public int Execute(int index, int offset)
 			{
 				bool flag;
 				return this.Execute(index, out flag, offset);
 			}
 
-			// Token: 0x0600856B RID: 34155 RVA: 0x00296C6C File Offset: 0x00294E6C
+			// Token: 0x06008C74 RID: 35956 RVA: 0x002C57BC File Offset: 0x002C39BC
 			public int Execute(int index, out bool hasJumped, int offset)
 			{
 				double variableValue = this._Argument1.GetVariableValue(ProgrammableChip._AliasTarget.Register, true);
@@ -6534,29 +6602,29 @@ namespace Assets.Scripts.Objects.Electrical
 			}
 		}
 
-		// Token: 0x02001245 RID: 4677
+		// Token: 0x020012EB RID: 4843
 		private class _BRNA_Operation : ProgrammableChip._Operation_J_3
 		{
-			// Token: 0x0600856C RID: 34156 RVA: 0x00296CE9 File Offset: 0x00294EE9
+			// Token: 0x06008C75 RID: 35957 RVA: 0x002C5839 File Offset: 0x002C3A39
 			public _BRNA_Operation(ProgrammableChip chip, int lineNumber, string registerArgument1Code, string registerArgument2Code, string registerArgument3Code, string jumpAddressCode) : base(chip, lineNumber, registerArgument1Code, registerArgument2Code, registerArgument3Code, jumpAddressCode)
 			{
 			}
 
-			// Token: 0x0600856D RID: 34157 RVA: 0x00296CFC File Offset: 0x00294EFC
+			// Token: 0x06008C76 RID: 35958 RVA: 0x002C584C File Offset: 0x002C3A4C
 			public override int Execute(int index)
 			{
 				bool flag;
 				return this.Execute(index, out flag, 0);
 			}
 
-			// Token: 0x0600856E RID: 34158 RVA: 0x00296D14 File Offset: 0x00294F14
+			// Token: 0x06008C77 RID: 35959 RVA: 0x002C5864 File Offset: 0x002C3A64
 			public int Execute(int index, int offset)
 			{
 				bool flag;
 				return this.Execute(index, out flag, offset);
 			}
 
-			// Token: 0x0600856F RID: 34159 RVA: 0x00296D2C File Offset: 0x00294F2C
+			// Token: 0x06008C78 RID: 35960 RVA: 0x002C587C File Offset: 0x002C3A7C
 			public int Execute(int index, out bool hasJumped, int offset)
 			{
 				double variableValue = this._Argument1.GetVariableValue(ProgrammableChip._AliasTarget.Register, true);
@@ -6572,53 +6640,53 @@ namespace Assets.Scripts.Objects.Electrical
 			}
 		}
 
-		// Token: 0x02001246 RID: 4678
+		// Token: 0x020012EC RID: 4844
 		private class _BREQZ_Operation : ProgrammableChip._BREQ_Operation
 		{
-			// Token: 0x06008570 RID: 34160 RVA: 0x00296DA9 File Offset: 0x00294FA9
+			// Token: 0x06008C79 RID: 35961 RVA: 0x002C58F9 File Offset: 0x002C3AF9
 			public _BREQZ_Operation(ProgrammableChip chip, int lineNumber, string registerArgument1Code, string jumpAddressCode) : base(chip, lineNumber, registerArgument1Code, "0", jumpAddressCode)
 			{
 			}
 		}
 
-		// Token: 0x02001247 RID: 4679
+		// Token: 0x020012ED RID: 4845
 		private class _BNAN_Operation : ProgrammableChip._BRNAN_Operation
 		{
-			// Token: 0x06008571 RID: 34161 RVA: 0x00296DBB File Offset: 0x00294FBB
+			// Token: 0x06008C7A RID: 35962 RVA: 0x002C590B File Offset: 0x002C3B0B
 			public _BNAN_Operation(ProgrammableChip chip, int lineNumber, string registerArgument1Code, string jumpAddressCode) : base(chip, lineNumber, registerArgument1Code, jumpAddressCode)
 			{
 			}
 
-			// Token: 0x06008572 RID: 34162 RVA: 0x00296DC8 File Offset: 0x00294FC8
+			// Token: 0x06008C7B RID: 35963 RVA: 0x002C5918 File Offset: 0x002C3B18
 			public override int Execute(int index)
 			{
 				return base.Execute(index, -index);
 			}
 		}
 
-		// Token: 0x02001248 RID: 4680
+		// Token: 0x020012EE RID: 4846
 		private class _BRNAN_Operation : ProgrammableChip._Operation_J_1
 		{
-			// Token: 0x06008573 RID: 34163 RVA: 0x00296DD3 File Offset: 0x00294FD3
+			// Token: 0x06008C7C RID: 35964 RVA: 0x002C5923 File Offset: 0x002C3B23
 			public _BRNAN_Operation(ProgrammableChip chip, int lineNumber, string registerArgument1Code, string jumpAddressCode) : base(chip, lineNumber, registerArgument1Code, jumpAddressCode)
 			{
 			}
 
-			// Token: 0x06008574 RID: 34164 RVA: 0x00296DE0 File Offset: 0x00294FE0
+			// Token: 0x06008C7D RID: 35965 RVA: 0x002C5930 File Offset: 0x002C3B30
 			public override int Execute(int index)
 			{
 				bool flag;
 				return this.Execute(index, out flag, 0);
 			}
 
-			// Token: 0x06008575 RID: 34165 RVA: 0x00296DF8 File Offset: 0x00294FF8
+			// Token: 0x06008C7E RID: 35966 RVA: 0x002C5948 File Offset: 0x002C3B48
 			public int Execute(int index, int offset)
 			{
 				bool flag;
 				return this.Execute(index, out flag, offset);
 			}
 
-			// Token: 0x06008576 RID: 34166 RVA: 0x00296E0F File Offset: 0x0029500F
+			// Token: 0x06008C7F RID: 35967 RVA: 0x002C595F File Offset: 0x002C3B5F
 			public int Execute(int index, out bool hasJumped, int offset = 0)
 			{
 				if (double.IsNaN(this._Argument1.GetVariableValue(ProgrammableChip._AliasTarget.Register, true)))
@@ -6631,42 +6699,42 @@ namespace Assets.Scripts.Objects.Electrical
 			}
 		}
 
-		// Token: 0x02001249 RID: 4681
+		// Token: 0x020012EF RID: 4847
 		private class _BRNEZ_Operation : ProgrammableChip._BRNE_Operation
 		{
-			// Token: 0x06008577 RID: 34167 RVA: 0x00296E40 File Offset: 0x00295040
+			// Token: 0x06008C80 RID: 35968 RVA: 0x002C5990 File Offset: 0x002C3B90
 			public _BRNEZ_Operation(ProgrammableChip chip, int lineNumber, string registerArgument1Code, string jumpAddressCode) : base(chip, lineNumber, registerArgument1Code, "0", jumpAddressCode)
 			{
 			}
 		}
 
-		// Token: 0x0200124A RID: 4682
+		// Token: 0x020012F0 RID: 4848
 		private class _BRAPZ_Operation : ProgrammableChip._BRAP_Operation
 		{
-			// Token: 0x06008578 RID: 34168 RVA: 0x00296E52 File Offset: 0x00295052
+			// Token: 0x06008C81 RID: 35969 RVA: 0x002C59A2 File Offset: 0x002C3BA2
 			public _BRAPZ_Operation(ProgrammableChip chip, int lineNumber, string registerArgument1Code, string registerArgument2Code, string jumpAddressCode) : base(chip, lineNumber, registerArgument1Code, "0", registerArgument2Code, jumpAddressCode)
 			{
 			}
 		}
 
-		// Token: 0x0200124B RID: 4683
+		// Token: 0x020012F1 RID: 4849
 		private class _BRNAZ_Operation : ProgrammableChip._BRNA_Operation
 		{
-			// Token: 0x06008579 RID: 34169 RVA: 0x00296E66 File Offset: 0x00295066
+			// Token: 0x06008C82 RID: 35970 RVA: 0x002C59B6 File Offset: 0x002C3BB6
 			public _BRNAZ_Operation(ProgrammableChip chip, int lineNumber, string registerArgument1Code, string registerArgument2Code, string jumpAddressCode) : base(chip, lineNumber, registerArgument1Code, "0", registerArgument2Code, jumpAddressCode)
 			{
 			}
 		}
 
-		// Token: 0x0200124C RID: 4684
+		// Token: 0x020012F2 RID: 4850
 		private class _SQRT_Operation : ProgrammableChip._Operation_1_1
 		{
-			// Token: 0x0600857A RID: 34170 RVA: 0x00296E7A File Offset: 0x0029507A
+			// Token: 0x06008C83 RID: 35971 RVA: 0x002C59CA File Offset: 0x002C3BCA
 			public _SQRT_Operation(ProgrammableChip chip, int lineNumber, string registerStoreCode, string registerArgument1Code) : base(chip, lineNumber, registerStoreCode, registerArgument1Code)
 			{
 			}
 
-			// Token: 0x0600857B RID: 34171 RVA: 0x00296E88 File Offset: 0x00295088
+			// Token: 0x06008C84 RID: 35972 RVA: 0x002C59D8 File Offset: 0x002C3BD8
 			public override int Execute(int index)
 			{
 				int variableIndex = this._Store.GetVariableIndex(ProgrammableChip._AliasTarget.Register, true);
@@ -6676,15 +6744,15 @@ namespace Assets.Scripts.Objects.Electrical
 			}
 		}
 
-		// Token: 0x0200124D RID: 4685
+		// Token: 0x020012F3 RID: 4851
 		private class _ROUND_Operation : ProgrammableChip._Operation_1_1
 		{
-			// Token: 0x0600857C RID: 34172 RVA: 0x00296EC7 File Offset: 0x002950C7
+			// Token: 0x06008C85 RID: 35973 RVA: 0x002C5A17 File Offset: 0x002C3C17
 			public _ROUND_Operation(ProgrammableChip chip, int lineNumber, string registerStoreCode, string registerArgument1Code) : base(chip, lineNumber, registerStoreCode, registerArgument1Code)
 			{
 			}
 
-			// Token: 0x0600857D RID: 34173 RVA: 0x00296ED4 File Offset: 0x002950D4
+			// Token: 0x06008C86 RID: 35974 RVA: 0x002C5A24 File Offset: 0x002C3C24
 			public override int Execute(int index)
 			{
 				int variableIndex = this._Store.GetVariableIndex(ProgrammableChip._AliasTarget.Register, true);
@@ -6694,15 +6762,15 @@ namespace Assets.Scripts.Objects.Electrical
 			}
 		}
 
-		// Token: 0x0200124E RID: 4686
+		// Token: 0x020012F4 RID: 4852
 		private class _TRUNC_Operation : ProgrammableChip._Operation_1_1
 		{
-			// Token: 0x0600857E RID: 34174 RVA: 0x00296F13 File Offset: 0x00295113
+			// Token: 0x06008C87 RID: 35975 RVA: 0x002C5A63 File Offset: 0x002C3C63
 			public _TRUNC_Operation(ProgrammableChip chip, int lineNumber, string registerStoreCode, string registerArgument1Code) : base(chip, lineNumber, registerStoreCode, registerArgument1Code)
 			{
 			}
 
-			// Token: 0x0600857F RID: 34175 RVA: 0x00296F20 File Offset: 0x00295120
+			// Token: 0x06008C88 RID: 35976 RVA: 0x002C5A70 File Offset: 0x002C3C70
 			public override int Execute(int index)
 			{
 				int variableIndex = this._Store.GetVariableIndex(ProgrammableChip._AliasTarget.Register, true);
@@ -6712,15 +6780,15 @@ namespace Assets.Scripts.Objects.Electrical
 			}
 		}
 
-		// Token: 0x0200124F RID: 4687
+		// Token: 0x020012F5 RID: 4853
 		private class _CEIL_Operation : ProgrammableChip._Operation_1_1
 		{
-			// Token: 0x06008580 RID: 34176 RVA: 0x00296F5F File Offset: 0x0029515F
+			// Token: 0x06008C89 RID: 35977 RVA: 0x002C5AAF File Offset: 0x002C3CAF
 			public _CEIL_Operation(ProgrammableChip chip, int lineNumber, string registerStoreCode, string registerArgument1Code) : base(chip, lineNumber, registerStoreCode, registerArgument1Code)
 			{
 			}
 
-			// Token: 0x06008581 RID: 34177 RVA: 0x00296F6C File Offset: 0x0029516C
+			// Token: 0x06008C8A RID: 35978 RVA: 0x002C5ABC File Offset: 0x002C3CBC
 			public override int Execute(int index)
 			{
 				int variableIndex = this._Store.GetVariableIndex(ProgrammableChip._AliasTarget.Register, true);
@@ -6730,15 +6798,15 @@ namespace Assets.Scripts.Objects.Electrical
 			}
 		}
 
-		// Token: 0x02001250 RID: 4688
+		// Token: 0x020012F6 RID: 4854
 		private class _FLOOR_Operation : ProgrammableChip._Operation_1_1
 		{
-			// Token: 0x06008582 RID: 34178 RVA: 0x00296FAB File Offset: 0x002951AB
+			// Token: 0x06008C8B RID: 35979 RVA: 0x002C5AFB File Offset: 0x002C3CFB
 			public _FLOOR_Operation(ProgrammableChip chip, int lineNumber, string registerStoreCode, string registerArgument1Code) : base(chip, lineNumber, registerStoreCode, registerArgument1Code)
 			{
 			}
 
-			// Token: 0x06008583 RID: 34179 RVA: 0x00296FB8 File Offset: 0x002951B8
+			// Token: 0x06008C8C RID: 35980 RVA: 0x002C5B08 File Offset: 0x002C3D08
 			public override int Execute(int index)
 			{
 				int variableIndex = this._Store.GetVariableIndex(ProgrammableChip._AliasTarget.Register, true);
@@ -6748,15 +6816,15 @@ namespace Assets.Scripts.Objects.Electrical
 			}
 		}
 
-		// Token: 0x02001251 RID: 4689
+		// Token: 0x020012F7 RID: 4855
 		private class _MAX_Operation : ProgrammableChip._Operation_1_2
 		{
-			// Token: 0x06008584 RID: 34180 RVA: 0x00296FF7 File Offset: 0x002951F7
+			// Token: 0x06008C8D RID: 35981 RVA: 0x002C5B47 File Offset: 0x002C3D47
 			public _MAX_Operation(ProgrammableChip chip, int lineNumber, string registerStoreCode, string registerArgument1Code, string registerArgument2Code) : base(chip, lineNumber, registerStoreCode, registerArgument1Code, registerArgument2Code)
 			{
 			}
 
-			// Token: 0x06008585 RID: 34181 RVA: 0x00297008 File Offset: 0x00295208
+			// Token: 0x06008C8E RID: 35982 RVA: 0x002C5B58 File Offset: 0x002C3D58
 			public override int Execute(int index)
 			{
 				int variableIndex = this._Store.GetVariableIndex(ProgrammableChip._AliasTarget.Register, true);
@@ -6767,15 +6835,15 @@ namespace Assets.Scripts.Objects.Electrical
 			}
 		}
 
-		// Token: 0x02001252 RID: 4690
+		// Token: 0x020012F8 RID: 4856
 		private class _MIN_Operation : ProgrammableChip._Operation_1_2
 		{
-			// Token: 0x06008586 RID: 34182 RVA: 0x00297056 File Offset: 0x00295256
+			// Token: 0x06008C8F RID: 35983 RVA: 0x002C5BA6 File Offset: 0x002C3DA6
 			public _MIN_Operation(ProgrammableChip chip, int lineNumber, string registerStoreCode, string registerArgument1Code, string registerArgument2Code) : base(chip, lineNumber, registerStoreCode, registerArgument1Code, registerArgument2Code)
 			{
 			}
 
-			// Token: 0x06008587 RID: 34183 RVA: 0x00297068 File Offset: 0x00295268
+			// Token: 0x06008C90 RID: 35984 RVA: 0x002C5BB8 File Offset: 0x002C3DB8
 			public override int Execute(int index)
 			{
 				int variableIndex = this._Store.GetVariableIndex(ProgrammableChip._AliasTarget.Register, true);
@@ -6786,15 +6854,15 @@ namespace Assets.Scripts.Objects.Electrical
 			}
 		}
 
-		// Token: 0x02001253 RID: 4691
+		// Token: 0x020012F9 RID: 4857
 		private class _POW_Operation : ProgrammableChip._Operation_1_2
 		{
-			// Token: 0x06008588 RID: 34184 RVA: 0x002970B6 File Offset: 0x002952B6
+			// Token: 0x06008C91 RID: 35985 RVA: 0x002C5C06 File Offset: 0x002C3E06
 			public _POW_Operation(ProgrammableChip chip, int lineNumber, string registerStoreCode, string registerArgument1Code, string registerArgument2Code) : base(chip, lineNumber, registerStoreCode, registerArgument1Code, registerArgument2Code)
 			{
 			}
 
-			// Token: 0x06008589 RID: 34185 RVA: 0x002970C8 File Offset: 0x002952C8
+			// Token: 0x06008C92 RID: 35986 RVA: 0x002C5C18 File Offset: 0x002C3E18
 			public override int Execute(int index)
 			{
 				int variableIndex = this._Store.GetVariableIndex(ProgrammableChip._AliasTarget.Register, true);
@@ -6805,15 +6873,15 @@ namespace Assets.Scripts.Objects.Electrical
 			}
 		}
 
-		// Token: 0x02001254 RID: 4692
+		// Token: 0x020012FA RID: 4858
 		private class _LERP_Operation : ProgrammableChip._Operation_1_3
 		{
-			// Token: 0x0600858A RID: 34186 RVA: 0x00297116 File Offset: 0x00295316
+			// Token: 0x06008C93 RID: 35987 RVA: 0x002C5C66 File Offset: 0x002C3E66
 			public _LERP_Operation(ProgrammableChip chip, int lineNumber, string registerStoreCode, string registerArgument1Code, string registerArgument2Code, string registerArgument3Code) : base(chip, lineNumber, registerStoreCode, registerArgument1Code, registerArgument2Code, registerArgument3Code)
 			{
 			}
 
-			// Token: 0x0600858B RID: 34187 RVA: 0x00297128 File Offset: 0x00295328
+			// Token: 0x06008C94 RID: 35988 RVA: 0x002C5C78 File Offset: 0x002C3E78
 			public override int Execute(int index)
 			{
 				int variableIndex = this._Store.GetVariableIndex(ProgrammableChip._AliasTarget.Register, true);
@@ -6825,15 +6893,15 @@ namespace Assets.Scripts.Objects.Electrical
 			}
 		}
 
-		// Token: 0x02001255 RID: 4693
+		// Token: 0x020012FB RID: 4859
 		private class _ABS_Operation : ProgrammableChip._Operation_1_1
 		{
-			// Token: 0x0600858C RID: 34188 RVA: 0x00297185 File Offset: 0x00295385
+			// Token: 0x06008C95 RID: 35989 RVA: 0x002C5CD5 File Offset: 0x002C3ED5
 			public _ABS_Operation(ProgrammableChip chip, int lineNumber, string registerStoreCode, string registerArgument1Code) : base(chip, lineNumber, registerStoreCode, registerArgument1Code)
 			{
 			}
 
-			// Token: 0x0600858D RID: 34189 RVA: 0x00297194 File Offset: 0x00295394
+			// Token: 0x06008C96 RID: 35990 RVA: 0x002C5CE4 File Offset: 0x002C3EE4
 			public override int Execute(int index)
 			{
 				int variableIndex = this._Store.GetVariableIndex(ProgrammableChip._AliasTarget.Register, true);
@@ -6843,15 +6911,15 @@ namespace Assets.Scripts.Objects.Electrical
 			}
 		}
 
-		// Token: 0x02001256 RID: 4694
+		// Token: 0x020012FC RID: 4860
 		private class _LOG_Operation : ProgrammableChip._Operation_1_1
 		{
-			// Token: 0x0600858E RID: 34190 RVA: 0x002971D3 File Offset: 0x002953D3
+			// Token: 0x06008C97 RID: 35991 RVA: 0x002C5D23 File Offset: 0x002C3F23
 			public _LOG_Operation(ProgrammableChip chip, int lineNumber, string registerStoreCode, string registerArgument1Code) : base(chip, lineNumber, registerStoreCode, registerArgument1Code)
 			{
 			}
 
-			// Token: 0x0600858F RID: 34191 RVA: 0x002971E0 File Offset: 0x002953E0
+			// Token: 0x06008C98 RID: 35992 RVA: 0x002C5D30 File Offset: 0x002C3F30
 			public override int Execute(int index)
 			{
 				int variableIndex = this._Store.GetVariableIndex(ProgrammableChip._AliasTarget.Register, true);
@@ -6861,15 +6929,15 @@ namespace Assets.Scripts.Objects.Electrical
 			}
 		}
 
-		// Token: 0x02001257 RID: 4695
+		// Token: 0x020012FD RID: 4861
 		private class _EXP_Operation : ProgrammableChip._Operation_1_1
 		{
-			// Token: 0x06008590 RID: 34192 RVA: 0x0029721F File Offset: 0x0029541F
+			// Token: 0x06008C99 RID: 35993 RVA: 0x002C5D6F File Offset: 0x002C3F6F
 			public _EXP_Operation(ProgrammableChip chip, int lineNumber, string registerStoreCode, string registerArgument1Code) : base(chip, lineNumber, registerStoreCode, registerArgument1Code)
 			{
 			}
 
-			// Token: 0x06008591 RID: 34193 RVA: 0x0029722C File Offset: 0x0029542C
+			// Token: 0x06008C9A RID: 35994 RVA: 0x002C5D7C File Offset: 0x002C3F7C
 			public override int Execute(int index)
 			{
 				int variableIndex = this._Store.GetVariableIndex(ProgrammableChip._AliasTarget.Register, true);
@@ -6879,15 +6947,15 @@ namespace Assets.Scripts.Objects.Electrical
 			}
 		}
 
-		// Token: 0x02001258 RID: 4696
+		// Token: 0x020012FE RID: 4862
 		private class _RAND_Operation : ProgrammableChip._Operation_1_0
 		{
-			// Token: 0x06008593 RID: 34195 RVA: 0x00297277 File Offset: 0x00295477
+			// Token: 0x06008C9C RID: 35996 RVA: 0x002C5DC7 File Offset: 0x002C3FC7
 			public _RAND_Operation(ProgrammableChip chip, int lineNumber, string registerStoreCode) : base(chip, lineNumber, registerStoreCode)
 			{
 			}
 
-			// Token: 0x06008594 RID: 34196 RVA: 0x00297284 File Offset: 0x00295484
+			// Token: 0x06008C9D RID: 35997 RVA: 0x002C5DD4 File Offset: 0x002C3FD4
 			public override int Execute(int index)
 			{
 				int variableIndex = this._Store.GetVariableIndex(ProgrammableChip._AliasTarget.Register, true);
@@ -6895,19 +6963,19 @@ namespace Assets.Scripts.Objects.Electrical
 				return index + 1;
 			}
 
-			// Token: 0x04007299 RID: 29337
+			// Token: 0x04007759 RID: 30553
 			private static readonly System.Random _RandomNumberGenerator = new System.Random();
 		}
 
-		// Token: 0x02001259 RID: 4697
+		// Token: 0x020012FF RID: 4863
 		private class _HCF_Operation : ProgrammableChip._Operation
 		{
-			// Token: 0x06008595 RID: 34197 RVA: 0x002972B9 File Offset: 0x002954B9
+			// Token: 0x06008C9E RID: 35998 RVA: 0x002C5E09 File Offset: 0x002C4009
 			public _HCF_Operation(ProgrammableChip chip, int lineNumber) : base(chip, lineNumber)
 			{
 			}
 
-			// Token: 0x06008596 RID: 34198 RVA: 0x002972C3 File Offset: 0x002954C3
+			// Token: 0x06008C9F RID: 35999 RVA: 0x002C5E13 File Offset: 0x002C4013
 			public override int Execute(int index)
 			{
 				this._Chip.HaltAndCatchFire();
@@ -6915,45 +6983,45 @@ namespace Assets.Scripts.Objects.Electrical
 			}
 		}
 
-		// Token: 0x0200125A RID: 4698
+		// Token: 0x02001300 RID: 4864
 		private class _YIELD_Operation : ProgrammableChip._Operation
 		{
-			// Token: 0x06008597 RID: 34199 RVA: 0x002972DD File Offset: 0x002954DD
+			// Token: 0x06008CA0 RID: 36000 RVA: 0x002C5E2D File Offset: 0x002C402D
 			public _YIELD_Operation(ProgrammableChip chip, int lineNumber) : base(chip, lineNumber)
 			{
 			}
 
-			// Token: 0x06008598 RID: 34200 RVA: 0x002972E7 File Offset: 0x002954E7
+			// Token: 0x06008CA1 RID: 36001 RVA: 0x002C5E37 File Offset: 0x002C4037
 			public override int Execute(int index)
 			{
 				return -index - 1;
 			}
 		}
 
-		// Token: 0x0200125B RID: 4699
+		// Token: 0x02001301 RID: 4865
 		private class _NOOP_Operation : ProgrammableChip._Operation
 		{
-			// Token: 0x06008599 RID: 34201 RVA: 0x002972ED File Offset: 0x002954ED
+			// Token: 0x06008CA2 RID: 36002 RVA: 0x002C5E3D File Offset: 0x002C403D
 			public _NOOP_Operation(ProgrammableChip chip, int lineNUmber) : base(chip, lineNUmber)
 			{
 			}
 
-			// Token: 0x0600859A RID: 34202 RVA: 0x002972F7 File Offset: 0x002954F7
+			// Token: 0x06008CA3 RID: 36003 RVA: 0x002C5E47 File Offset: 0x002C4047
 			public override int Execute(int index)
 			{
 				return index + 1;
 			}
 		}
 
-		// Token: 0x0200125C RID: 4700
+		// Token: 0x02001302 RID: 4866
 		private class _POP_Operation : ProgrammableChip._PEEK_Operation
 		{
-			// Token: 0x0600859B RID: 34203 RVA: 0x002972FC File Offset: 0x002954FC
+			// Token: 0x06008CA4 RID: 36004 RVA: 0x002C5E4C File Offset: 0x002C404C
 			public _POP_Operation(ProgrammableChip chip, int lineNumber, string registerStoreCode) : base(chip, lineNumber, registerStoreCode)
 			{
 			}
 
-			// Token: 0x0600859C RID: 34204 RVA: 0x00297308 File Offset: 0x00295508
+			// Token: 0x06008CA5 RID: 36005 RVA: 0x002C5E58 File Offset: 0x002C4058
 			public override int Execute(int index)
 			{
 				this._Chip._Registers[this._Chip._StackPointerIndex] -= 1.0;
@@ -6981,15 +7049,15 @@ namespace Assets.Scripts.Objects.Electrical
 			}
 		}
 
-		// Token: 0x0200125D RID: 4701
+		// Token: 0x02001303 RID: 4867
 		private class _PEEK_Operation : ProgrammableChip._Operation_1_0
 		{
-			// Token: 0x0600859D RID: 34205 RVA: 0x002973DC File Offset: 0x002955DC
+			// Token: 0x06008CA6 RID: 36006 RVA: 0x002C5F2C File Offset: 0x002C412C
 			public _PEEK_Operation(ProgrammableChip chip, int lineNumber, string registerStoreCode) : base(chip, lineNumber, registerStoreCode)
 			{
 			}
 
-			// Token: 0x0600859E RID: 34206 RVA: 0x002973E8 File Offset: 0x002955E8
+			// Token: 0x06008CA7 RID: 36007 RVA: 0x002C5F38 File Offset: 0x002C4138
 			public override int Execute(int index)
 			{
 				int variableIndex = this._Store.GetVariableIndex(ProgrammableChip._AliasTarget.Register, true);
@@ -7016,16 +7084,16 @@ namespace Assets.Scripts.Objects.Electrical
 			}
 		}
 
-		// Token: 0x0200125E RID: 4702
+		// Token: 0x02001304 RID: 4868
 		private class _PUSH_Operation : ProgrammableChip._Operation
 		{
-			// Token: 0x0600859F RID: 34207 RVA: 0x00297496 File Offset: 0x00295696
+			// Token: 0x06008CA8 RID: 36008 RVA: 0x002C5FE6 File Offset: 0x002C41E6
 			public _PUSH_Operation(ProgrammableChip chip, int lineNumber, string argument1Code) : base(chip, lineNumber)
 			{
 				this._Argument1 = new ProgrammableChip._Operation.DoubleValueVariable(chip, lineNumber, argument1Code, InstructionInclude.MaskDoubleValue, false);
 			}
 
-			// Token: 0x060085A0 RID: 34208 RVA: 0x002974B4 File Offset: 0x002956B4
+			// Token: 0x06008CA9 RID: 36009 RVA: 0x002C6004 File Offset: 0x002C4204
 			public override int Execute(int index)
 			{
 				double variableValue = this._Argument1.GetVariableValue(ProgrammableChip._AliasTarget.Register, true);
@@ -7052,20 +7120,20 @@ namespace Assets.Scripts.Objects.Electrical
 				return index + 1;
 			}
 
-			// Token: 0x0400729A RID: 29338
+			// Token: 0x0400775A RID: 30554
 			protected ProgrammableChip._Operation.DoubleValueVariable _Argument1;
 		}
 
-		// Token: 0x0200125F RID: 4703
+		// Token: 0x02001305 RID: 4869
 		private class _CLR_Operation : ProgrammableChip._Operation
 		{
-			// Token: 0x060085A1 RID: 34209 RVA: 0x0029757C File Offset: 0x0029577C
+			// Token: 0x06008CAA RID: 36010 RVA: 0x002C60CC File Offset: 0x002C42CC
 			public _CLR_Operation(ProgrammableChip chip, int lineNumber, string deviceCode) : base(chip, lineNumber)
 			{
 				this._DeviceIndex = new ProgrammableChip._Operation.DeviceIndexVariable(chip, lineNumber, deviceCode, InstructionInclude.MaskDeviceIndex, false);
 			}
 
-			// Token: 0x060085A2 RID: 34210 RVA: 0x0029759C File Offset: 0x0029579C
+			// Token: 0x06008CAB RID: 36011 RVA: 0x002C60EC File Offset: 0x002C42EC
 			public override int Execute(int index)
 			{
 				int variableIndex = this._DeviceIndex.GetVariableIndex(ProgrammableChip._AliasTarget.Device, true);
@@ -7083,20 +7151,20 @@ namespace Assets.Scripts.Objects.Electrical
 				return index + 1;
 			}
 
-			// Token: 0x0400729B RID: 29339
+			// Token: 0x0400775B RID: 30555
 			protected readonly ProgrammableChip._Operation.DeviceIndexVariable _DeviceIndex;
 		}
 
-		// Token: 0x02001260 RID: 4704
+		// Token: 0x02001306 RID: 4870
 		private class _CLRD_Operation : ProgrammableChip._Operation
 		{
-			// Token: 0x060085A3 RID: 34211 RVA: 0x002975FC File Offset: 0x002957FC
+			// Token: 0x06008CAC RID: 36012 RVA: 0x002C614C File Offset: 0x002C434C
 			public _CLRD_Operation(ProgrammableChip chip, int lineNumber, string referenceId) : base(chip, lineNumber)
 			{
 				this._DeviceId = new ProgrammableChip._Operation.IntValuedVariable(chip, lineNumber, referenceId, InstructionInclude.MaskDoubleValue, false);
 			}
 
-			// Token: 0x060085A4 RID: 34212 RVA: 0x00297618 File Offset: 0x00295818
+			// Token: 0x06008CAD RID: 36013 RVA: 0x002C6168 File Offset: 0x002C4368
 			public override int Execute(int index)
 			{
 				int variableValue = this._DeviceId.GetVariableValue(ProgrammableChip._AliasTarget.Register, true);
@@ -7114,21 +7182,21 @@ namespace Assets.Scripts.Objects.Electrical
 				return index + 1;
 			}
 
-			// Token: 0x0400729C RID: 29340
+			// Token: 0x0400775C RID: 30556
 			protected readonly ProgrammableChip._Operation.IntValuedVariable _DeviceId;
 		}
 
-		// Token: 0x02001261 RID: 4705
+		// Token: 0x02001307 RID: 4871
 		private class _GET_Operation : ProgrammableChip._Operation_1_0
 		{
-			// Token: 0x060085A5 RID: 34213 RVA: 0x00297678 File Offset: 0x00295878
+			// Token: 0x06008CAE RID: 36014 RVA: 0x002C61C8 File Offset: 0x002C43C8
 			public _GET_Operation(ProgrammableChip chip, int lineNumber, string registerStoreCode, string deviceCode, string stackIndexCode) : base(chip, lineNumber, registerStoreCode)
 			{
 				this._DeviceRef = ProgrammableChip._Operation._MakeDeviceVariable(chip, lineNumber, deviceCode);
 				this._StackIndex = new ProgrammableChip._Operation.IntValuedVariable(chip, lineNumber, stackIndexCode, InstructionInclude.MaskDoubleValue, false);
 			}
 
-			// Token: 0x060085A6 RID: 34214 RVA: 0x002976A4 File Offset: 0x002958A4
+			// Token: 0x06008CAF RID: 36015 RVA: 0x002C61F4 File Offset: 0x002C43F4
 			public override int Execute(int index)
 			{
 				int variableIndex = this._Store.GetVariableIndex(ProgrammableChip._AliasTarget.Register, true);
@@ -7147,17 +7215,17 @@ namespace Assets.Scripts.Objects.Electrical
 				return index + 1;
 			}
 
-			// Token: 0x0400729D RID: 29341
+			// Token: 0x0400775D RID: 30557
 			protected readonly ProgrammableChip._Operation.IDeviceVariable _DeviceRef;
 
-			// Token: 0x0400729E RID: 29342
+			// Token: 0x0400775E RID: 30558
 			protected readonly ProgrammableChip._Operation.IntValuedVariable _StackIndex;
 		}
 
-		// Token: 0x02001262 RID: 4706
+		// Token: 0x02001308 RID: 4872
 		private class _PUT_Operation : ProgrammableChip._Operation
 		{
-			// Token: 0x060085A7 RID: 34215 RVA: 0x00297722 File Offset: 0x00295922
+			// Token: 0x06008CB0 RID: 36016 RVA: 0x002C6272 File Offset: 0x002C4472
 			public _PUT_Operation(ProgrammableChip chip, int lineNumber, string argument1Code, string deviceCode, string stackIndexCode) : base(chip, lineNumber)
 			{
 				this._Argument1 = new ProgrammableChip._Operation.DoubleValueVariable(chip, lineNumber, argument1Code, InstructionInclude.MaskDoubleValue, false);
@@ -7165,7 +7233,7 @@ namespace Assets.Scripts.Objects.Electrical
 				this._StackIndex = new ProgrammableChip._Operation.IntValuedVariable(chip, lineNumber, stackIndexCode, InstructionInclude.MaskDoubleValue, false);
 			}
 
-			// Token: 0x060085A8 RID: 34216 RVA: 0x00297760 File Offset: 0x00295960
+			// Token: 0x06008CB1 RID: 36017 RVA: 0x002C62B0 File Offset: 0x002C44B0
 			public override int Execute(int index)
 			{
 				double variableValue = this._Argument1.GetVariableValue(ProgrammableChip._AliasTarget.Register, true);
@@ -7204,26 +7272,26 @@ namespace Assets.Scripts.Objects.Electrical
 				return index + 1;
 			}
 
-			// Token: 0x0400729F RID: 29343
+			// Token: 0x0400775F RID: 30559
 			protected readonly ProgrammableChip._Operation.IDeviceVariable _DeviceRef;
 
-			// Token: 0x040072A0 RID: 29344
+			// Token: 0x04007760 RID: 30560
 			protected readonly ProgrammableChip._Operation.DoubleValueVariable _Argument1;
 
-			// Token: 0x040072A1 RID: 29345
+			// Token: 0x04007761 RID: 30561
 			protected readonly ProgrammableChip._Operation.IntValuedVariable _StackIndex;
 		}
 
-		// Token: 0x02001263 RID: 4707
+		// Token: 0x02001309 RID: 4873
 		private class _GETD_Operation : ProgrammableChip._Operation_I
 		{
-			// Token: 0x060085A9 RID: 34217 RVA: 0x00297848 File Offset: 0x00295A48
+			// Token: 0x06008CB2 RID: 36018 RVA: 0x002C6398 File Offset: 0x002C4598
 			public _GETD_Operation(ProgrammableChip chip, int lineNumber, string registerStoreCode, string idCode, string stackIndexCode) : base(chip, lineNumber, registerStoreCode, idCode)
 			{
 				this._StackIndex = new ProgrammableChip._Operation.IntValuedVariable(chip, lineNumber, stackIndexCode, InstructionInclude.MaskDoubleValue, false);
 			}
 
-			// Token: 0x060085AA RID: 34218 RVA: 0x00297868 File Offset: 0x00295A68
+			// Token: 0x06008CB3 RID: 36019 RVA: 0x002C63B8 File Offset: 0x002C45B8
 			public override int Execute(int index)
 			{
 				int variableIndex = this._Store.GetVariableIndex(ProgrammableChip._AliasTarget.Register, true);
@@ -7243,14 +7311,14 @@ namespace Assets.Scripts.Objects.Electrical
 				return index + 1;
 			}
 
-			// Token: 0x040072A2 RID: 29346
+			// Token: 0x04007762 RID: 30562
 			protected readonly ProgrammableChip._Operation.IntValuedVariable _StackIndex;
 		}
 
-		// Token: 0x02001264 RID: 4708
+		// Token: 0x0200130A RID: 4874
 		private class _PUTD_Operation : ProgrammableChip._Operation
 		{
-			// Token: 0x060085AB RID: 34219 RVA: 0x002978F4 File Offset: 0x00295AF4
+			// Token: 0x06008CB4 RID: 36020 RVA: 0x002C6444 File Offset: 0x002C4644
 			public _PUTD_Operation(ProgrammableChip chip, int lineNumber, string argument1Code, string referenceId, string stackIndexCode) : base(chip, lineNumber)
 			{
 				this._Argument1 = new ProgrammableChip._Operation.DoubleValueVariable(chip, lineNumber, argument1Code, InstructionInclude.MaskDoubleValue, false);
@@ -7258,7 +7326,7 @@ namespace Assets.Scripts.Objects.Electrical
 				this._StackIndex = new ProgrammableChip._Operation.IntValuedVariable(chip, lineNumber, stackIndexCode, InstructionInclude.MaskDoubleValue, false);
 			}
 
-			// Token: 0x060085AC RID: 34220 RVA: 0x00297934 File Offset: 0x00295B34
+			// Token: 0x06008CB5 RID: 36021 RVA: 0x002C6484 File Offset: 0x002C4684
 			public override int Execute(int index)
 			{
 				double variableValue = this._Argument1.GetVariableValue(ProgrammableChip._AliasTarget.Register, true);
@@ -7298,27 +7366,27 @@ namespace Assets.Scripts.Objects.Electrical
 				return index + 1;
 			}
 
-			// Token: 0x040072A3 RID: 29347
+			// Token: 0x04007763 RID: 30563
 			protected readonly ProgrammableChip._Operation.DoubleValueVariable _Argument1;
 
-			// Token: 0x040072A4 RID: 29348
+			// Token: 0x04007764 RID: 30564
 			protected readonly ProgrammableChip._Operation.IntValuedVariable _DeviceId;
 
-			// Token: 0x040072A5 RID: 29349
+			// Token: 0x04007765 RID: 30565
 			protected readonly ProgrammableChip._Operation.IntValuedVariable _StackIndex;
 		}
 
-		// Token: 0x02001265 RID: 4709
+		// Token: 0x0200130B RID: 4875
 		private class _POKE_Operation : ProgrammableChip._Operation
 		{
-			// Token: 0x060085AD RID: 34221 RVA: 0x00297A30 File Offset: 0x00295C30
+			// Token: 0x06008CB6 RID: 36022 RVA: 0x002C6580 File Offset: 0x002C4780
 			public _POKE_Operation(ProgrammableChip chip, int lineNumber, string stackIndexCode, string valueCode) : base(chip, lineNumber)
 			{
 				this._Index = new ProgrammableChip._Operation.IntValuedVariable(chip, lineNumber, stackIndexCode, InstructionInclude.MaskDoubleValue, false);
 				this._Value = new ProgrammableChip._Operation.DoubleValueVariable(chip, lineNumber, valueCode, InstructionInclude.MaskDoubleValue, false);
 			}
 
-			// Token: 0x060085AE RID: 34222 RVA: 0x00297A60 File Offset: 0x00295C60
+			// Token: 0x06008CB7 RID: 36023 RVA: 0x002C65B0 File Offset: 0x002C47B0
 			public override int Execute(int index)
 			{
 				double variableValue = this._Value.GetVariableValue(ProgrammableChip._AliasTarget.Register, true);
@@ -7335,22 +7403,22 @@ namespace Assets.Scripts.Objects.Electrical
 				return index + 1;
 			}
 
-			// Token: 0x040072A6 RID: 29350
+			// Token: 0x04007766 RID: 30566
 			protected ProgrammableChip._Operation.IntValuedVariable _Index;
 
-			// Token: 0x040072A7 RID: 29351
+			// Token: 0x04007767 RID: 30567
 			protected ProgrammableChip._Operation.DoubleValueVariable _Value;
 		}
 
-		// Token: 0x02001266 RID: 4710
+		// Token: 0x0200130C RID: 4876
 		private class _SELECT_Operation : ProgrammableChip._Operation_1_3
 		{
-			// Token: 0x060085AF RID: 34223 RVA: 0x00297ACA File Offset: 0x00295CCA
+			// Token: 0x06008CB8 RID: 36024 RVA: 0x002C661A File Offset: 0x002C481A
 			public _SELECT_Operation(ProgrammableChip chip, int lineNumber, string registerStoreCode, string argument1Code, string argument2Code, string argument3Code) : base(chip, lineNumber, registerStoreCode, argument1Code, argument2Code, argument3Code)
 			{
 			}
 
-			// Token: 0x060085B0 RID: 34224 RVA: 0x00297ADC File Offset: 0x00295CDC
+			// Token: 0x06008CB9 RID: 36025 RVA: 0x002C662C File Offset: 0x002C482C
 			public override int Execute(int index)
 			{
 				int variableIndex = this._Store.GetVariableIndex(ProgrammableChip._AliasTarget.Register, true);
@@ -7362,16 +7430,16 @@ namespace Assets.Scripts.Objects.Electrical
 			}
 		}
 
-		// Token: 0x02001267 RID: 4711
+		// Token: 0x0200130D RID: 4877
 		private class _SLEEP_Operation : ProgrammableChip._Operation
 		{
-			// Token: 0x060085B1 RID: 34225 RVA: 0x00297B41 File Offset: 0x00295D41
+			// Token: 0x06008CBA RID: 36026 RVA: 0x002C6691 File Offset: 0x002C4891
 			public _SLEEP_Operation(ProgrammableChip chip, int lineNumber, string sleepDurationCode) : base(chip, lineNumber)
 			{
 				this._SleepDuration = new ProgrammableChip._Operation.DoubleValueVariable(chip, lineNumber, sleepDurationCode, InstructionInclude.MaskDoubleValue, false);
 			}
 
-			// Token: 0x060085B2 RID: 34226 RVA: 0x00297B6C File Offset: 0x00295D6C
+			// Token: 0x06008CBB RID: 36027 RVA: 0x002C66BC File Offset: 0x002C48BC
 			public override int Execute(int index)
 			{
 				if (double.IsNaN(this.SleepDurationRemaining))
@@ -7392,25 +7460,25 @@ namespace Assets.Scripts.Objects.Electrical
 				return -index;
 			}
 
-			// Token: 0x040072A8 RID: 29352
+			// Token: 0x04007768 RID: 30568
 			protected readonly ProgrammableChip._Operation.DoubleValueVariable _SleepDuration;
 
-			// Token: 0x040072A9 RID: 29353
+			// Token: 0x04007769 RID: 30569
 			public float LastTimeSet;
 
-			// Token: 0x040072AA RID: 29354
+			// Token: 0x0400776A RID: 30570
 			public double SleepDurationRemaining = double.NaN;
 		}
 
-		// Token: 0x02001268 RID: 4712
+		// Token: 0x0200130E RID: 4878
 		private class _SRL_Operation : ProgrammableChip._Operation_1_2
 		{
-			// Token: 0x060085B3 RID: 34227 RVA: 0x00297BFF File Offset: 0x00295DFF
+			// Token: 0x06008CBC RID: 36028 RVA: 0x002C674F File Offset: 0x002C494F
 			public _SRL_Operation(ProgrammableChip chip, int lineNumber, string registerStoreCode, string registerArgument1Code, string registerArgument2Code) : base(chip, lineNumber, registerStoreCode, registerArgument1Code, registerArgument2Code)
 			{
 			}
 
-			// Token: 0x060085B4 RID: 34228 RVA: 0x00297C10 File Offset: 0x00295E10
+			// Token: 0x06008CBD RID: 36029 RVA: 0x002C6760 File Offset: 0x002C4960
 			public override int Execute(int index)
 			{
 				int variableIndex = this._Store.GetVariableIndex(ProgrammableChip._AliasTarget.Register, true);
@@ -7421,15 +7489,15 @@ namespace Assets.Scripts.Objects.Electrical
 			}
 		}
 
-		// Token: 0x02001269 RID: 4713
+		// Token: 0x0200130F RID: 4879
 		private class _SRA_Operation : ProgrammableChip._Operation_1_2
 		{
-			// Token: 0x060085B5 RID: 34229 RVA: 0x00297C63 File Offset: 0x00295E63
+			// Token: 0x06008CBE RID: 36030 RVA: 0x002C67B3 File Offset: 0x002C49B3
 			public _SRA_Operation(ProgrammableChip chip, int lineNumber, string registerStoreCode, string registerArgument1Code, string registerArgument2Code) : base(chip, lineNumber, registerStoreCode, registerArgument1Code, registerArgument2Code)
 			{
 			}
 
-			// Token: 0x060085B6 RID: 34230 RVA: 0x00297C74 File Offset: 0x00295E74
+			// Token: 0x06008CBF RID: 36031 RVA: 0x002C67C4 File Offset: 0x002C49C4
 			public override int Execute(int index)
 			{
 				int variableIndex = this._Store.GetVariableIndex(ProgrammableChip._AliasTarget.Register, true);
@@ -7440,15 +7508,15 @@ namespace Assets.Scripts.Objects.Electrical
 			}
 		}
 
-		// Token: 0x0200126A RID: 4714
+		// Token: 0x02001310 RID: 4880
 		private class _SLA_SLL_Operation : ProgrammableChip._Operation_1_2
 		{
-			// Token: 0x060085B7 RID: 34231 RVA: 0x00297CC7 File Offset: 0x00295EC7
+			// Token: 0x06008CC0 RID: 36032 RVA: 0x002C6817 File Offset: 0x002C4A17
 			public _SLA_SLL_Operation(ProgrammableChip chip, int lineNumber, string registerStoreCode, string registerArgument1Code, string registerArgument2Code) : base(chip, lineNumber, registerStoreCode, registerArgument1Code, registerArgument2Code)
 			{
 			}
 
-			// Token: 0x060085B8 RID: 34232 RVA: 0x00297CD8 File Offset: 0x00295ED8
+			// Token: 0x06008CC1 RID: 36033 RVA: 0x002C6828 File Offset: 0x002C4A28
 			public override int Execute(int index)
 			{
 				int variableIndex = this._Store.GetVariableIndex(ProgrammableChip._AliasTarget.Register, true);
@@ -7460,15 +7528,93 @@ namespace Assets.Scripts.Objects.Electrical
 			}
 		}
 
-		// Token: 0x0200126B RID: 4715
+		// Token: 0x02001311 RID: 4881
+		private class _ROL_Operation : ProgrammableChip._Operation_1_2
+		{
+			// Token: 0x06008CC2 RID: 36034 RVA: 0x002C687B File Offset: 0x002C4A7B
+			public _ROL_Operation(ProgrammableChip chip, int lineNumber, string registerStoreCode, string registerArgument1Code, string registerArgument2Code) : base(chip, lineNumber, registerStoreCode, registerArgument1Code, registerArgument2Code)
+			{
+			}
+
+			// Token: 0x06008CC3 RID: 36035 RVA: 0x002C688C File Offset: 0x002C4A8C
+			public override int Execute(int index)
+			{
+				int variableIndex = this._Store.GetVariableIndex(ProgrammableChip._AliasTarget.Register, true);
+				long num = this._Argument1.GetVariableLong(ProgrammableChip._AliasTarget.Register, false, true) & 18014398509481983L;
+				int num2 = (this._Argument2.GetVariableInt(ProgrammableChip._AliasTarget.Register, true) % 54 + 54) % 54;
+				long l = (num << num2 | num >> 54 - num2) & 18014398509481983L;
+				this._Chip._Registers[variableIndex] = ProgrammableChip.LongToDouble(l);
+				return index + 1;
+			}
+		}
+
+		// Token: 0x02001312 RID: 4882
+		private class _ROR_Operation : ProgrammableChip._Operation_1_2
+		{
+			// Token: 0x06008CC4 RID: 36036 RVA: 0x002C6908 File Offset: 0x002C4B08
+			public _ROR_Operation(ProgrammableChip chip, int lineNumber, string registerStoreCode, string registerArgument1Code, string registerArgument2Code) : base(chip, lineNumber, registerStoreCode, registerArgument1Code, registerArgument2Code)
+			{
+			}
+
+			// Token: 0x06008CC5 RID: 36037 RVA: 0x002C6918 File Offset: 0x002C4B18
+			public override int Execute(int index)
+			{
+				int variableIndex = this._Store.GetVariableIndex(ProgrammableChip._AliasTarget.Register, true);
+				long num = this._Argument1.GetVariableLong(ProgrammableChip._AliasTarget.Register, false, true) & 18014398509481983L;
+				int num2 = (this._Argument2.GetVariableInt(ProgrammableChip._AliasTarget.Register, true) % 54 + 54) % 54;
+				long l = (num >> num2 | num << 54 - num2) & 18014398509481983L;
+				this._Chip._Registers[variableIndex] = ProgrammableChip.LongToDouble(l);
+				return index + 1;
+			}
+		}
+
+		// Token: 0x02001313 RID: 4883
+		private class _SGN_Operation : ProgrammableChip._Operation_1_1
+		{
+			// Token: 0x06008CC6 RID: 36038 RVA: 0x002C6994 File Offset: 0x002C4B94
+			public _SGN_Operation(ProgrammableChip chip, int lineNumber, string registerStoreCode, string registerArgument1Code) : base(chip, lineNumber, registerStoreCode, registerArgument1Code)
+			{
+			}
+
+			// Token: 0x06008CC7 RID: 36039 RVA: 0x002C69A4 File Offset: 0x002C4BA4
+			public override int Execute(int index)
+			{
+				int variableIndex = this._Store.GetVariableIndex(ProgrammableChip._AliasTarget.Register, true);
+				double variableValue = this._Argument1.GetVariableValue(ProgrammableChip._AliasTarget.Register, true);
+				this._Chip._Registers[variableIndex] = ((variableValue > 0.0) ? 1.0 : ((variableValue < 0.0) ? -1.0 : 0.0));
+				return index + 1;
+			}
+		}
+
+		// Token: 0x02001314 RID: 4884
+		private class _CLAMP_Operation : ProgrammableChip._Operation_1_3
+		{
+			// Token: 0x06008CC8 RID: 36040 RVA: 0x002C6A14 File Offset: 0x002C4C14
+			public _CLAMP_Operation(ProgrammableChip chip, int lineNumber, string registerStoreCode, string registerArgument1Code, string registerArgument2Code, string registerArgument3Code) : base(chip, lineNumber, registerStoreCode, registerArgument1Code, registerArgument2Code, registerArgument3Code)
+			{
+			}
+
+			// Token: 0x06008CC9 RID: 36041 RVA: 0x002C6A28 File Offset: 0x002C4C28
+			public override int Execute(int index)
+			{
+				int variableIndex = this._Store.GetVariableIndex(ProgrammableChip._AliasTarget.Register, true);
+				double variableValue = this._Argument1.GetVariableValue(ProgrammableChip._AliasTarget.Register, true);
+				double variableValue2 = this._Argument2.GetVariableValue(ProgrammableChip._AliasTarget.Register, true);
+				double variableValue3 = this._Argument3.GetVariableValue(ProgrammableChip._AliasTarget.Register, true);
+				this._Chip._Registers[variableIndex] = Math.Min(Math.Max(variableValue, variableValue2), variableValue3);
+				return index + 1;
+			}
+		}
+
+		// Token: 0x02001315 RID: 4885
 		private class _SIN_Operation : ProgrammableChip._Operation_1_1
 		{
-			// Token: 0x060085B9 RID: 34233 RVA: 0x00297D2B File Offset: 0x00295F2B
+			// Token: 0x06008CCA RID: 36042 RVA: 0x002C6A8A File Offset: 0x002C4C8A
 			public _SIN_Operation(ProgrammableChip chip, int lineNumber, string registerStoreCode, string registerArgument1Code) : base(chip, lineNumber, registerStoreCode, registerArgument1Code)
 			{
 			}
 
-			// Token: 0x060085BA RID: 34234 RVA: 0x00297D38 File Offset: 0x00295F38
+			// Token: 0x06008CCB RID: 36043 RVA: 0x002C6A98 File Offset: 0x002C4C98
 			public override int Execute(int index)
 			{
 				int variableIndex = this._Store.GetVariableIndex(ProgrammableChip._AliasTarget.Register, true);
@@ -7478,15 +7624,15 @@ namespace Assets.Scripts.Objects.Electrical
 			}
 		}
 
-		// Token: 0x0200126C RID: 4716
+		// Token: 0x02001316 RID: 4886
 		private class _ASIN_Operation : ProgrammableChip._Operation_1_1
 		{
-			// Token: 0x060085BB RID: 34235 RVA: 0x00297D77 File Offset: 0x00295F77
+			// Token: 0x06008CCC RID: 36044 RVA: 0x002C6AD7 File Offset: 0x002C4CD7
 			public _ASIN_Operation(ProgrammableChip chip, int lineNumber, string registerStoreCode, string registerArgument1Code) : base(chip, lineNumber, registerStoreCode, registerArgument1Code)
 			{
 			}
 
-			// Token: 0x060085BC RID: 34236 RVA: 0x00297D84 File Offset: 0x00295F84
+			// Token: 0x06008CCD RID: 36045 RVA: 0x002C6AE4 File Offset: 0x002C4CE4
 			public override int Execute(int index)
 			{
 				int variableIndex = this._Store.GetVariableIndex(ProgrammableChip._AliasTarget.Register, true);
@@ -7496,15 +7642,15 @@ namespace Assets.Scripts.Objects.Electrical
 			}
 		}
 
-		// Token: 0x0200126D RID: 4717
+		// Token: 0x02001317 RID: 4887
 		private class _TAN_Operation : ProgrammableChip._Operation_1_1
 		{
-			// Token: 0x060085BD RID: 34237 RVA: 0x00297DC3 File Offset: 0x00295FC3
+			// Token: 0x06008CCE RID: 36046 RVA: 0x002C6B23 File Offset: 0x002C4D23
 			public _TAN_Operation(ProgrammableChip chip, int lineNumber, string registerStoreCode, string registerArgument1Code) : base(chip, lineNumber, registerStoreCode, registerArgument1Code)
 			{
 			}
 
-			// Token: 0x060085BE RID: 34238 RVA: 0x00297DD0 File Offset: 0x00295FD0
+			// Token: 0x06008CCF RID: 36047 RVA: 0x002C6B30 File Offset: 0x002C4D30
 			public override int Execute(int index)
 			{
 				int variableIndex = this._Store.GetVariableIndex(ProgrammableChip._AliasTarget.Register, true);
@@ -7514,15 +7660,15 @@ namespace Assets.Scripts.Objects.Electrical
 			}
 		}
 
-		// Token: 0x0200126E RID: 4718
+		// Token: 0x02001318 RID: 4888
 		private class _ATAN_Operation : ProgrammableChip._Operation_1_1
 		{
-			// Token: 0x060085BF RID: 34239 RVA: 0x00297E0F File Offset: 0x0029600F
+			// Token: 0x06008CD0 RID: 36048 RVA: 0x002C6B6F File Offset: 0x002C4D6F
 			public _ATAN_Operation(ProgrammableChip chip, int lineNumber, string registerStoreCode, string registerArgument1Code) : base(chip, lineNumber, registerStoreCode, registerArgument1Code)
 			{
 			}
 
-			// Token: 0x060085C0 RID: 34240 RVA: 0x00297E1C File Offset: 0x0029601C
+			// Token: 0x06008CD1 RID: 36049 RVA: 0x002C6B7C File Offset: 0x002C4D7C
 			public override int Execute(int index)
 			{
 				int variableIndex = this._Store.GetVariableIndex(ProgrammableChip._AliasTarget.Register, true);
@@ -7532,15 +7678,15 @@ namespace Assets.Scripts.Objects.Electrical
 			}
 		}
 
-		// Token: 0x0200126F RID: 4719
+		// Token: 0x02001319 RID: 4889
 		private class _ATAN2_Operation : ProgrammableChip._Operation_1_2
 		{
-			// Token: 0x060085C1 RID: 34241 RVA: 0x00297E5B File Offset: 0x0029605B
+			// Token: 0x06008CD2 RID: 36050 RVA: 0x002C6BBB File Offset: 0x002C4DBB
 			public _ATAN2_Operation(ProgrammableChip chip, int lineNumber, string registerStoreCode, string registerArgument1Code, string registerArgument2Code) : base(chip, lineNumber, registerStoreCode, registerArgument1Code, registerArgument2Code)
 			{
 			}
 
-			// Token: 0x060085C2 RID: 34242 RVA: 0x00297E6C File Offset: 0x0029606C
+			// Token: 0x06008CD3 RID: 36051 RVA: 0x002C6BCC File Offset: 0x002C4DCC
 			public override int Execute(int index)
 			{
 				int variableIndex = this._Store.GetVariableIndex(ProgrammableChip._AliasTarget.Register, true);
@@ -7551,15 +7697,15 @@ namespace Assets.Scripts.Objects.Electrical
 			}
 		}
 
-		// Token: 0x02001270 RID: 4720
+		// Token: 0x0200131A RID: 4890
 		private class _COS_Operation : ProgrammableChip._Operation_1_1
 		{
-			// Token: 0x060085C3 RID: 34243 RVA: 0x00297EBA File Offset: 0x002960BA
+			// Token: 0x06008CD4 RID: 36052 RVA: 0x002C6C1A File Offset: 0x002C4E1A
 			public _COS_Operation(ProgrammableChip chip, int lineNumber, string registerStoreCode, string registerArgument1Code) : base(chip, lineNumber, registerStoreCode, registerArgument1Code)
 			{
 			}
 
-			// Token: 0x060085C4 RID: 34244 RVA: 0x00297EC8 File Offset: 0x002960C8
+			// Token: 0x06008CD5 RID: 36053 RVA: 0x002C6C28 File Offset: 0x002C4E28
 			public override int Execute(int index)
 			{
 				int variableIndex = this._Store.GetVariableIndex(ProgrammableChip._AliasTarget.Register, true);
@@ -7569,15 +7715,15 @@ namespace Assets.Scripts.Objects.Electrical
 			}
 		}
 
-		// Token: 0x02001271 RID: 4721
+		// Token: 0x0200131B RID: 4891
 		private class _ACOS_Operation : ProgrammableChip._Operation_1_1
 		{
-			// Token: 0x060085C5 RID: 34245 RVA: 0x00297F07 File Offset: 0x00296107
+			// Token: 0x06008CD6 RID: 36054 RVA: 0x002C6C67 File Offset: 0x002C4E67
 			public _ACOS_Operation(ProgrammableChip chip, int lineNumber, string registerStoreCode, string registerArgument1Code) : base(chip, lineNumber, registerStoreCode, registerArgument1Code)
 			{
 			}
 
-			// Token: 0x060085C6 RID: 34246 RVA: 0x00297F14 File Offset: 0x00296114
+			// Token: 0x06008CD7 RID: 36055 RVA: 0x002C6C74 File Offset: 0x002C4E74
 			public override int Execute(int index)
 			{
 				int variableIndex = this._Store.GetVariableIndex(ProgrammableChip._AliasTarget.Register, true);
@@ -7587,17 +7733,17 @@ namespace Assets.Scripts.Objects.Electrical
 			}
 		}
 
-		// Token: 0x02001272 RID: 4722
+		// Token: 0x0200131C RID: 4892
 		private class _BDNVS_Operation : ProgrammableChip._Operation_J_0
 		{
-			// Token: 0x060085C7 RID: 34247 RVA: 0x00297F53 File Offset: 0x00296153
+			// Token: 0x06008CD8 RID: 36056 RVA: 0x002C6CB3 File Offset: 0x002C4EB3
 			public _BDNVS_Operation(ProgrammableChip chip, int lineNumber, string deviceCode, string logicTypeCode, string argument1Code) : base(chip, lineNumber, argument1Code)
 			{
 				this._DeviceRef = ProgrammableChip._Operation._MakeDeviceVariable(chip, lineNumber, deviceCode);
 				this._LogicType = new ProgrammableChip._Operation.EnumValuedVariable<LogicType>(chip, lineNumber, logicTypeCode, InstructionInclude.RegisterIndex | InstructionInclude.Alias | InstructionInclude.Value | InstructionInclude.JumpTag | InstructionInclude.Define | InstructionInclude.Enum | InstructionInclude.LogicType, false);
 			}
 
-			// Token: 0x060085C8 RID: 34248 RVA: 0x00297F84 File Offset: 0x00296184
+			// Token: 0x06008CD9 RID: 36057 RVA: 0x002C6CE4 File Offset: 0x002C4EE4
 			public override int Execute(int index)
 			{
 				LogicType variableValue = this._LogicType.GetVariableValue(ProgrammableChip._AliasTarget.Register, true);
@@ -7617,24 +7763,24 @@ namespace Assets.Scripts.Objects.Electrical
 				return index + 1;
 			}
 
-			// Token: 0x040072AB RID: 29355
+			// Token: 0x0400776B RID: 30571
 			protected readonly ProgrammableChip._Operation.IDeviceVariable _DeviceRef;
 
-			// Token: 0x040072AC RID: 29356
+			// Token: 0x0400776C RID: 30572
 			protected readonly ProgrammableChip._Operation.EnumValuedVariable<LogicType> _LogicType;
 		}
 
-		// Token: 0x02001273 RID: 4723
+		// Token: 0x0200131D RID: 4893
 		private class _BDNVL_Operation : ProgrammableChip._Operation_J_0
 		{
-			// Token: 0x060085C9 RID: 34249 RVA: 0x00297FF1 File Offset: 0x002961F1
+			// Token: 0x06008CDA RID: 36058 RVA: 0x002C6D51 File Offset: 0x002C4F51
 			public _BDNVL_Operation(ProgrammableChip chip, int lineNumber, string deviceCode, string logicTypeCode, string argument1Code) : base(chip, lineNumber, argument1Code)
 			{
 				this._DeviceRef = ProgrammableChip._Operation._MakeDeviceVariable(chip, lineNumber, deviceCode);
 				this._LogicType = new ProgrammableChip._Operation.EnumValuedVariable<LogicType>(chip, lineNumber, logicTypeCode, InstructionInclude.RegisterIndex | InstructionInclude.Alias | InstructionInclude.Value | InstructionInclude.JumpTag | InstructionInclude.Define | InstructionInclude.Enum | InstructionInclude.LogicType, false);
 			}
 
-			// Token: 0x060085CA RID: 34250 RVA: 0x00298020 File Offset: 0x00296220
+			// Token: 0x06008CDB RID: 36059 RVA: 0x002C6D80 File Offset: 0x002C4F80
 			public override int Execute(int index)
 			{
 				LogicType variableValue = this._LogicType.GetVariableValue(ProgrammableChip._AliasTarget.Register, true);
@@ -7654,23 +7800,23 @@ namespace Assets.Scripts.Objects.Electrical
 				return index + 1;
 			}
 
-			// Token: 0x040072AD RID: 29357
+			// Token: 0x0400776D RID: 30573
 			protected readonly ProgrammableChip._Operation.IDeviceVariable _DeviceRef;
 
-			// Token: 0x040072AE RID: 29358
+			// Token: 0x0400776E RID: 30574
 			protected readonly ProgrammableChip._Operation.EnumValuedVariable<LogicType> _LogicType;
 		}
 
-		// Token: 0x02001274 RID: 4724
+		// Token: 0x0200131E RID: 4894
 		private class _RMAP_Operation : ProgrammableChip._Operation_1_1
 		{
-			// Token: 0x060085CB RID: 34251 RVA: 0x0029808D File Offset: 0x0029628D
+			// Token: 0x06008CDC RID: 36060 RVA: 0x002C6DED File Offset: 0x002C4FED
 			public _RMAP_Operation(ProgrammableChip chip, int lineNumber, string registerStoreCode, string deviceCode, string argument1Code) : base(chip, lineNumber, registerStoreCode, argument1Code)
 			{
 				this._DeviceIndex = new ProgrammableChip._Operation.DeviceIndexVariable(chip, lineNumber, deviceCode, InstructionInclude.MaskDeviceIndex, false);
 			}
 
-			// Token: 0x060085CC RID: 34252 RVA: 0x002980B0 File Offset: 0x002962B0
+			// Token: 0x06008CDD RID: 36061 RVA: 0x002C6E10 File Offset: 0x002C5010
 			public override int Execute(int index)
 			{
 				int variableIndex = this._Store.GetVariableIndex(ProgrammableChip._AliasTarget.Register, true);
@@ -7691,14 +7837,14 @@ namespace Assets.Scripts.Objects.Electrical
 				return index + 1;
 			}
 
-			// Token: 0x040072AF RID: 29359
+			// Token: 0x0400776F RID: 30575
 			protected readonly ProgrammableChip._Operation.DeviceIndexVariable _DeviceIndex;
 		}
 
-		// Token: 0x02001275 RID: 4725
+		// Token: 0x0200131F RID: 4895
 		public class ScriptEnum<T> : IScriptEnum where T : struct, Enum, IConvertible
 		{
-			// Token: 0x060085CD RID: 34253 RVA: 0x00298144 File Offset: 0x00296344
+			// Token: 0x06008CDE RID: 36062 RVA: 0x002C6EA4 File Offset: 0x002C50A4
 			public ScriptEnum(InstructionInclude logicType, Func<T, bool> isDeprecated, Func<T, string> getDescription = null)
 			{
 				this._includeType = logicType;
@@ -7710,20 +7856,20 @@ namespace Assets.Scripts.Objects.Electrical
 				this._typeHash = Animator.StringToHash(typeof(T).Name);
 			}
 
-			// Token: 0x060085CE RID: 34254 RVA: 0x002981C0 File Offset: 0x002963C0
+			// Token: 0x06008CDF RID: 36063 RVA: 0x002C6F20 File Offset: 0x002C5120
 			public int Count()
 			{
 				return this._types.Length;
 			}
 
-			// Token: 0x060085CF RID: 34255 RVA: 0x002981CA File Offset: 0x002963CA
+			// Token: 0x06008CE0 RID: 36064 RVA: 0x002C6F2A File Offset: 0x002C512A
 			public bool IsDeprecated(int i)
 			{
 				Func<T, bool> isDeprecated = this._isDeprecated;
 				return isDeprecated != null && isDeprecated(this._types[i]);
 			}
 
-			// Token: 0x060085D0 RID: 34256 RVA: 0x002981EC File Offset: 0x002963EC
+			// Token: 0x06008CE1 RID: 36065 RVA: 0x002C6F4C File Offset: 0x002C514C
 			public HelpReference MakePage(int i, HelpReference prefab, RectTransform parent)
 			{
 				T t = this._types[i];
@@ -7762,20 +7908,20 @@ namespace Assets.Scripts.Objects.Electrical
 				return helpReference;
 			}
 
-			// Token: 0x060085D1 RID: 34257 RVA: 0x0029836C File Offset: 0x0029656C
+			// Token: 0x06008CE2 RID: 36066 RVA: 0x002C70CC File Offset: 0x002C52CC
 			public bool TryParse(string searchText)
 			{
 				T t;
 				return Enum.TryParse<T>(searchText, out t);
 			}
 
-			// Token: 0x060085D2 RID: 34258 RVA: 0x00298381 File Offset: 0x00296581
+			// Token: 0x06008CE3 RID: 36067 RVA: 0x002C70E1 File Offset: 0x002C52E1
 			public bool IsHashType(int hash)
 			{
 				return this._typeHash == hash;
 			}
 
-			// Token: 0x060085D3 RID: 34259 RVA: 0x0029838C File Offset: 0x0029658C
+			// Token: 0x06008CE4 RID: 36068 RVA: 0x002C70EC File Offset: 0x002C52EC
 			public void Parse(ref string masterString)
 			{
 				for (int i = 0; i < this._types.Length; i++)
@@ -7790,7 +7936,7 @@ namespace Assets.Scripts.Objects.Electrical
 				}
 			}
 
-			// Token: 0x060085D4 RID: 34260 RVA: 0x00298409 File Offset: 0x00296609
+			// Token: 0x06008CE5 RID: 36069 RVA: 0x002C7169 File Offset: 0x002C5369
 			public void Execute(ref bool isValueSet, ref double value, string code, InstructionInclude propertiesToUse)
 			{
 				if (isValueSet || (propertiesToUse & this._includeType) == InstructionInclude.None)
@@ -7805,7 +7951,7 @@ namespace Assets.Scripts.Objects.Electrical
 				isValueSet = true;
 			}
 
-			// Token: 0x060085D5 RID: 34261 RVA: 0x00298449 File Offset: 0x00296649
+			// Token: 0x06008CE6 RID: 36070 RVA: 0x002C71A9 File Offset: 0x002C53A9
 			public void Execute(ref bool isValueSet, ref int value, string code, InstructionInclude propertiesToUse)
 			{
 				if (isValueSet || (propertiesToUse & this._includeType) == InstructionInclude.None)
@@ -7820,32 +7966,32 @@ namespace Assets.Scripts.Objects.Electrical
 				isValueSet = true;
 			}
 
-			// Token: 0x040072B0 RID: 29360
+			// Token: 0x04007770 RID: 30576
 			private readonly InstructionInclude _includeType;
 
-			// Token: 0x040072B1 RID: 29361
+			// Token: 0x04007771 RID: 30577
 			private readonly T[] _types;
 
-			// Token: 0x040072B2 RID: 29362
+			// Token: 0x04007772 RID: 30578
 			private readonly int _typeHash;
 
-			// Token: 0x040072B3 RID: 29363
+			// Token: 0x04007773 RID: 30579
 			private readonly string[] _names;
 
-			// Token: 0x040072B4 RID: 29364
+			// Token: 0x04007774 RID: 30580
 			private readonly Func<T, bool> _isDeprecated;
 
-			// Token: 0x040072B5 RID: 29365
+			// Token: 0x04007775 RID: 30581
 			private readonly Func<T, string> _getDescription;
 
-			// Token: 0x040072B6 RID: 29366
+			// Token: 0x04007776 RID: 30582
 			private readonly string _color;
 		}
 
-		// Token: 0x02001276 RID: 4726
+		// Token: 0x02001320 RID: 4896
 		public class BasicEnum<T> : IScriptEnum where T : struct, Enum, IConvertible
 		{
-			// Token: 0x060085D6 RID: 34262 RVA: 0x00298488 File Offset: 0x00296688
+			// Token: 0x06008CE7 RID: 36071 RVA: 0x002C71E8 File Offset: 0x002C53E8
 			public BasicEnum(string typeString = "", Func<T, bool> isDeprecated = null)
 			{
 				this._types = (T[])Enum.GetValues(typeof(T));
@@ -7863,7 +8009,7 @@ namespace Assets.Scripts.Objects.Electrical
 				this._isDeprecated = isDeprecated;
 			}
 
-			// Token: 0x060085D7 RID: 34263 RVA: 0x0029852C File Offset: 0x0029672C
+			// Token: 0x06008CE8 RID: 36072 RVA: 0x002C728C File Offset: 0x002C548C
 			public HelpReference MakePage(int i, HelpReference prefab, RectTransform parent)
 			{
 				T t = this._types[i];
@@ -7892,33 +8038,33 @@ namespace Assets.Scripts.Objects.Electrical
 				return helpReference;
 			}
 
-			// Token: 0x060085D8 RID: 34264 RVA: 0x00298649 File Offset: 0x00296849
+			// Token: 0x06008CE9 RID: 36073 RVA: 0x002C73A9 File Offset: 0x002C55A9
 			public int Count()
 			{
 				return this._types.Length;
 			}
 
-			// Token: 0x060085D9 RID: 34265 RVA: 0x00298653 File Offset: 0x00296853
+			// Token: 0x06008CEA RID: 36074 RVA: 0x002C73B3 File Offset: 0x002C55B3
 			public bool IsDeprecated(int i)
 			{
 				Func<T, bool> isDeprecated = this._isDeprecated;
 				return isDeprecated != null && isDeprecated(this._types[i]);
 			}
 
-			// Token: 0x060085DA RID: 34266 RVA: 0x00298674 File Offset: 0x00296874
+			// Token: 0x06008CEB RID: 36075 RVA: 0x002C73D4 File Offset: 0x002C55D4
 			public bool TryParse(string searchText)
 			{
 				T t;
 				return Enum.TryParse<T>(searchText, out t);
 			}
 
-			// Token: 0x060085DB RID: 34267 RVA: 0x00298689 File Offset: 0x00296889
+			// Token: 0x06008CEC RID: 36076 RVA: 0x002C73E9 File Offset: 0x002C55E9
 			public bool IsHashType(int hash)
 			{
 				return this._typeHash == hash;
 			}
 
-			// Token: 0x060085DC RID: 34268 RVA: 0x00298694 File Offset: 0x00296894
+			// Token: 0x06008CED RID: 36077 RVA: 0x002C73F4 File Offset: 0x002C55F4
 			public void Parse(ref string masterString)
 			{
 				for (int i = 0; i < this._types.Length; i++)
@@ -7933,7 +8079,7 @@ namespace Assets.Scripts.Objects.Electrical
 				}
 			}
 
-			// Token: 0x060085DD RID: 34269 RVA: 0x0029870C File Offset: 0x0029690C
+			// Token: 0x06008CEE RID: 36078 RVA: 0x002C746C File Offset: 0x002C566C
 			public void Execute(ref bool isValueSet, ref double value, string code, InstructionInclude propertiesToUse)
 			{
 				if (isValueSet || (propertiesToUse & InstructionInclude.Enum) == InstructionInclude.None)
@@ -7961,7 +8107,7 @@ namespace Assets.Scripts.Objects.Electrical
 				isValueSet = true;
 			}
 
-			// Token: 0x060085DE RID: 34270 RVA: 0x00298788 File Offset: 0x00296988
+			// Token: 0x06008CEF RID: 36079 RVA: 0x002C74E8 File Offset: 0x002C56E8
 			public void Execute(ref bool isValueSet, ref int value, string code, InstructionInclude propertiesToUse)
 			{
 				if (isValueSet || (propertiesToUse & InstructionInclude.Enum) == InstructionInclude.None)
@@ -7989,22 +8135,22 @@ namespace Assets.Scripts.Objects.Electrical
 				isValueSet = true;
 			}
 
-			// Token: 0x040072B7 RID: 29367
+			// Token: 0x04007777 RID: 30583
 			private readonly T[] _types;
 
-			// Token: 0x040072B8 RID: 29368
+			// Token: 0x04007778 RID: 30584
 			private readonly string[] _names;
 
-			// Token: 0x040072B9 RID: 29369
+			// Token: 0x04007779 RID: 30585
 			private readonly string _color;
 
-			// Token: 0x040072BA RID: 29370
+			// Token: 0x0400777A RID: 30586
 			private readonly string _typeString;
 
-			// Token: 0x040072BB RID: 29371
+			// Token: 0x0400777B RID: 30587
 			private readonly int _typeHash;
 
-			// Token: 0x040072BC RID: 29372
+			// Token: 0x0400777C RID: 30588
 			private readonly Func<T, bool> _isDeprecated;
 		}
 	}

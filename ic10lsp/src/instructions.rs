@@ -2,7 +2,7 @@ use std::fmt::Display;
 
 use phf::phf_map;
 
-// Auto-generated types from build.rs (game-sources/)
+// Auto-generated types from build.rs (sources in data/)
 // This include happens BEFORE manual definitions, but manual pub const takes precedence
 // So we comment out the manual ones below
 include!(concat!(env!("OUT_DIR"), "/instructions_generated.rs"));
@@ -25,6 +25,10 @@ pub struct Union<'a>(pub &'a [DataType]);
 #[derive(Debug)]
 pub struct InstructionSignature(pub &'static [Union<'static>]);
 
+/* HAND-TUNED CONSTS + INSTRUCTIONS MAP DISABLED — the INSTRUCTIONS signature map is now
+   auto-generated from data/Stationpedia.json examples + a small override table (see build.rs;
+   emitted into instructions_generated.rs, included near the top of this file). Kept below as
+   historical reference only.
 const REGISTER: Union = Union(&[DataType::Register]);
 const DEVICE: Union = Union(&[DataType::Device]);
 const VALUE: Union = Union(&[DataType::Register, DataType::Number]);
@@ -185,7 +189,12 @@ pub const INSTRUCTIONS: phf::Map<&'static str, InstructionSignature> = phf_map! 
     "ext" => InstructionSignature(&[REGISTER, VALUE, VALUE, VALUE]),
     "ins" => InstructionSignature(&[REGISTER, VALUE, VALUE, VALUE]),
     "lerp" => InstructionSignature(&[REGISTER, VALUE, VALUE, VALUE]),
+    "sgn" => InstructionSignature(&[REGISTER, VALUE]),
+    "rol" => InstructionSignature(&[REGISTER, VALUE, VALUE]),
+    "ror" => InstructionSignature(&[REGISTER, VALUE, VALUE]),
+    "clamp" => InstructionSignature(&[REGISTER, VALUE, VALUE, VALUE]),
 };
+*/
 
 /* MANUAL DEFINITIONS DISABLED - NOW AUTO-GENERATED FROM game-sources/Enums.json
    See module 'generated' at top of file for auto-generated LOGIC_TYPES, etc.
@@ -538,6 +547,8 @@ pub fn logictype_candidates(text: &str) -> Vec<DataType> {
     ret
 }
 
+/* HARDCODED INSTRUCTION_DOCS DISABLED - NOW AUTO-GENERATED from data/Stationpedia.json
+   scriptCommands (see build.rs -> instructions_generated.rs, included at the top of this file).
 #[allow(dead_code)]
 pub const INSTRUCTION_DOCS: phf::Map<&'static str, &'static str> = phf_map! {
     "l" => "Loads device var to register.",
@@ -691,6 +702,7 @@ pub const INSTRUCTION_DOCS: phf::Map<&'static str, &'static str> = phf_map! {
     "ins" => "Inserts a bit field of a into the provided register, beginning at b for c length. Payload cannot exceed 53 bits in final length.",
     "lerp" => "Linearly interpolates between a and b by the ratio c, and places the result in the register provided. The ratio c will be clamped between 0 and 1.",
 };
+*/
 
 /* MANUAL DOCS DEFINITIONS DISABLED - NOW AUTO-GENERATED
 
@@ -903,13 +915,6 @@ It is an unwavering universal law that anything higher than 11 will be purple. T
 
 END OF MANUAL DEFINITIONS - NOW AUTO-GENERATED */
 
-// Wrap generated Stationpedia constants to silence dead_code warnings, then re-export
-#[allow(dead_code)]
-mod _stationpedia_generated {
-    include!(concat!(env!("OUT_DIR"), "/stationpedia.rs"));
-}
-#[allow(unused_imports)]
-pub use _stationpedia_generated::*;
 // Generated from Enums.json at build time
 include!(concat!(env!("OUT_DIR"), "/enums_generated.rs"));
 

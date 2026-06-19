@@ -6,15 +6,15 @@ const fs = require('fs');
 const path = require('path');
 
 // Read Enums.json
-const enumsPath = path.join(__dirname, '../data/game-sources/Enums.json');
+const enumsPath = path.join(__dirname, '../data/Enums.json');
 const enumsData = JSON.parse(fs.readFileSync(enumsPath, 'utf8'));
 
 // Read Stationpedia.json for constants
-const stationpediaPath = path.join(__dirname, '../data/game-sources/Stationpedia.json');
+const stationpediaPath = path.join(__dirname, '../data/Stationpedia.json');
 const stationpediaData = JSON.parse(fs.readFileSync(stationpediaPath, 'utf8'));
 
 // Read ProgrammableChip.cs to get instructions
-const chipPath = path.join(__dirname, '../data/game-sources/ProgrammableChip.cs');
+const chipPath = path.join(__dirname, '../data/ProgrammableChip.cs');
 const chipCs = fs.readFileSync(chipPath, 'utf8');
 
 // Extract instructions from GetCommandExample method's case statements
@@ -209,6 +209,23 @@ ${allLogicTypes.map(type => `            '${type}',`).join('\n')}
 const outputPath = path.join(__dirname, 'grammar.js');
 fs.writeFileSync(outputPath, grammarTemplate, 'utf8');
 
+// --- Also regenerate the TextMate grammar's keyword lists -------------------
+// The TextMate grammar (used for static syntax highlighting, separate from the
+// tree-sitter parser/LSP) has its own instruction + logic-type alternations.
+// Keep them in sync with the game data so new instructions/logic types (e.g.
+// new gases) get highlighted too. Longest-first ordering keeps the alternation
+// unambiguous for shared prefixes (e.g. "Ratio" vs "RatioOxygen").
+const tmPath = path.join(__dirname, '../FlorpyDorp Language Support/syntaxes/ic10.tmLanguage.json');
+const byLenDesc = (a, b) => b.length - a.length || a.localeCompare(b);
+const uniqSorted = arr => [...new Set(arr)].sort(byLenDesc);
+
+const tm = JSON.parse(fs.readFileSync(tmPath, 'utf8'));
+const instrAlt = uniqSorted(instructions).join('|');
+const logicAlt = uniqSorted(allLogicTypes).join('|');
+tm.repository.instruction.patterns[0].match = `^\\s*(?i:(${instrAlt}))\\b`;
+tm.repository.logictype.patterns[0].match = `\\b(${logicAlt})\\b`;
+fs.writeFileSync(tmPath, JSON.stringify(tm, null, 2) + '\n', 'utf8');
+
 console.log(`✅ Generated grammar.js with:`);
 console.log(`   - ${instructions.length} instructions`);
 console.log(`   - ${logicTypes.length} LogicTypes`);
@@ -216,3 +233,6 @@ console.log(`   - ${slotTypes.length} SlotLogicTypes`);
 console.log(`   - ${batchModes.length} BatchModes`);
 console.log(`   - ${constants.length} constants`);
 console.log(`   - ${allLogicTypes.length} total logictype tokens`);
+console.log(`✅ Synced TextMate grammar (syntaxes/ic10.tmLanguage.json):`);
+console.log(`   - ${uniqSorted(instructions).length} instruction keywords`);
+console.log(`   - ${uniqSorted(allLogicTypes).length} logic-type keywords`);

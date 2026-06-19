@@ -1,5 +1,35 @@
 ### Changelog Beginning 11-01-2025
 
+## [2.4.0] - 2026-06-19 The "Gas Update" Sync
+
+### ✨ New Features
+- **Updated to the latest Stationeers game data** (Stationpedia `0.2.6367.27532`):
+  - New gases: **Helium, Silanol, Hydrochloric Acid, Ozone** — including their `Ratio*`
+    logic types (atmospheric, liquid, and Input/Output network variants) and `GasType` values.
+  - **~79 new devices** recognized in `HASH()` completion + hover (gas filters, pure-ice items,
+    and other gas-update prefabs).
+- **Four new instructions** now fully supported (completion, validation, hover): `clamp`,
+  `rol`, `ror`, `sgn`.
+
+### 🐛 Bug Fixes
+- **Fixed device-reference tracking through aliased `move`**: copying a device `ReferenceId`
+  into another register via an alias now correctly preserves its "device" kind, eliminating a
+  false "expected a device" diagnostic in that case.
+
+### 🔧 Internal Improvements
+- **Everything is now auto-generated from four game files** in `data/`
+  (`Enums.json`, `Stationpedia.json`, `english.xml`, `ProgrammableChip.cs`):
+  - Device name↔hash maps now generate from `Stationpedia.json` (previously a hand-maintained
+    table that never updated).
+  - Instruction **signatures** generate from the color-coded Stationpedia examples + a small
+    override table (144/154 parse automatically); instruction **docs** from `scriptCommands`.
+  - Logic/slot/batch/reagent types, all enums, and device descriptions generate as before.
+  - TextMate syntax highlighting keyword lists now auto-sync too, so new instructions and
+    logic types get colored without manual edits.
+- Result: future game updates need only the four files dropped into `data/` + a rebuild.
+
+---
+
 ## [2.3.2] - 2025-01-04
 
 ### 🐛 Bug Fixes

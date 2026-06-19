@@ -93,10 +93,10 @@
           "deprecated": false,
           "description": "The ratio of pollutant in device atmosphere"
         },
-        "RatioVolatiles": {
+        "RatioMethane": {
           "value": 18,
           "deprecated": false,
-          "description": "The ratio of volatiles in device atmosphere"
+          "description": "The ratio of <link=GasMethane><color=#44AD83>Methane</color></link> in device atmosphere"
         },
         "RatioWater": {
           "value": 19,
@@ -563,10 +563,10 @@
           "deprecated": false,
           "description": "The ratio of pollutant in device's input network"
         },
-        "RatioVolatilesInput": {
+        "RatioMethaneInput": {
           "value": 112,
           "deprecated": false,
-          "description": "The ratio of volatiles in device's input network"
+          "description": "The ratio of <link=GasMethane><color=#44AD83>Methane</color></link> in device's input network"
         },
         "RatioWaterInput": {
           "value": 113,
@@ -613,10 +613,10 @@
           "deprecated": false,
           "description": "The ratio of pollutant in device's Input2 network"
         },
-        "RatioVolatilesInput2": {
+        "RatioMethaneInput2": {
           "value": 122,
           "deprecated": false,
-          "description": "The ratio of volatiles in device's Input2 network"
+          "description": "The ratio of <link=GasMethane><color=#44AD83>Methane</color></link> in device's Input2 network"
         },
         "RatioWaterInput2": {
           "value": 123,
@@ -663,10 +663,10 @@
           "deprecated": false,
           "description": "The ratio of pollutant in device's Output network"
         },
-        "RatioVolatilesOutput": {
+        "RatioMethaneOutput": {
           "value": 132,
           "deprecated": false,
-          "description": "The ratio of volatiles in device's Output network"
+          "description": "The ratio of <link=GasMethane><color=#44AD83>Methane</color></link> in device's Output network"
         },
         "RatioWaterOutput": {
           "value": 133,
@@ -713,10 +713,10 @@
           "deprecated": false,
           "description": "The ratio of pollutant in device's Output2 network"
         },
-        "RatioVolatilesOutput2": {
+        "RatioMethaneOutput2": {
           "value": 142,
           "deprecated": false,
-          "description": "The ratio of volatiles in device's Output2 network"
+          "description": "The ratio of <link=GasMethane><color=#44AD83>Methane</color></link> in device's Output2 network"
         },
         "RatioWaterOutput2": {
           "value": 143,
@@ -938,30 +938,30 @@
           "deprecated": false,
           "description": "The ratio of <link=GasLiquidOxygen><color=#44AD83>Liquid Oxygen</color></link> in device's Output2 Atmopshere"
         },
-        "RatioLiquidVolatiles": {
+        "RatioLiquidMethane": {
           "value": 188,
           "deprecated": false,
-          "description": "The ratio of <link=GasLiquidVolatiles><color=#44AD83>Liquid Volatiles</color></link> in device's Atmosphere"
+          "description": "The ratio of <link=GasLiquidMethane><color=#44AD83>Liquid Methane</color></link> in device's Atmosphere"
         },
-        "RatioLiquidVolatilesInput": {
+        "RatioLiquidMethaneInput": {
           "value": 189,
           "deprecated": false,
-          "description": "The ratio of <link=GasLiquidVolatiles><color=#44AD83>Liquid Volatiles</color></link> in device's Input Atmosphere"
+          "description": "The ratio of <link=GasLiquidMethane><color=#44AD83>Liquid Methane</color></link> in device's Input Atmosphere"
         },
-        "RatioLiquidVolatilesInput2": {
+        "RatioLiquidMethaneInput2": {
           "value": 190,
           "deprecated": false,
-          "description": "The ratio of <link=GasLiquidVolatiles><color=#44AD83>Liquid Volatiles</color></link> in device's Input2 Atmosphere"
+          "description": "The ratio of <link=GasLiquidMethane><color=#44AD83>Liquid Methane</color></link> in device's Input2 Atmosphere"
         },
-        "RatioLiquidVolatilesOutput": {
+        "RatioLiquidMethaneOutput": {
           "value": 191,
           "deprecated": false,
-          "description": "The ratio of <link=GasLiquidVolatiles><color=#44AD83>Liquid Volatiles</color></link> in device's device's Output Atmosphere"
+          "description": "The ratio of <link=GasLiquidMethane><color=#44AD83>Liquid Methane</color></link> in device's device's Output Atmosphere"
         },
-        "RatioLiquidVolatilesOutput2": {
+        "RatioLiquidMethaneOutput2": {
           "value": 192,
           "deprecated": false,
-          "description": "The ratio of <link=GasLiquidVolatiles><color=#44AD83>Liquid Volatiles</color></link> in device's Output2 Atmopshere"
+          "description": "The ratio of <link=GasLiquidMethane><color=#44AD83>Liquid Methane</color></link> in device's Output2 Atmopshere"
         },
         "RatioSteam": {
           "value": 193,
@@ -1407,6 +1407,366 @@
           "value": 281,
           "deprecated": false,
           "description": "NextWeatherHash provides the hash value for the name of the next weather event as a 32 bit integer."
+        },
+        "ContactSlotIndex": {
+          "value": 282,
+          "deprecated": false,
+          "description": "The index of the slot in which the trader has spawned. This defines the class of the trader i.e. Utility, Small, Medium etc."
+        },
+        "RatioHydrazine": {
+          "value": 283,
+          "deprecated": false,
+          "description": "The ratio of <link=GasHydrazine><color=#44AD83>Hydrazine</color></link> in device's Atmosphere"
+        },
+        "RatioLiquidHydrazine": {
+          "value": 284,
+          "deprecated": false,
+          "description": "The ratio of <link=GasLiquidHydrazine><color=#44AD83>Liquid Hydrazine</color></link> in device's Atmosphere"
+        },
+        "RatioLiquidAlcohol": {
+          "value": 285,
+          "deprecated": false,
+          "description": "The ratio of <link=GasLiquidAlcohol><color=#44AD83>Liquid Alcohol</color></link> in device's Atmosphere"
+        },
+        "RatioHelium": {
+          "value": 286,
+          "deprecated": false,
+          "description": "The ratio of <link=GasHelium><color=#44AD83>Helium</color></link> in device's Atmosphere"
+        },
+        "RatioLiquidSodiumChloride": {
+          "value": 287,
+          "deprecated": false,
+          "description": "The ratio of <link=GasLiquidSodiumChloride><color=#44AD83>Liquid Sodium Chloride</color></link> in device's Atmosphere"
+        },
+        "RatioSilanol": {
+          "value": 288,
+          "deprecated": false,
+          "description": "The ratio of <link=GasSilanol><color=#44AD83>Silanol</color></link> in device's Atmosphere"
+        },
+        "RatioLiquidSilanol": {
+          "value": 289,
+          "deprecated": false,
+          "description": "The ratio of <link=GasLiquidSilanol><color=#44AD83>Liquid Silanol</color></link> in device's Atmosphere"
+        },
+        "RatioHydrochloricAcid": {
+          "value": 290,
+          "deprecated": false,
+          "description": "The ratio of <link=GasHydrochloricAcid><color=#44AD83>Hydrochloric Acid</color></link> in device's Atmosphere"
+        },
+        "RatioLiquidHydrochloricAcid": {
+          "value": 291,
+          "deprecated": false,
+          "description": "The ratio of <link=GasLiquidHydrochloricAcid><color=#44AD83>Liquid Hydrochloric Acid</color></link> in device's Atmosphere"
+        },
+        "RatioOzone": {
+          "value": 292,
+          "deprecated": false,
+          "description": "The ratio of <link=GasOzone><color=#44AD83>Ozone</color></link> in device's Atmosphere"
+        },
+        "RatioLiquidOzone": {
+          "value": 293,
+          "deprecated": false,
+          "description": "The ratio of <link=GasLiquidOzone><color=#44AD83>Liquid Ozone</color></link> in device's Atmosphere"
+        },
+        "RatioHydrogenInput": {
+          "value": 294,
+          "deprecated": false,
+          "description": "The ratio of <link=GasHydrogen><color=#44AD83>Hydrogen</color></link> in device's Input Atmosphere"
+        },
+        "RatioHydrogenInput2": {
+          "value": 295,
+          "deprecated": false,
+          "description": "The ratio of <link=GasHydrogen><color=#44AD83>Hydrogen</color></link> in device's Input2 Atmosphere"
+        },
+        "RatioHydrogenOutput": {
+          "value": 296,
+          "deprecated": false,
+          "description": "The ratio of <link=GasHydrogen><color=#44AD83>Hydrogen</color></link> in device's Output Atmosphere"
+        },
+        "RatioHydrogenOutput2": {
+          "value": 297,
+          "deprecated": false,
+          "description": "The ratio of <link=GasHydrogen><color=#44AD83>Hydrogen</color></link> in device's Output2 Atmosphere"
+        },
+        "RatioLiquidHydrogenInput": {
+          "value": 298,
+          "deprecated": false,
+          "description": "The ratio of <link=GasLiquidHydrogen><color=#44AD83>Liquid Hydrogen</color></link> in device's Input Atmosphere"
+        },
+        "RatioLiquidHydrogenInput2": {
+          "value": 299,
+          "deprecated": false,
+          "description": "The ratio of <link=GasLiquidHydrogen><color=#44AD83>Liquid Hydrogen</color></link> in device's Input2 Atmosphere"
+        },
+        "RatioLiquidHydrogenOutput": {
+          "value": 300,
+          "deprecated": false,
+          "description": "The ratio of <link=GasLiquidHydrogen><color=#44AD83>Liquid Hydrogen</color></link> in device's Output Atmosphere"
+        },
+        "RatioLiquidHydrogenOutput2": {
+          "value": 301,
+          "deprecated": false,
+          "description": "The ratio of <link=GasLiquidHydrogen><color=#44AD83>Liquid Hydrogen</color></link> in device's Output2 Atmosphere"
+        },
+        "RatioPollutedWaterInput": {
+          "value": 302,
+          "deprecated": false,
+          "description": "The ratio of <link=GasPollutedWater><color=#44AD83>Polluted Water</color></link> in device's Input Atmosphere"
+        },
+        "RatioPollutedWaterInput2": {
+          "value": 303,
+          "deprecated": false,
+          "description": "The ratio of <link=GasPollutedWater><color=#44AD83>Polluted Water</color></link> in device's Input2 Atmosphere"
+        },
+        "RatioPollutedWaterOutput": {
+          "value": 304,
+          "deprecated": false,
+          "description": "The ratio of <link=GasPollutedWater><color=#44AD83>Polluted Water</color></link> in device's Output Atmosphere"
+        },
+        "RatioPollutedWaterOutput2": {
+          "value": 305,
+          "deprecated": false,
+          "description": "The ratio of <link=GasPollutedWater><color=#44AD83>Polluted Water</color></link> in device's Output2 Atmosphere"
+        },
+        "RatioHydrazineInput": {
+          "value": 306,
+          "deprecated": false,
+          "description": "The ratio of <link=GasHydrazine><color=#44AD83>Hydrazine</color></link> in device's Input Atmosphere"
+        },
+        "RatioHydrazineInput2": {
+          "value": 307,
+          "deprecated": false,
+          "description": "The ratio of <link=GasHydrazine><color=#44AD83>Hydrazine</color></link> in device's Input2 Atmosphere"
+        },
+        "RatioHydrazineOutput": {
+          "value": 308,
+          "deprecated": false,
+          "description": "The ratio of <link=GasHydrazine><color=#44AD83>Hydrazine</color></link> in device's Output Atmosphere"
+        },
+        "RatioHydrazineOutput2": {
+          "value": 309,
+          "deprecated": false,
+          "description": "The ratio of <link=GasHydrazine><color=#44AD83>Hydrazine</color></link> in device's Output2 Atmosphere"
+        },
+        "RatioLiquidHydrazineInput": {
+          "value": 310,
+          "deprecated": false,
+          "description": "The ratio of <link=GasLiquidHydrazine><color=#44AD83>Liquid Hydrazine</color></link> in device's Input Atmosphere"
+        },
+        "RatioLiquidHydrazineInput2": {
+          "value": 311,
+          "deprecated": false,
+          "description": "The ratio of <link=GasLiquidHydrazine><color=#44AD83>Liquid Hydrazine</color></link> in device's Input2 Atmosphere"
+        },
+        "RatioLiquidHydrazineOutput": {
+          "value": 312,
+          "deprecated": false,
+          "description": "The ratio of <link=GasLiquidHydrazine><color=#44AD83>Liquid Hydrazine</color></link> in device's Output Atmosphere"
+        },
+        "RatioLiquidHydrazineOutput2": {
+          "value": 313,
+          "deprecated": false,
+          "description": "The ratio of <link=GasLiquidHydrazine><color=#44AD83>Liquid Hydrazine</color></link> in device's Output2 Atmosphere"
+        },
+        "RatioLiquidAlcoholInput": {
+          "value": 314,
+          "deprecated": false,
+          "description": "The ratio of <link=GasLiquidAlcohol><color=#44AD83>Liquid Alcohol</color></link> in device's Input Atmosphere"
+        },
+        "RatioLiquidAlcoholInput2": {
+          "value": 315,
+          "deprecated": false,
+          "description": "The ratio of <link=GasLiquidAlcohol><color=#44AD83>Liquid Alcohol</color></link> in device's Input2 Atmosphere"
+        },
+        "RatioLiquidAlcoholOutput": {
+          "value": 316,
+          "deprecated": false,
+          "description": "The ratio of <link=GasLiquidAlcohol><color=#44AD83>Liquid Alcohol</color></link> in device's Output Atmosphere"
+        },
+        "RatioLiquidAlcoholOutput2": {
+          "value": 317,
+          "deprecated": false,
+          "description": "The ratio of <link=GasLiquidAlcohol><color=#44AD83>Liquid Alcohol</color></link> in device's Output2 Atmosphere"
+        },
+        "RatioHeliumInput": {
+          "value": 318,
+          "deprecated": false,
+          "description": "The ratio of <link=GasHelium><color=#44AD83>Helium</color></link> in device's Input Atmosphere"
+        },
+        "RatioHeliumInput2": {
+          "value": 319,
+          "deprecated": false,
+          "description": "The ratio of <link=GasHelium><color=#44AD83>Helium</color></link> in device's Input2 Atmosphere"
+        },
+        "RatioHeliumOutput": {
+          "value": 320,
+          "deprecated": false,
+          "description": "The ratio of <link=GasHelium><color=#44AD83>Helium</color></link> in device's Output Atmosphere"
+        },
+        "RatioHeliumOutput2": {
+          "value": 321,
+          "deprecated": false,
+          "description": "The ratio of <link=GasHelium><color=#44AD83>Helium</color></link> in device's Output2 Atmosphere"
+        },
+        "RatioLiquidSodiumChlorideInput": {
+          "value": 322,
+          "deprecated": false,
+          "description": "The ratio of <link=GasLiquidSodiumChloride><color=#44AD83>Liquid Sodium Chloride</color></link> in device's Input Atmosphere"
+        },
+        "RatioLiquidSodiumChlorideInput2": {
+          "value": 323,
+          "deprecated": false,
+          "description": "The ratio of <link=GasLiquidSodiumChloride><color=#44AD83>Liquid Sodium Chloride</color></link> in device's Input2 Atmosphere"
+        },
+        "RatioLiquidSodiumChlorideOutput": {
+          "value": 324,
+          "deprecated": false,
+          "description": "The ratio of <link=GasLiquidSodiumChloride><color=#44AD83>Liquid Sodium Chloride</color></link> in device's Output Atmosphere"
+        },
+        "RatioLiquidSodiumChlorideOutput2": {
+          "value": 325,
+          "deprecated": false,
+          "description": "The ratio of <link=GasLiquidSodiumChloride><color=#44AD83>Liquid Sodium Chloride</color></link> in device's Output2 Atmosphere"
+        },
+        "RatioSilanolInput": {
+          "value": 326,
+          "deprecated": false,
+          "description": "The ratio of <link=GasSilanol><color=#44AD83>Silanol</color></link> in device's Input Atmosphere"
+        },
+        "RatioSilanolInput2": {
+          "value": 327,
+          "deprecated": false,
+          "description": "The ratio of <link=GasSilanol><color=#44AD83>Silanol</color></link> in device's Input2 Atmosphere"
+        },
+        "RatioSilanolOutput": {
+          "value": 328,
+          "deprecated": false,
+          "description": "The ratio of <link=GasSilanol><color=#44AD83>Silanol</color></link> in device's Output Atmosphere"
+        },
+        "RatioSilanolOutput2": {
+          "value": 329,
+          "deprecated": false,
+          "description": "The ratio of <link=GasSilanol><color=#44AD83>Silanol</color></link> in device's Output2 Atmosphere"
+        },
+        "RatioLiquidSilanolInput": {
+          "value": 330,
+          "deprecated": false,
+          "description": "The ratio of <link=GasLiquidSilanol><color=#44AD83>Liquid Silanol</color></link> in device's Input Atmosphere"
+        },
+        "RatioLiquidSilanolInput2": {
+          "value": 331,
+          "deprecated": false,
+          "description": "The ratio of <link=GasLiquidSilanol><color=#44AD83>Liquid Silanol</color></link> in device's Input2 Atmosphere"
+        },
+        "RatioLiquidSilanolOutput": {
+          "value": 332,
+          "deprecated": false,
+          "description": "The ratio of <link=GasLiquidSilanol><color=#44AD83>Liquid Silanol</color></link> in device's Output Atmosphere"
+        },
+        "RatioLiquidSilanolOutput2": {
+          "value": 333,
+          "deprecated": false,
+          "description": "The ratio of <link=GasLiquidSilanol><color=#44AD83>Liquid Silanol</color></link> in device's Output2 Atmosphere"
+        },
+        "RatioHydrochloricAcidInput": {
+          "value": 334,
+          "deprecated": false,
+          "description": "The ratio of <link=GasHydrochloricAcid><color=#44AD83>Hydrochloric Acid</color></link> in device's Input Atmosphere"
+        },
+        "RatioHydrochloricAcidInput2": {
+          "value": 335,
+          "deprecated": false,
+          "description": "The ratio of <link=GasHydrochloricAcid><color=#44AD83>Hydrochloric Acid</color></link> in device's Input2 Atmosphere"
+        },
+        "RatioHydrochloricAcidOutput": {
+          "value": 336,
+          "deprecated": false,
+          "description": "The ratio of <link=GasHydrochloricAcid><color=#44AD83>Hydrochloric Acid</color></link> in device's Output Atmosphere"
+        },
+        "RatioHydrochloricAcidOutput2": {
+          "value": 337,
+          "deprecated": false,
+          "description": "The ratio of <link=GasHydrochloricAcid><color=#44AD83>Hydrochloric Acid</color></link> in device's Output2 Atmosphere"
+        },
+        "RatioLiquidHydrochloricAcidInput": {
+          "value": 338,
+          "deprecated": false,
+          "description": "The ratio of <link=GasLiquidHydrochloricAcid><color=#44AD83>Liquid Hydrochloric Acid</color></link> in device's Input Atmosphere"
+        },
+        "RatioLiquidHydrochloricAcidInput2": {
+          "value": 339,
+          "deprecated": false,
+          "description": "The ratio of <link=GasLiquidHydrochloricAcid><color=#44AD83>Liquid Hydrochloric Acid</color></link> in device's Input2 Atmosphere"
+        },
+        "RatioLiquidHydrochloricAcidOutput": {
+          "value": 340,
+          "deprecated": false,
+          "description": "The ratio of <link=GasLiquidHydrochloricAcid><color=#44AD83>Liquid Hydrochloric Acid</color></link> in device's Output Atmosphere"
+        },
+        "RatioLiquidHydrochloricAcidOutput2": {
+          "value": 341,
+          "deprecated": false,
+          "description": "The ratio of <link=GasLiquidHydrochloricAcid><color=#44AD83>Liquid Hydrochloric Acid</color></link> in device's Output2 Atmosphere"
+        },
+        "RatioOzoneInput": {
+          "value": 342,
+          "deprecated": false,
+          "description": "The ratio of <link=GasOzone><color=#44AD83>Ozone</color></link> in device's Input Atmosphere"
+        },
+        "RatioOzoneInput2": {
+          "value": 343,
+          "deprecated": false,
+          "description": "The ratio of <link=GasOzone><color=#44AD83>Ozone</color></link> in device's Input2 Atmosphere"
+        },
+        "RatioOzoneOutput": {
+          "value": 344,
+          "deprecated": false,
+          "description": "The ratio of <link=GasOzone><color=#44AD83>Ozone</color></link> in device's Output Atmosphere"
+        },
+        "RatioOzoneOutput2": {
+          "value": 345,
+          "deprecated": false,
+          "description": "The ratio of <link=GasOzone><color=#44AD83>Ozone</color></link> in device's Output2 Atmosphere"
+        },
+        "RatioLiquidOzoneInput": {
+          "value": 346,
+          "deprecated": false,
+          "description": "The ratio of <link=GasLiquidOzone><color=#44AD83>Liquid Ozone</color></link> in device's Input Atmosphere"
+        },
+        "RatioLiquidOzoneInput2": {
+          "value": 347,
+          "deprecated": false,
+          "description": "The ratio of <link=GasLiquidOzone><color=#44AD83>Liquid Ozone</color></link> in device's Input2 Atmosphere"
+        },
+        "RatioLiquidOzoneOutput": {
+          "value": 348,
+          "deprecated": false,
+          "description": "The ratio of <link=GasLiquidOzone><color=#44AD83>Liquid Ozone</color></link> in device's Output Atmosphere"
+        },
+        "RatioLiquidOzoneOutput2": {
+          "value": 349,
+          "deprecated": false,
+          "description": "The ratio of <link=GasLiquidOzone><color=#44AD83>Liquid Ozone</color></link> in device's Output2 Atmosphere"
+        },
+        "HealthDamage": {
+          "value": 350,
+          "deprecated": false,
+          "description": "The total amount of health damage on the entity"
+        },
+        "StunDamage": {
+          "value": 351,
+          "deprecated": false,
+          "description": "The amount of stun damage on the entity"
+        },
+        "CurrentNodeType": {
+          "value": 352,
+          "deprecated": false,
+          "description": "Returns the NodeType as an integer for the current location for a Rocket"
+        },
+        "TargetNodeType": {
+          "value": 353,
+          "deprecated": false,
+          "description": "Returns the NodeType as an integer for the target location for a Rocket"
         }
       }
     },
@@ -1627,6 +1987,11 @@
           "value": 3,
           "deprecated": false,
           "description": ""
+        },
+        "Count": {
+          "value": 4,
+          "deprecated": false,
+          "description": ""
         }
       }
     }
@@ -1725,10 +2090,10 @@
           "deprecated": false,
           "description": "The ratio of pollutant in device atmosphere"
         },
-        "RatioVolatiles": {
+        "RatioMethane": {
           "value": 18,
           "deprecated": false,
-          "description": "The ratio of volatiles in device atmosphere"
+          "description": "The ratio of <link=GasMethane><color=#44AD83>Methane</color></link> in device atmosphere"
         },
         "RatioWater": {
           "value": 19,
@@ -2195,10 +2560,10 @@
           "deprecated": false,
           "description": "The ratio of pollutant in device's input network"
         },
-        "RatioVolatilesInput": {
+        "RatioMethaneInput": {
           "value": 112,
           "deprecated": false,
-          "description": "The ratio of volatiles in device's input network"
+          "description": "The ratio of <link=GasMethane><color=#44AD83>Methane</color></link> in device's input network"
         },
         "RatioWaterInput": {
           "value": 113,
@@ -2245,10 +2610,10 @@
           "deprecated": false,
           "description": "The ratio of pollutant in device's Input2 network"
         },
-        "RatioVolatilesInput2": {
+        "RatioMethaneInput2": {
           "value": 122,
           "deprecated": false,
-          "description": "The ratio of volatiles in device's Input2 network"
+          "description": "The ratio of <link=GasMethane><color=#44AD83>Methane</color></link> in device's Input2 network"
         },
         "RatioWaterInput2": {
           "value": 123,
@@ -2295,10 +2660,10 @@
           "deprecated": false,
           "description": "The ratio of pollutant in device's Output network"
         },
-        "RatioVolatilesOutput": {
+        "RatioMethaneOutput": {
           "value": 132,
           "deprecated": false,
-          "description": "The ratio of volatiles in device's Output network"
+          "description": "The ratio of <link=GasMethane><color=#44AD83>Methane</color></link> in device's Output network"
         },
         "RatioWaterOutput": {
           "value": 133,
@@ -2345,10 +2710,10 @@
           "deprecated": false,
           "description": "The ratio of pollutant in device's Output2 network"
         },
-        "RatioVolatilesOutput2": {
+        "RatioMethaneOutput2": {
           "value": 142,
           "deprecated": false,
-          "description": "The ratio of volatiles in device's Output2 network"
+          "description": "The ratio of <link=GasMethane><color=#44AD83>Methane</color></link> in device's Output2 network"
         },
         "RatioWaterOutput2": {
           "value": 143,
@@ -2570,30 +2935,30 @@
           "deprecated": false,
           "description": "The ratio of <link=GasLiquidOxygen><color=#44AD83>Liquid Oxygen</color></link> in device's Output2 Atmopshere"
         },
-        "RatioLiquidVolatiles": {
+        "RatioLiquidMethane": {
           "value": 188,
           "deprecated": false,
-          "description": "The ratio of <link=GasLiquidVolatiles><color=#44AD83>Liquid Volatiles</color></link> in device's Atmosphere"
+          "description": "The ratio of <link=GasLiquidMethane><color=#44AD83>Liquid Methane</color></link> in device's Atmosphere"
         },
-        "RatioLiquidVolatilesInput": {
+        "RatioLiquidMethaneInput": {
           "value": 189,
           "deprecated": false,
-          "description": "The ratio of <link=GasLiquidVolatiles><color=#44AD83>Liquid Volatiles</color></link> in device's Input Atmosphere"
+          "description": "The ratio of <link=GasLiquidMethane><color=#44AD83>Liquid Methane</color></link> in device's Input Atmosphere"
         },
-        "RatioLiquidVolatilesInput2": {
+        "RatioLiquidMethaneInput2": {
           "value": 190,
           "deprecated": false,
-          "description": "The ratio of <link=GasLiquidVolatiles><color=#44AD83>Liquid Volatiles</color></link> in device's Input2 Atmosphere"
+          "description": "The ratio of <link=GasLiquidMethane><color=#44AD83>Liquid Methane</color></link> in device's Input2 Atmosphere"
         },
-        "RatioLiquidVolatilesOutput": {
+        "RatioLiquidMethaneOutput": {
           "value": 191,
           "deprecated": false,
-          "description": "The ratio of <link=GasLiquidVolatiles><color=#44AD83>Liquid Volatiles</color></link> in device's device's Output Atmosphere"
+          "description": "The ratio of <link=GasLiquidMethane><color=#44AD83>Liquid Methane</color></link> in device's device's Output Atmosphere"
         },
-        "RatioLiquidVolatilesOutput2": {
+        "RatioLiquidMethaneOutput2": {
           "value": 192,
           "deprecated": false,
-          "description": "The ratio of <link=GasLiquidVolatiles><color=#44AD83>Liquid Volatiles</color></link> in device's Output2 Atmopshere"
+          "description": "The ratio of <link=GasLiquidMethane><color=#44AD83>Liquid Methane</color></link> in device's Output2 Atmopshere"
         },
         "RatioSteam": {
           "value": 193,
@@ -3039,6 +3404,366 @@
           "value": 281,
           "deprecated": false,
           "description": "NextWeatherHash provides the hash value for the name of the next weather event as a 32 bit integer."
+        },
+        "ContactSlotIndex": {
+          "value": 282,
+          "deprecated": false,
+          "description": "The index of the slot in which the trader has spawned. This defines the class of the trader i.e. Utility, Small, Medium etc."
+        },
+        "RatioHydrazine": {
+          "value": 283,
+          "deprecated": false,
+          "description": "The ratio of <link=GasHydrazine><color=#44AD83>Hydrazine</color></link> in device's Atmosphere"
+        },
+        "RatioLiquidHydrazine": {
+          "value": 284,
+          "deprecated": false,
+          "description": "The ratio of <link=GasLiquidHydrazine><color=#44AD83>Liquid Hydrazine</color></link> in device's Atmosphere"
+        },
+        "RatioLiquidAlcohol": {
+          "value": 285,
+          "deprecated": false,
+          "description": "The ratio of <link=GasLiquidAlcohol><color=#44AD83>Liquid Alcohol</color></link> in device's Atmosphere"
+        },
+        "RatioHelium": {
+          "value": 286,
+          "deprecated": false,
+          "description": "The ratio of <link=GasHelium><color=#44AD83>Helium</color></link> in device's Atmosphere"
+        },
+        "RatioLiquidSodiumChloride": {
+          "value": 287,
+          "deprecated": false,
+          "description": "The ratio of <link=GasLiquidSodiumChloride><color=#44AD83>Liquid Sodium Chloride</color></link> in device's Atmosphere"
+        },
+        "RatioSilanol": {
+          "value": 288,
+          "deprecated": false,
+          "description": "The ratio of <link=GasSilanol><color=#44AD83>Silanol</color></link> in device's Atmosphere"
+        },
+        "RatioLiquidSilanol": {
+          "value": 289,
+          "deprecated": false,
+          "description": "The ratio of <link=GasLiquidSilanol><color=#44AD83>Liquid Silanol</color></link> in device's Atmosphere"
+        },
+        "RatioHydrochloricAcid": {
+          "value": 290,
+          "deprecated": false,
+          "description": "The ratio of <link=GasHydrochloricAcid><color=#44AD83>Hydrochloric Acid</color></link> in device's Atmosphere"
+        },
+        "RatioLiquidHydrochloricAcid": {
+          "value": 291,
+          "deprecated": false,
+          "description": "The ratio of <link=GasLiquidHydrochloricAcid><color=#44AD83>Liquid Hydrochloric Acid</color></link> in device's Atmosphere"
+        },
+        "RatioOzone": {
+          "value": 292,
+          "deprecated": false,
+          "description": "The ratio of <link=GasOzone><color=#44AD83>Ozone</color></link> in device's Atmosphere"
+        },
+        "RatioLiquidOzone": {
+          "value": 293,
+          "deprecated": false,
+          "description": "The ratio of <link=GasLiquidOzone><color=#44AD83>Liquid Ozone</color></link> in device's Atmosphere"
+        },
+        "RatioHydrogenInput": {
+          "value": 294,
+          "deprecated": false,
+          "description": "The ratio of <link=GasHydrogen><color=#44AD83>Hydrogen</color></link> in device's Input Atmosphere"
+        },
+        "RatioHydrogenInput2": {
+          "value": 295,
+          "deprecated": false,
+          "description": "The ratio of <link=GasHydrogen><color=#44AD83>Hydrogen</color></link> in device's Input2 Atmosphere"
+        },
+        "RatioHydrogenOutput": {
+          "value": 296,
+          "deprecated": false,
+          "description": "The ratio of <link=GasHydrogen><color=#44AD83>Hydrogen</color></link> in device's Output Atmosphere"
+        },
+        "RatioHydrogenOutput2": {
+          "value": 297,
+          "deprecated": false,
+          "description": "The ratio of <link=GasHydrogen><color=#44AD83>Hydrogen</color></link> in device's Output2 Atmosphere"
+        },
+        "RatioLiquidHydrogenInput": {
+          "value": 298,
+          "deprecated": false,
+          "description": "The ratio of <link=GasLiquidHydrogen><color=#44AD83>Liquid Hydrogen</color></link> in device's Input Atmosphere"
+        },
+        "RatioLiquidHydrogenInput2": {
+          "value": 299,
+          "deprecated": false,
+          "description": "The ratio of <link=GasLiquidHydrogen><color=#44AD83>Liquid Hydrogen</color></link> in device's Input2 Atmosphere"
+        },
+        "RatioLiquidHydrogenOutput": {
+          "value": 300,
+          "deprecated": false,
+          "description": "The ratio of <link=GasLiquidHydrogen><color=#44AD83>Liquid Hydrogen</color></link> in device's Output Atmosphere"
+        },
+        "RatioLiquidHydrogenOutput2": {
+          "value": 301,
+          "deprecated": false,
+          "description": "The ratio of <link=GasLiquidHydrogen><color=#44AD83>Liquid Hydrogen</color></link> in device's Output2 Atmosphere"
+        },
+        "RatioPollutedWaterInput": {
+          "value": 302,
+          "deprecated": false,
+          "description": "The ratio of <link=GasPollutedWater><color=#44AD83>Polluted Water</color></link> in device's Input Atmosphere"
+        },
+        "RatioPollutedWaterInput2": {
+          "value": 303,
+          "deprecated": false,
+          "description": "The ratio of <link=GasPollutedWater><color=#44AD83>Polluted Water</color></link> in device's Input2 Atmosphere"
+        },
+        "RatioPollutedWaterOutput": {
+          "value": 304,
+          "deprecated": false,
+          "description": "The ratio of <link=GasPollutedWater><color=#44AD83>Polluted Water</color></link> in device's Output Atmosphere"
+        },
+        "RatioPollutedWaterOutput2": {
+          "value": 305,
+          "deprecated": false,
+          "description": "The ratio of <link=GasPollutedWater><color=#44AD83>Polluted Water</color></link> in device's Output2 Atmosphere"
+        },
+        "RatioHydrazineInput": {
+          "value": 306,
+          "deprecated": false,
+          "description": "The ratio of <link=GasHydrazine><color=#44AD83>Hydrazine</color></link> in device's Input Atmosphere"
+        },
+        "RatioHydrazineInput2": {
+          "value": 307,
+          "deprecated": false,
+          "description": "The ratio of <link=GasHydrazine><color=#44AD83>Hydrazine</color></link> in device's Input2 Atmosphere"
+        },
+        "RatioHydrazineOutput": {
+          "value": 308,
+          "deprecated": false,
+          "description": "The ratio of <link=GasHydrazine><color=#44AD83>Hydrazine</color></link> in device's Output Atmosphere"
+        },
+        "RatioHydrazineOutput2": {
+          "value": 309,
+          "deprecated": false,
+          "description": "The ratio of <link=GasHydrazine><color=#44AD83>Hydrazine</color></link> in device's Output2 Atmosphere"
+        },
+        "RatioLiquidHydrazineInput": {
+          "value": 310,
+          "deprecated": false,
+          "description": "The ratio of <link=GasLiquidHydrazine><color=#44AD83>Liquid Hydrazine</color></link> in device's Input Atmosphere"
+        },
+        "RatioLiquidHydrazineInput2": {
+          "value": 311,
+          "deprecated": false,
+          "description": "The ratio of <link=GasLiquidHydrazine><color=#44AD83>Liquid Hydrazine</color></link> in device's Input2 Atmosphere"
+        },
+        "RatioLiquidHydrazineOutput": {
+          "value": 312,
+          "deprecated": false,
+          "description": "The ratio of <link=GasLiquidHydrazine><color=#44AD83>Liquid Hydrazine</color></link> in device's Output Atmosphere"
+        },
+        "RatioLiquidHydrazineOutput2": {
+          "value": 313,
+          "deprecated": false,
+          "description": "The ratio of <link=GasLiquidHydrazine><color=#44AD83>Liquid Hydrazine</color></link> in device's Output2 Atmosphere"
+        },
+        "RatioLiquidAlcoholInput": {
+          "value": 314,
+          "deprecated": false,
+          "description": "The ratio of <link=GasLiquidAlcohol><color=#44AD83>Liquid Alcohol</color></link> in device's Input Atmosphere"
+        },
+        "RatioLiquidAlcoholInput2": {
+          "value": 315,
+          "deprecated": false,
+          "description": "The ratio of <link=GasLiquidAlcohol><color=#44AD83>Liquid Alcohol</color></link> in device's Input2 Atmosphere"
+        },
+        "RatioLiquidAlcoholOutput": {
+          "value": 316,
+          "deprecated": false,
+          "description": "The ratio of <link=GasLiquidAlcohol><color=#44AD83>Liquid Alcohol</color></link> in device's Output Atmosphere"
+        },
+        "RatioLiquidAlcoholOutput2": {
+          "value": 317,
+          "deprecated": false,
+          "description": "The ratio of <link=GasLiquidAlcohol><color=#44AD83>Liquid Alcohol</color></link> in device's Output2 Atmosphere"
+        },
+        "RatioHeliumInput": {
+          "value": 318,
+          "deprecated": false,
+          "description": "The ratio of <link=GasHelium><color=#44AD83>Helium</color></link> in device's Input Atmosphere"
+        },
+        "RatioHeliumInput2": {
+          "value": 319,
+          "deprecated": false,
+          "description": "The ratio of <link=GasHelium><color=#44AD83>Helium</color></link> in device's Input2 Atmosphere"
+        },
+        "RatioHeliumOutput": {
+          "value": 320,
+          "deprecated": false,
+          "description": "The ratio of <link=GasHelium><color=#44AD83>Helium</color></link> in device's Output Atmosphere"
+        },
+        "RatioHeliumOutput2": {
+          "value": 321,
+          "deprecated": false,
+          "description": "The ratio of <link=GasHelium><color=#44AD83>Helium</color></link> in device's Output2 Atmosphere"
+        },
+        "RatioLiquidSodiumChlorideInput": {
+          "value": 322,
+          "deprecated": false,
+          "description": "The ratio of <link=GasLiquidSodiumChloride><color=#44AD83>Liquid Sodium Chloride</color></link> in device's Input Atmosphere"
+        },
+        "RatioLiquidSodiumChlorideInput2": {
+          "value": 323,
+          "deprecated": false,
+          "description": "The ratio of <link=GasLiquidSodiumChloride><color=#44AD83>Liquid Sodium Chloride</color></link> in device's Input2 Atmosphere"
+        },
+        "RatioLiquidSodiumChlorideOutput": {
+          "value": 324,
+          "deprecated": false,
+          "description": "The ratio of <link=GasLiquidSodiumChloride><color=#44AD83>Liquid Sodium Chloride</color></link> in device's Output Atmosphere"
+        },
+        "RatioLiquidSodiumChlorideOutput2": {
+          "value": 325,
+          "deprecated": false,
+          "description": "The ratio of <link=GasLiquidSodiumChloride><color=#44AD83>Liquid Sodium Chloride</color></link> in device's Output2 Atmosphere"
+        },
+        "RatioSilanolInput": {
+          "value": 326,
+          "deprecated": false,
+          "description": "The ratio of <link=GasSilanol><color=#44AD83>Silanol</color></link> in device's Input Atmosphere"
+        },
+        "RatioSilanolInput2": {
+          "value": 327,
+          "deprecated": false,
+          "description": "The ratio of <link=GasSilanol><color=#44AD83>Silanol</color></link> in device's Input2 Atmosphere"
+        },
+        "RatioSilanolOutput": {
+          "value": 328,
+          "deprecated": false,
+          "description": "The ratio of <link=GasSilanol><color=#44AD83>Silanol</color></link> in device's Output Atmosphere"
+        },
+        "RatioSilanolOutput2": {
+          "value": 329,
+          "deprecated": false,
+          "description": "The ratio of <link=GasSilanol><color=#44AD83>Silanol</color></link> in device's Output2 Atmosphere"
+        },
+        "RatioLiquidSilanolInput": {
+          "value": 330,
+          "deprecated": false,
+          "description": "The ratio of <link=GasLiquidSilanol><color=#44AD83>Liquid Silanol</color></link> in device's Input Atmosphere"
+        },
+        "RatioLiquidSilanolInput2": {
+          "value": 331,
+          "deprecated": false,
+          "description": "The ratio of <link=GasLiquidSilanol><color=#44AD83>Liquid Silanol</color></link> in device's Input2 Atmosphere"
+        },
+        "RatioLiquidSilanolOutput": {
+          "value": 332,
+          "deprecated": false,
+          "description": "The ratio of <link=GasLiquidSilanol><color=#44AD83>Liquid Silanol</color></link> in device's Output Atmosphere"
+        },
+        "RatioLiquidSilanolOutput2": {
+          "value": 333,
+          "deprecated": false,
+          "description": "The ratio of <link=GasLiquidSilanol><color=#44AD83>Liquid Silanol</color></link> in device's Output2 Atmosphere"
+        },
+        "RatioHydrochloricAcidInput": {
+          "value": 334,
+          "deprecated": false,
+          "description": "The ratio of <link=GasHydrochloricAcid><color=#44AD83>Hydrochloric Acid</color></link> in device's Input Atmosphere"
+        },
+        "RatioHydrochloricAcidInput2": {
+          "value": 335,
+          "deprecated": false,
+          "description": "The ratio of <link=GasHydrochloricAcid><color=#44AD83>Hydrochloric Acid</color></link> in device's Input2 Atmosphere"
+        },
+        "RatioHydrochloricAcidOutput": {
+          "value": 336,
+          "deprecated": false,
+          "description": "The ratio of <link=GasHydrochloricAcid><color=#44AD83>Hydrochloric Acid</color></link> in device's Output Atmosphere"
+        },
+        "RatioHydrochloricAcidOutput2": {
+          "value": 337,
+          "deprecated": false,
+          "description": "The ratio of <link=GasHydrochloricAcid><color=#44AD83>Hydrochloric Acid</color></link> in device's Output2 Atmosphere"
+        },
+        "RatioLiquidHydrochloricAcidInput": {
+          "value": 338,
+          "deprecated": false,
+          "description": "The ratio of <link=GasLiquidHydrochloricAcid><color=#44AD83>Liquid Hydrochloric Acid</color></link> in device's Input Atmosphere"
+        },
+        "RatioLiquidHydrochloricAcidInput2": {
+          "value": 339,
+          "deprecated": false,
+          "description": "The ratio of <link=GasLiquidHydrochloricAcid><color=#44AD83>Liquid Hydrochloric Acid</color></link> in device's Input2 Atmosphere"
+        },
+        "RatioLiquidHydrochloricAcidOutput": {
+          "value": 340,
+          "deprecated": false,
+          "description": "The ratio of <link=GasLiquidHydrochloricAcid><color=#44AD83>Liquid Hydrochloric Acid</color></link> in device's Output Atmosphere"
+        },
+        "RatioLiquidHydrochloricAcidOutput2": {
+          "value": 341,
+          "deprecated": false,
+          "description": "The ratio of <link=GasLiquidHydrochloricAcid><color=#44AD83>Liquid Hydrochloric Acid</color></link> in device's Output2 Atmosphere"
+        },
+        "RatioOzoneInput": {
+          "value": 342,
+          "deprecated": false,
+          "description": "The ratio of <link=GasOzone><color=#44AD83>Ozone</color></link> in device's Input Atmosphere"
+        },
+        "RatioOzoneInput2": {
+          "value": 343,
+          "deprecated": false,
+          "description": "The ratio of <link=GasOzone><color=#44AD83>Ozone</color></link> in device's Input2 Atmosphere"
+        },
+        "RatioOzoneOutput": {
+          "value": 344,
+          "deprecated": false,
+          "description": "The ratio of <link=GasOzone><color=#44AD83>Ozone</color></link> in device's Output Atmosphere"
+        },
+        "RatioOzoneOutput2": {
+          "value": 345,
+          "deprecated": false,
+          "description": "The ratio of <link=GasOzone><color=#44AD83>Ozone</color></link> in device's Output2 Atmosphere"
+        },
+        "RatioLiquidOzoneInput": {
+          "value": 346,
+          "deprecated": false,
+          "description": "The ratio of <link=GasLiquidOzone><color=#44AD83>Liquid Ozone</color></link> in device's Input Atmosphere"
+        },
+        "RatioLiquidOzoneInput2": {
+          "value": 347,
+          "deprecated": false,
+          "description": "The ratio of <link=GasLiquidOzone><color=#44AD83>Liquid Ozone</color></link> in device's Input2 Atmosphere"
+        },
+        "RatioLiquidOzoneOutput": {
+          "value": 348,
+          "deprecated": false,
+          "description": "The ratio of <link=GasLiquidOzone><color=#44AD83>Liquid Ozone</color></link> in device's Output Atmosphere"
+        },
+        "RatioLiquidOzoneOutput2": {
+          "value": 349,
+          "deprecated": false,
+          "description": "The ratio of <link=GasLiquidOzone><color=#44AD83>Liquid Ozone</color></link> in device's Output2 Atmosphere"
+        },
+        "HealthDamage": {
+          "value": 350,
+          "deprecated": false,
+          "description": "The total amount of health damage on the entity"
+        },
+        "StunDamage": {
+          "value": 351,
+          "deprecated": false,
+          "description": "The amount of stun damage on the entity"
+        },
+        "CurrentNodeType": {
+          "value": 352,
+          "deprecated": false,
+          "description": "Returns the NodeType as an integer for the current location for a Rocket"
+        },
+        "TargetNodeType": {
+          "value": 353,
+          "deprecated": false,
+          "description": "Returns the NodeType as an integer for the target location for a Rocket"
         }
       }
     },
@@ -3672,6 +4397,21 @@
         }
       }
     },
+    "FiltrationMode": {
+      "enumName": "FiltrationMode",
+      "values": {
+        "Idle": {
+          "value": 0,
+          "deprecated": false,
+          "description": ""
+        },
+        "Active": {
+          "value": 1,
+          "deprecated": false,
+          "description": ""
+        }
+      }
+    },
     "PowerMode": {
       "enumName": "PowerMode",
       "values": {
@@ -4019,6 +4759,11 @@
           "value": 42,
           "deprecated": false,
           "description": ""
+        },
+        "AutoInjector": {
+          "value": 43,
+          "deprecated": false,
+          "description": ""
         }
       }
     },
@@ -4050,7 +4795,7 @@
           "deprecated": false,
           "description": ""
         },
-        "Volatiles": {
+        "Methane": {
           "value": 8,
           "deprecated": false,
           "description": ""
@@ -4085,7 +4830,7 @@
           "deprecated": false,
           "description": ""
         },
-        "LiquidVolatiles": {
+        "LiquidMethane": {
           "value": 512,
           "deprecated": false,
           "description": ""
@@ -4122,6 +4867,61 @@
         },
         "PollutedWater": {
           "value": 65536,
+          "deprecated": false,
+          "description": ""
+        },
+        "Hydrazine": {
+          "value": 131072,
+          "deprecated": false,
+          "description": ""
+        },
+        "LiquidHydrazine": {
+          "value": 262144,
+          "deprecated": false,
+          "description": ""
+        },
+        "LiquidAlcohol": {
+          "value": 524288,
+          "deprecated": false,
+          "description": ""
+        },
+        "Helium": {
+          "value": 1048576,
+          "deprecated": false,
+          "description": ""
+        },
+        "LiquidSodiumChloride": {
+          "value": 2097152,
+          "deprecated": false,
+          "description": ""
+        },
+        "Silanol": {
+          "value": 4194304,
+          "deprecated": false,
+          "description": ""
+        },
+        "LiquidSilanol": {
+          "value": 8388608,
+          "deprecated": false,
+          "description": ""
+        },
+        "HydrochloricAcid": {
+          "value": 16777216,
+          "deprecated": false,
+          "description": ""
+        },
+        "LiquidHydrochloricAcid": {
+          "value": 33554432,
+          "deprecated": false,
+          "description": ""
+        },
+        "Ozone": {
+          "value": 67108864,
+          "deprecated": false,
+          "description": ""
+        },
+        "LiquidOzone": {
+          "value": 134217728,
           "deprecated": false,
           "description": ""
         }
@@ -4162,6 +4962,16 @@
         },
         "Deploy": {
           "value": 6,
+          "deprecated": false,
+          "description": ""
+        },
+        "SurfaceScan": {
+          "value": 7,
+          "deprecated": false,
+          "description": ""
+        },
+        "Transfer": {
+          "value": 8,
           "deprecated": false,
           "description": ""
         }
@@ -4557,6 +5367,46 @@
         },
         "String": {
           "value": 1,
+          "deprecated": false,
+          "description": ""
+        }
+      }
+    },
+    "NodeType": {
+      "enumName": "NodeType",
+      "values": {
+        "None": {
+          "value": 0,
+          "deprecated": false,
+          "description": ""
+        },
+        "Entry": {
+          "value": 1,
+          "deprecated": false,
+          "description": ""
+        },
+        "Static": {
+          "value": 2,
+          "deprecated": false,
+          "description": ""
+        },
+        "Generated": {
+          "value": 3,
+          "deprecated": false,
+          "description": ""
+        },
+        "LaunchPad": {
+          "value": 4,
+          "deprecated": false,
+          "description": ""
+        },
+        "LowOrbitHub": {
+          "value": 5,
+          "deprecated": false,
+          "description": ""
+        },
+        "LowOrbitLaunchPad": {
+          "value": 6,
           "deprecated": false,
           "description": ""
         }

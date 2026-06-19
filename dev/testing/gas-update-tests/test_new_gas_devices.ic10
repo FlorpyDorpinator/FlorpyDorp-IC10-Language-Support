@@ -1,0 +1,26 @@
+# NEW GAS-UPDATE DEVICES via HASH() — device names/hashes auto-generated from
+# data/Stationpedia.json (+ data/english.xml for friendly names).
+# Expectations in the dev host:
+#   * typing  HASH("ItemGasFilter   offers the new filters in autocomplete
+#   * hovering each HASH("...") shows the in-game display name
+#   * hovering the raw numeric hash also resolves to the display name
+
+# --- gas filters (Helium / Ozone / Silanol) ---
+define HeliumFilter        HASH("ItemGasFilterHelium")
+define HeliumFilterLarge   HASH("ItemGasFilterHeliumL")
+define HeliumFilterInf     HASH("ItemGasFilterHeliumInfinite")
+define OzoneFilter         HASH("ItemGasFilterOzone")
+define OzoneFilterMedium   HASH("ItemGasFilterOzoneM")
+define SilanolFilter       HASH("ItemGasFilterSilanol")
+define SilanolFilterLarge  HASH("ItemGasFilterSilanolL")
+
+# --- pure ice items (new solids/liquids) ---
+define OzoneIce            HASH("ItemPureIceOzone")
+define SilanolIce          HASH("ItemPureIceSilanol")
+define HClIce              HASH("ItemPureIceHydrochloricAcid")
+define LiquidOzoneIce      HASH("ItemPureIceLiquidOzone")
+
+# --- raw numeric hashes should hover to the same devices ---
+define HeliumFilterHash    -283214125    # hover -> Gas Filter (Helium)
+define OzoneFilterHash      787360299    # hover -> Gas Filter (Ozone)
+define SilanolFilterHash   2094616925    # hover -> Gas Filter (Silanol)

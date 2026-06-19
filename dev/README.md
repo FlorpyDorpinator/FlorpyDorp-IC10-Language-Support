@@ -20,29 +20,27 @@ dev/
 
 ## Data Processing Pipeline
 
-### How Device Data is Generated
+> **RETIRED:** The `generate_hashes.py` → `stationpedia.txt` path described below is **no
+> longer used** by the build. Device hashes are now generated directly from
+> `data/Stationpedia.json` at compile time. To update game data, just drop the four source
+> files into `data/` and run `cargo build` — see [`data/README.md`](../data/README.md).
+> The extractor script is kept only as a historical reference.
 
-1. **Extract from Game**: Run `generate_hashes.py` to extract device hashes from Stationeers' `english.xml`
-2. **Generate Code**: The `ic10lsp/build.rs` script automatically reads `stationpedia.txt` and generates Rust code
-3. **Compile LSP**: Device mappings are compiled directly into the language server
+### How Device Data is Generated (current)
 
-**Data Pipeline**: `english.xml` → `generate_hashes.py` → `stationpedia.txt` → `build.rs` → LSP binary
+1. **Drop in sources**: place fresh `Enums.json`, `Stationpedia.json`, `ProgrammableChip.cs`,
+   and `english.xml` into `data/`.
+2. **Build**: `ic10lsp/build.rs` reads those four files and regenerates all device hashes,
+   logic types, enums, instruction docs, and descriptions into `OUT_DIR`.
+3. **Compile LSP**: the generated maps are `include!`d straight into the language server.
 
-### Updating Device Hashes
+**Data Pipeline (current):** `data/{Enums.json, Stationpedia.json, ProgrammableChip.cs, english.xml}` → `build.rs` → LSP binary
 
-When Stationeers releases new devices:
+### Legacy extractor (no longer required)
 
-```bash
-# 1. Navigate to extractor directory
-cd dev/extractor/StationeersDataExtractor
-
-# 2. Run the Python script (will prompt to copy game files)
-python generate_hashes.py
-
-# 3. Rebuild the language server (automatic via build.rs)
-cd ../../../ic10lsp
-cargo build
-```
+`generate_hashes.py` historically produced `output/stationpedia.txt` from the game's
+`english.xml`. The build no longer reads that file. Device names/hashes now come from
+`data/Stationpedia.json` (hashes) joined with `data/english.xml` (display names).
 
 ## Test Files
 

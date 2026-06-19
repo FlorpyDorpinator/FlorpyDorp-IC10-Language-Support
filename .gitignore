@@ -69,3 +69,6 @@ anex-ic10/dev/extractor/StationeersDataExtractor-BepInEx
 
 # Spec Story
 .specstory/
+
+# Local archive of previous game-data versions (not needed by the build)
+data/game-sources/Old Versions/
