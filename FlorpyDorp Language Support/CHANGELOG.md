@@ -1,5 +1,16 @@
 ### Changelog Beginning 11-01-2025
 
+## [2.4.1] - 2026-06-19
+
+### 🐛 Bug Fixes
+- **Autocomplete now pops up automatically again**: the extension now ships a default that
+  enables quick suggestions for `.ic10` files, including inside strings. This fixes device
+  name completion not appearing inside `HASH("...")`, and restores automatic suggestions for
+  logic types, batch modes, etc. without needing to press Ctrl+Space. (You can still override
+  `editor.quickSuggestions` yourself.)
+
+---
+
 ## [2.4.0] - 2026-06-19 The "Gas Update" Sync
 
 ### ✨ New Features

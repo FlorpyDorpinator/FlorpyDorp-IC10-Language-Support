@@ -72,3 +72,6 @@ anex-ic10/dev/extractor/StationeersDataExtractor-BepInEx
 
 # Local archive of previous game-data versions (not needed by the build)
 data/game-sources/Old Versions/
+
+# Personal draft (not part of the extension)
+reddit-post.md
