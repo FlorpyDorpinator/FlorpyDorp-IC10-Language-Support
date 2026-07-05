@@ -1,0 +1,33 @@
+# ============================================================
+# TEST 2: Loops - back edges must NOT cause false positives
+# ============================================================
+# The OLD textual model compares "first read line" vs "first assign line".
+# In loops the assignment can sit textually BELOW a read that the loop
+# body reaches again, which used to mis-fire. The CFG follows the back
+# edge and sees the register as assigned.
+#
+# PASS = NO red errors anywhere in this file.
+
+# --- Simple counter loop -----------------------------------
+move r0 0            # r0 initialized
+loop:
+add r0 r0 1          # reads r0 (was assigned above + on back edge)
+slt r1 r0 10         # r1 = r0 < 10
+bnez r1 loop         # branch back to loop
+
+# --- Accumulator that is read after the loop ---------------
+move r2 0
+move r3 0
+sum:
+add r2 r2 r3         # r2 += r3
+add r3 r3 1
+blt r3 5 sum
+s db Setting r2      # read r2 after loop -> fine
+
+# --- Loop whose counter is only ever touched inside --------
+move r4 0
+spin:
+add r4 r4 1
+blt r4 100 spin      # read r4 -> assigned on entry and back edge
+yield
+j spin

@@ -1,0 +1,23 @@
+# ============================================================
+# TEST 1: True positives - reads of NEVER-assigned registers
+# ============================================================
+# Control-flow analysis should STILL flag genuine bugs: a register
+# that is read but never written on ANY path that reaches the read.
+#
+# PASS = a red "read before being assigned" error on EVERY line marked
+#        # ERROR below, and NO errors on the other lines.
+
+# r2 is never assigned anywhere -> ERROR on the read of r2
+add r1 r2 5          # ERROR: r2 read before assigned
+
+# r4 used as a source before any write -> ERROR on r4
+move r3 r4           # ERROR: r4 read before assigned
+
+# A device load is fine (r5 gets assigned), but r6 below is never set
+l r5 d0 Temperature
+add r7 r6 r5         # ERROR: r6 read before assigned
+
+# r1, r3, r5, r7 are all assigned before/at their reads -> NO error.
+# sp / ra are implicitly initialized -> NO error even though "read".
+add r8 sp 1
+add r9 ra 1

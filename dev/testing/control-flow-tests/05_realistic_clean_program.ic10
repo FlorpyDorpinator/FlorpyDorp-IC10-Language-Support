@@ -1,0 +1,44 @@
+# ============================================================
+# TEST 5: Realistic program - no false positives on real code
+# ============================================================
+# A thermostat + airlock style script using the patterns real IC10
+# authors write: aliases, a main yield loop, conditional branches, and a
+# subroutine called with jal / returned with j ra. None of these reads
+# are genuine read-before-assign bugs, so the CFG must stay silent.
+#
+# PASS = NO red "read before assigned" errors anywhere in this file.
+
+alias Sensor d0
+alias Heater d1
+alias Door d2
+alias target r0
+alias temp r1
+alias flag r2
+
+# --- one-time init (runs before the loop) ------------------
+move target 293          # desired temperature (K)
+move flag 0
+
+main:
+l temp Sensor Temperature    # read sensor each tick
+ble temp target heat_off     # if temp <= target, turn heat off
+move flag 1
+s Heater On flag             # flag read here - assigned on every path in
+j after_heat
+
+heat_off:
+move flag 0
+s Heater On flag
+
+after_heat:
+# subroutine call: toggle the door, then come back
+jal toggle_door
+yield
+j main                       # loop forever
+
+# --- subroutine: read/modify/write a device state ----------
+toggle_door:
+l temp Door Open             # reuse temp as scratch
+seqz temp temp               # temp = (temp == 0)
+s Door Open temp
+j ra                         # return to caller (ra set by jal)

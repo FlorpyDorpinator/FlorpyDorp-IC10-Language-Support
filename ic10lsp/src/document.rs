@@ -34,7 +34,7 @@ impl Default for Configuration {
             warn_overline_comment: true,
             warn_overcolumn_comment: true,
             suppress_hash_diagnostics: false,
-            enable_control_flow_analysis: false,
+            enable_control_flow_analysis: true,
             suppress_register_warnings: false,
         }
     }

@@ -1,0 +1,21 @@
+# ============================================================
+# TEST 3: Init-skip / forward jumps - the classic false positive
+# ============================================================
+# Here the READ of a register appears textually ABOVE its assignment,
+# but an unconditional jump runs the init block first. The old textual
+# model flagged this as "read before assign"; the CFG proves the init
+# block is reachable before the read and stays silent.
+#
+# PASS = NO red errors anywhere in this file.
+
+j init               # jump over the processing block on first entry
+
+process:
+add r1 r0 1          # reads r0 - assigned in init below, reached first
+s db Setting r1
+yield
+j process            # keep processing
+
+init:
+move r0 100          # r0 assigned here
+j process            # fall into the processing loop

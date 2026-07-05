@@ -857,6 +857,7 @@ pub async fn run_diagnostics(backend: &Backend, uri: &Url) {
         // Skip register diagnostics if globally suppressed
         if !config.suppress_register_warnings {
             let mut register_analyzer = additional_features::RegisterAnalyzer::new();
+            register_analyzer.set_control_flow_enabled(config.enable_control_flow_analysis);
             register_analyzer.analyze_register_usage(
                 tree,
                 &document.content,
