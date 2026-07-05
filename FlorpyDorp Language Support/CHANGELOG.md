@@ -1,5 +1,24 @@
 ### Changelog Beginning 11-01-2025
 
+## [2.4.5] - 2026-07-05
+
+### ✨ New Features
+- **Control-flow-aware "read before assigned" diagnostic**: the register analyzer now builds
+  a real control-flow graph (basic blocks, jump/branch/loop edges) and runs a *may-be-assigned*
+  dataflow analysis instead of the old textual line-order heuristic. A register read is only
+  flagged when it is provably never assigned on **any** path that reaches it.
+  - Removes false positives on common patterns: loops (assignment across a back edge),
+    init-skips and forward jumps (`j main` over a setup block), and read-then-assign inside
+    a loop body.
+  - Catches more genuine bugs, too — e.g. a read whose only assignment sits in an unreachable
+    block, which the old model silently missed.
+  - Handles labels, absolute/relative branches, `jal`/`j ra` subroutines, and treats computed
+    jumps conservatively (never a false alarm).
+  - Toggle with **`ic10.lsp.enableControlFlowAnalysis`** (default **on**); turn it off to fall
+    back to the legacy textual heuristic.
+
+---
+
 ## [2.4.1] - 2026-06-19
 
 ### 🐛 Bug Fixes

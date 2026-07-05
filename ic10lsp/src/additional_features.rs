@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use tower_lsp::lsp_types::{
     CodeActionOrCommand, Diagnostic, DiagnosticSeverity, Position as LspPosition, Range as LspRange,
 };
@@ -35,6 +35,49 @@ pub enum RegisterState {
     AssignedNotRead,  // Assigned but value never used
     ReadBeforeAssign, // Read before any assignment (error)
     Used,             // Properly assigned and read
+}
+
+// ---------------------------------------------------------------------------
+// Control-flow analysis (definite/may assignment) for read-before-assign.
+//
+// IC10 programs are tiny (<= ~128 lines, ~18 registers), so a full per-
+// instruction control-flow graph with iterative dataflow is effectively free
+// (microseconds). We build a CFG, then run a forward "may be assigned"
+// analysis (union over predecessors, no kill). A read is reported as
+// read-before-assign ONLY when the register is provably *never* assigned on
+// ANY path reaching the read. This is the sound, false-positive-free choice:
+// it stays silent whenever some execution path could have assigned the value
+// (loops, init-skips, jumps), at the cost of occasionally missing a bug that
+// only manifests on one branch. For a linter that emits hard errors, silence
+// on ambiguity beats crying wolf on correct code.
+// ---------------------------------------------------------------------------
+
+/// Where a jump/branch transfers control. Either a resolved 0-based source row
+/// or "we can't tell" (computed register target, unresolved define, etc.).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum CfgTarget {
+    Line(u32),
+    Indeterminate,
+}
+
+/// How an instruction passes control to the next one.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum CfgControl {
+    Seq,                 // normal instruction: falls through to next
+    JumpAbs(CfgTarget),  // j: unconditional, absolute, no fallthrough
+    JumpRel(CfgTarget),  // jr: unconditional, relative, no fallthrough
+    BranchAbs(CfgTarget),// b*: conditional, absolute, target + fallthrough
+    BranchRel(CfgTarget),// br*: conditional, relative, target + fallthrough
+    Call(CfgTarget),     // jal: sets ra, target + fallthrough (subroutine return)
+    Halt,                // hcf: no successors
+}
+
+/// One instruction in source order, distilled to what the dataflow needs.
+struct CfgInstr {
+    row: u32,                         // 0-based source row (for target resolution)
+    reads: Vec<(String, Range)>,      // canonical register reads, in operand order
+    writes: Vec<String>,              // canonical registers written
+    control: CfgControl,
 }
 
 impl RegisterUsage {
@@ -84,6 +127,8 @@ pub struct RegisterAnalyzer {
     register_usage: HashMap<String, RegisterUsage>,
     alias_to_register: HashMap<String, String>, // alias -> register mapping for quick lookup
     ignored_registers: std::collections::HashSet<String>, // registers to suppress diagnostics for
+    control_flow_enabled: bool,                 // use CFG-based read-before-assign analysis
+    cfg_violations: Vec<(String, Range)>,       // (canonical register, read range) confirmed by CFG
 }
 
 // Helper function to recursively find identifier nodes within operands
@@ -101,13 +146,157 @@ fn find_identifier_in_node(node: tree_sitter::Node) -> Option<tree_sitter::Node>
     None
 }
 
+// --- Control-flow helpers (free functions; no &self to avoid borrow conflicts) ---
+
+/// Resolve a read operand to its canonical register name + the range to
+/// underline. Mirrors `detect_register_reads` (check the operand's child, then
+/// the operand itself, then any nested identifier for indirect references).
+fn cfg_resolve_read_operand(
+    operand: tree_sitter::Node,
+    content: &str,
+    aliases: &HashMap<String, crate::DefinitionData<crate::AliasValue>>,
+) -> Option<(String, Range)> {
+    let nodes_to_check = if let Some(child) = operand.child(0) {
+        vec![child, operand]
+    } else {
+        vec![operand]
+    };
+    for node in nodes_to_check {
+        match node.kind() {
+            "register" => {
+                if let Ok(reg) = node.utf8_text(content.as_bytes()) {
+                    return Some((reg.to_string(), Range::from(node.range())));
+                }
+            }
+            "identifier" => {
+                if let Ok(id) = node.utf8_text(content.as_bytes()) {
+                    if let Some(alias_data) = aliases.get(id) {
+                        if let crate::AliasValue::Register(reg) = &alias_data.value {
+                            return Some((reg.clone(), Range::from(node.range())));
+                        }
+                    }
+                }
+            }
+            _ => {
+                if let Some(id_node) = find_identifier_in_node(node) {
+                    if let Ok(id) = id_node.utf8_text(content.as_bytes()) {
+                        if let Some(alias_data) = aliases.get(id) {
+                            if let crate::AliasValue::Register(reg) = &alias_data.value {
+                                return Some((reg.clone(), Range::from(id_node.range())));
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    None
+}
+
+/// Resolve the first operand of an assignment instruction to the canonical
+/// register it writes. Mirrors `detect_register_assignments`.
+fn cfg_resolve_write_target(
+    first_operand: tree_sitter::Node,
+    content: &str,
+    aliases: &HashMap<String, crate::DefinitionData<crate::AliasValue>>,
+) -> Option<String> {
+    let child = first_operand.child(0)?;
+    match child.kind() {
+        "register" => child.utf8_text(content.as_bytes()).ok().map(|s| s.to_string()),
+        "identifier" => {
+            let id = child.utf8_text(content.as_bytes()).ok()?;
+            if let Some(alias_data) = aliases.get(id) {
+                if let crate::AliasValue::Register(reg) = &alias_data.value {
+                    return Some(reg.clone());
+                }
+            }
+            None
+        }
+        _ => None,
+    }
+}
+
+/// Resolve a jump/branch target operand to an absolute source row (or
+/// Indeterminate when it's computed/unresolvable).
+fn cfg_resolve_target(
+    operand: Option<&tree_sitter::Node>,
+    relative: bool,
+    row: u32,
+    label_lines: &HashMap<String, u32>,
+    content: &str,
+) -> CfgTarget {
+    let operand = match operand {
+        Some(o) => *o,
+        None => return CfgTarget::Indeterminate,
+    };
+    let node = operand.child(0).unwrap_or(operand);
+    match node.kind() {
+        "number" => {
+            let txt = node.utf8_text(content.as_bytes()).unwrap_or("").trim();
+            if let Ok(v) = txt.parse::<i64>() {
+                let target = if relative { row as i64 + v } else { v };
+                if target >= 0 {
+                    return CfgTarget::Line(target as u32);
+                }
+            }
+            CfgTarget::Indeterminate
+        }
+        "identifier" => {
+            let txt = node.utf8_text(content.as_bytes()).unwrap_or("");
+            match label_lines.get(txt) {
+                Some(&lrow) => CfgTarget::Line(lrow),
+                None => CfgTarget::Indeterminate, // alias-to-register or define constant
+            }
+        }
+        // register / hash / anything else => computed target
+        _ => CfgTarget::Indeterminate,
+    }
+}
+
+/// Classify how an instruction transfers control, resolving its target.
+fn cfg_classify_control(
+    op_lower: &str,
+    operands: &[tree_sitter::Node],
+    row: u32,
+    label_lines: &HashMap<String, u32>,
+    content: &str,
+) -> CfgControl {
+    match op_lower {
+        "hcf" => CfgControl::Halt,
+        "j" => CfgControl::JumpAbs(cfg_resolve_target(operands.get(0), false, row, label_lines, content)),
+        "jal" => CfgControl::Call(cfg_resolve_target(operands.get(0), false, row, label_lines, content)),
+        "jr" => CfgControl::JumpRel(cfg_resolve_target(operands.get(0), true, row, label_lines, content)),
+        _ => {
+            // Every IC10 opcode beginning with 'b' is a conditional branch whose
+            // last operand is the target. "br*" variants are PC-relative.
+            if operands.is_empty() {
+                CfgControl::Seq
+            } else if op_lower.starts_with("br") {
+                CfgControl::BranchRel(cfg_resolve_target(operands.last(), true, row, label_lines, content))
+            } else if op_lower.starts_with('b') {
+                CfgControl::BranchAbs(cfg_resolve_target(operands.last(), false, row, label_lines, content))
+            } else {
+                CfgControl::Seq
+            }
+        }
+    }
+}
+
 impl RegisterAnalyzer {
     pub fn new() -> Self {
         Self {
             register_usage: HashMap::new(),
             alias_to_register: HashMap::new(),
             ignored_registers: std::collections::HashSet::new(),
+            control_flow_enabled: true,
+            cfg_violations: Vec::new(),
         }
+    }
+
+    /// Toggle control-flow-aware read-before-assign analysis. When disabled the
+    /// analyzer falls back to the legacy textual (line-order) heuristic.
+    pub fn set_control_flow_enabled(&mut self, enabled: bool) {
+        self.control_flow_enabled = enabled;
     }
 
     fn ensure_register_entry(&mut self, name: &str) -> &mut RegisterUsage {
@@ -229,7 +418,8 @@ impl RegisterAnalyzer {
         self.register_usage.clear();
         self.alias_to_register.clear();
         self.ignored_registers.clear();
-        
+        self.cfg_violations.clear();
+
         // Parse ignore directives from comments
         self.parse_ignore_directives(content);
 
@@ -264,6 +454,9 @@ impl RegisterAnalyzer {
         self.fallback_line_scan(content, aliases); // resilience if tree-sitter patterns miss
         self.bootstrap_registers();
         self.mark_rr_as_used();
+        // Control-flow-aware read-before-assign (cheap; always computed, used by
+        // generate_diagnostics only when control_flow_enabled).
+        self.compute_control_flow(tree, content, aliases);
     }
 
     fn detect_register_assignments(
@@ -520,6 +713,233 @@ impl RegisterAnalyzer {
         )
     }
 
+    /// Build a per-instruction control-flow graph and run a forward "may be
+    /// assigned" dataflow. Fills `self.cfg_violations` with reads of registers
+    /// that are provably never assigned on ANY path reaching them.
+    fn compute_control_flow(
+        &mut self,
+        tree: &Tree,
+        content: &str,
+        aliases: &HashMap<String, crate::DefinitionData<crate::AliasValue>>,
+    ) {
+        let bytes = content.as_bytes();
+        let root = tree.root_node();
+
+        // 1. Map every label name to its 0-based source row.
+        let mut label_lines: HashMap<String, u32> = HashMap::new();
+        if let Ok(label_query) =
+            Query::new(tree_sitter_ic10::language(), "(label (identifier) @name)")
+        {
+            let mut cursor = QueryCursor::new();
+            if let Some(name_idx) = label_query.capture_index_for_name("name") {
+                for m in cursor.matches(&label_query, root, bytes) {
+                    for cap in m.captures {
+                        if cap.index == name_idx {
+                            if let Ok(name) = cap.node.utf8_text(bytes) {
+                                label_lines
+                                    .entry(name.to_string())
+                                    .or_insert(cap.node.start_position().row as u32);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // 2. Collect instructions in source order.
+        let instr_query = match Query::new(
+            tree_sitter_ic10::language(),
+            "(instruction (operation) @op) @instruction",
+        ) {
+            Ok(q) => q,
+            Err(_) => return,
+        };
+        let op_idx = instr_query.capture_index_for_name("op").unwrap();
+        let inst_idx = instr_query.capture_index_for_name("instruction").unwrap();
+
+        let mut raw: Vec<(String, tree_sitter::Node)> = Vec::new();
+        {
+            let mut cursor = QueryCursor::new();
+            for m in cursor.matches(&instr_query, root, bytes) {
+                let mut op_text = None;
+                let mut inst_node = None;
+                for cap in m.captures {
+                    if cap.index == op_idx {
+                        op_text = cap.node.utf8_text(bytes).ok();
+                    } else if cap.index == inst_idx {
+                        inst_node = Some(cap.node);
+                    }
+                }
+                if let (Some(op), Some(node)) = (op_text, inst_node) {
+                    raw.push((op.to_string(), node));
+                }
+            }
+        }
+        raw.sort_by_key(|(_, n)| (n.start_position().row, n.start_position().column));
+        if raw.is_empty() {
+            return;
+        }
+
+        // 3. Distill each instruction into reads / writes / control transfer.
+        let mut instrs: Vec<CfgInstr> = Vec::with_capacity(raw.len());
+        for (op, inst) in &raw {
+            let row = inst.start_position().row as u32;
+            let op_lower = op.to_ascii_lowercase();
+            let mut tc = inst.walk();
+            let operands: Vec<tree_sitter::Node> =
+                inst.children_by_field_name("operand", &mut tc).collect();
+
+            let mut writes: Vec<String> = Vec::new();
+            let mut reads: Vec<(String, Range)> = Vec::new();
+
+            let is_assign = self.is_assignment_operation(op);
+            if is_assign {
+                if let Some(first) = operands.first() {
+                    if let Some(reg) = cfg_resolve_write_target(*first, content, aliases) {
+                        writes.push(reg);
+                    }
+                }
+            }
+            if op_lower == "jal" {
+                writes.push("ra".to_string());
+            }
+
+            let start_idx = if is_assign { 1 } else { 0 };
+            for operand in operands.iter().skip(start_idx) {
+                if let Some(rd) = cfg_resolve_read_operand(*operand, content, aliases) {
+                    reads.push(rd);
+                }
+            }
+
+            let control = cfg_classify_control(&op_lower, &operands, row, &label_lines, content);
+            instrs.push(CfgInstr { row, reads, writes, control });
+        }
+
+        let n = instrs.len();
+
+        // 4. Build successor edges. Targets resolve to the first instruction at
+        //    or after the target row; indeterminate targets reach everywhere.
+        let find_index = |target_row: u32| -> Option<usize> {
+            instrs.iter().position(|ci| ci.row >= target_row)
+        };
+        let mut succ: Vec<Vec<usize>> = vec![Vec::new(); n];
+        for i in 0..n {
+            let next = if i + 1 < n { Some(i + 1) } else { None };
+            let add_target = |list: &mut Vec<usize>, t: CfgTarget| match t {
+                CfgTarget::Line(row) => {
+                    if let Some(idx) = find_index(row) {
+                        list.push(idx);
+                    }
+                }
+                CfgTarget::Indeterminate => {
+                    for j in 0..n {
+                        list.push(j);
+                    }
+                }
+            };
+            match instrs[i].control {
+                CfgControl::Seq => {
+                    if let Some(nx) = next {
+                        succ[i].push(nx);
+                    }
+                }
+                CfgControl::Halt => {}
+                CfgControl::JumpAbs(t) | CfgControl::JumpRel(t) => {
+                    let mut list = std::mem::take(&mut succ[i]);
+                    add_target(&mut list, t);
+                    succ[i] = list;
+                }
+                CfgControl::BranchAbs(t) | CfgControl::BranchRel(t) | CfgControl::Call(t) => {
+                    let mut list = std::mem::take(&mut succ[i]);
+                    if let Some(nx) = next {
+                        list.push(nx);
+                    }
+                    add_target(&mut list, t);
+                    succ[i] = list;
+                }
+            }
+        }
+
+        // 5. Predecessors + reachability from entry (instruction 0).
+        let mut preds: Vec<Vec<usize>> = vec![Vec::new(); n];
+        for i in 0..n {
+            for &s in &succ[i] {
+                preds[s].push(i);
+            }
+        }
+        let mut reachable = vec![false; n];
+        let mut stack = vec![0usize];
+        reachable[0] = true;
+        while let Some(u) = stack.pop() {
+            for &v in &succ[u] {
+                if !reachable[v] {
+                    reachable[v] = true;
+                    stack.push(v);
+                }
+            }
+        }
+
+        // 6. Entry set: registers that are implicitly initialized at startup.
+        let mut entry: HashSet<String> = HashSet::new();
+        entry.insert("sp".to_string());
+        entry.insert("ra".to_string());
+        for k in 0..=15 {
+            entry.insert(format!("rr{}", k));
+        }
+
+        // 7. Forward "may be assigned" dataflow to fixpoint (monotone: sets only grow).
+        let writes_sets: Vec<HashSet<String>> = instrs
+            .iter()
+            .map(|ci| ci.writes.iter().cloned().collect())
+            .collect();
+        let mut may: Vec<HashSet<String>> = vec![HashSet::new(); n];
+        loop {
+            let mut changed = false;
+            for i in 0..n {
+                let mut incoming: HashSet<String> = HashSet::new();
+                if i == 0 {
+                    incoming.extend(entry.iter().cloned());
+                }
+                for &p in &preds[i] {
+                    // out(p) = may[p] ∪ writes[p]
+                    for r in &may[p] {
+                        incoming.insert(r.clone());
+                    }
+                    for r in &writes_sets[p] {
+                        incoming.insert(r.clone());
+                    }
+                }
+                for r in incoming {
+                    if may[i].insert(r) {
+                        changed = true;
+                    }
+                }
+            }
+            if !changed {
+                break;
+            }
+        }
+
+        // 8. A read is a confirmed violation when the register is not in the
+        //    instruction's IN set (never assigned on any path reaching it).
+        for i in 0..n {
+            if !reachable[i] {
+                continue; // dead code: never executes, don't flag
+            }
+            for (reg, range) in &instrs[i].reads {
+                if reg == "sp" || reg == "ra" || reg.starts_with("rr") {
+                    continue;
+                }
+                if self.ignored_registers.contains(reg) {
+                    continue;
+                }
+                if !may[i].contains(reg) {
+                    self.cfg_violations.push((reg.clone(), *range));
+                }
+            }
+        }
+    }
+
     pub fn generate_diagnostics(&self) -> Vec<Diagnostic> {
         let mut diagnostics = Vec::new();
 
@@ -581,6 +1001,12 @@ impl RegisterAnalyzer {
                     }
                 }
                 RegisterState::ReadBeforeAssign => {
+                    // When control-flow analysis is on, read-before-assign is
+                    // decided by the CFG pass below (which accounts for jumps,
+                    // branches and loops) rather than this textual heuristic.
+                    if self.control_flow_enabled {
+                        continue;
+                    }
                     // Do not flag stack pointer, return address, or rr registers as read-before-assign; they're implicitly initialized
                     if register_name == "sp" || register_name == "ra" || register_name.starts_with("rr") {
                         continue;
@@ -593,7 +1019,7 @@ impl RegisterAnalyzer {
                             .unwrap_or_else(|| register_name.clone());
 
                         eprintln!("DEBUG DIAGNOSTIC: ReadBeforeAssign for {} at range {:?}", register_display, read_range);
-                        
+
                         diagnostics.push(Diagnostic {
                             range: read_range.clone().into(),
                             severity: Some(DiagnosticSeverity::ERROR),
@@ -610,6 +1036,44 @@ impl RegisterAnalyzer {
                 RegisterState::Used => {
                     // No diagnostic needed for properly used registers
                 }
+            }
+        }
+
+        // Control-flow-aware read-before-assign: emit only reads of registers
+        // proven to be assigned on NO path that reaches them. This both removes
+        // false positives from the textual heuristic (loops, init-skips, forward
+        // jumps) and pinpoints the exact reads at fault.
+        if self.control_flow_enabled {
+            for (register_name, range) in &self.cfg_violations {
+                if register_name == "sp"
+                    || register_name == "ra"
+                    || register_name.starts_with("rr")
+                {
+                    continue;
+                }
+                if self.ignored_registers.contains(register_name) {
+                    continue;
+                }
+                let register_display = self
+                    .register_usage
+                    .get(register_name)
+                    .and_then(|u| u.alias_name.clone())
+                    .map(|alias| format!("'{}' ({})", alias, register_name))
+                    .unwrap_or_else(|| register_name.clone());
+
+                diagnostics.push(Diagnostic {
+                    range: (*range).into(),
+                    severity: Some(DiagnosticSeverity::ERROR),
+                    code: Some(tower_lsp::lsp_types::NumberOrString::String(
+                        "register_read_before_assign".to_string(),
+                    )),
+                    message: format!(
+                        "Register {} is read before being assigned a value.",
+                        register_display
+                    ),
+                    data: Some(serde_json::json!(register_name)),
+                    ..Default::default()
+                });
             }
         }
 
@@ -1299,5 +1763,170 @@ mod tests {
         assert!(!info.assignments.is_empty(), "peek should assign to r10");
         assert!(!info.reads.is_empty(), "add should read r10");
         assert_eq!(info.get_state(), RegisterState::Used);
+    }
+
+    // ---- Control-flow analysis (read-before-assign) ----------------------
+
+    /// Count read-before-assign ERROR diagnostics mentioning `register`.
+    fn rba_count(ra: &RegisterAnalyzer, register: &str) -> usize {
+        ra.generate_diagnostics()
+            .iter()
+            .filter(|d| {
+                matches!(
+                    &d.code,
+                    Some(tower_lsp::lsp_types::NumberOrString::String(c))
+                        if c == "register_read_before_assign"
+                )
+            })
+            .filter(|d| {
+                d.data
+                    .as_ref()
+                    .and_then(|v| v.as_str())
+                    .map(|s| s == register)
+                    .unwrap_or(false)
+            })
+            .count()
+    }
+
+    #[test]
+    fn cfg_flags_never_assigned_read() {
+        // r2 is read but never written on any path -> genuine read-before-assign.
+        let aliases = HashMap::new();
+        let ra = analyze("add r1 r2 5\n", &aliases);
+        assert_eq!(rba_count(&ra, "r2"), 1, "r2 is never assigned, must be flagged");
+        assert_eq!(rba_count(&ra, "r1"), 0, "r1 is the write target, not a read");
+    }
+
+    #[test]
+    fn cfg_suppresses_loop_back_edge() {
+        // Classic loop: r0 assigned at top, incremented inside loop. The textual
+        // model could misorder this; the CFG must see r0 as assigned.
+        let aliases = HashMap::new();
+        let src = "move r0 0\nloop:\nadd r0 r0 1\nblt r0 10 loop\n";
+        let ra = analyze(src, &aliases);
+        assert_eq!(rba_count(&ra, "r0"), 0, "r0 is assigned before the loop");
+    }
+
+    #[test]
+    fn cfg_suppresses_init_skip_forward_jump() {
+        // Read appears textually BEFORE the assignment, but control flow runs the
+        // init block first via the jump. This is the textual model's false positive.
+        let aliases = HashMap::new();
+        let src = "\
+j init
+process:
+add r1 r0 1
+yield
+init:
+move r0 5
+j process
+";
+        let ra = analyze(src, &aliases);
+        assert_eq!(
+            rba_count(&ra, "r0"),
+            0,
+            "r0 is assigned in init (reached before process), must NOT be flagged"
+        );
+    }
+
+    #[test]
+    fn cfg_flags_read_in_unconditionally_reached_block() {
+        // r5 is only ever assigned inside a block that is skipped over by an
+        // unconditional jump and never falls through -> never assigned on the
+        // path that reaches the read.
+        let aliases = HashMap::new();
+        let src = "\
+j main
+dead:
+move r5 9
+hcf
+main:
+add r6 r5 1
+";
+        let ra = analyze(src, &aliases);
+        assert_eq!(
+            rba_count(&ra, "r5"),
+            1,
+            "r5's only assignment is unreachable before the read"
+        );
+    }
+
+    #[test]
+    fn cfg_respects_disabled_flag_falls_back_to_textual() {
+        // With control flow disabled, the legacy textual heuristic runs instead.
+        let aliases = HashMap::new();
+        let src = "add r1 r2 5\n";
+        let mut parser = Parser::new();
+        parser.set_language(tree_sitter_ic10::language()).unwrap();
+        let tree = parser.parse(src, None).unwrap();
+        let mut ra = RegisterAnalyzer::new();
+        ra.set_control_flow_enabled(false);
+        ra.analyze_register_usage(&tree, src, &aliases);
+        // r2 never assigned -> both models agree it's a violation.
+        assert_eq!(rba_count(&ra, "r2"), 1);
+    }
+
+    #[test]
+    fn cfg_ignores_implicitly_initialized_registers() {
+        // sp, ra and rr* are implicitly initialized and must never be flagged.
+        let aliases = HashMap::new();
+        let ra = analyze("add r0 sp 1\nadd r1 ra 1\nadd r2 rr3 1\n", &aliases);
+        assert_eq!(rba_count(&ra, "sp"), 0);
+        assert_eq!(rba_count(&ra, "ra"), 0);
+        assert_eq!(rba_count(&ra, "rr3"), 0);
+    }
+
+    /// End-to-end check of the shipped `.ic10` test scripts through the real
+    /// diagnostics entry point. Keeps the manual test files honest.
+    #[test]
+    fn cfg_test_scripts_match_expectations() {
+        let dir = concat!(
+            env!("CARGO_MANIFEST_DIR"),
+            "/../dev/testing/control-flow-tests/"
+        );
+        // (file, expected number of read-before-assign errors)
+        let cases = [
+            ("01_true_positives.ic10", 3),
+            ("02_loop_back_edge.ic10", 0),
+            ("03_init_skip_forward_jump.ic10", 0),
+            ("04_unreachable_assignment.ic10", 2),
+            ("05_realistic_clean_program.ic10", 0),
+        ];
+        for (file, expected) in cases {
+            let path = format!("{}{}", dir, file);
+            let content = std::fs::read_to_string(&path)
+                .unwrap_or_else(|e| panic!("read {}: {}", path, e));
+            let count = crate::lsp_diagnostics::compute_diagnostics_for_text(&content)
+                .iter()
+                .filter(|d| {
+                    matches!(
+                        &d.code,
+                        Some(tower_lsp::lsp_types::NumberOrString::String(c))
+                            if c == "register_read_before_assign"
+                    )
+                })
+                .count();
+            assert_eq!(
+                count, expected,
+                "{} expected {} read-before-assign error(s), got {}",
+                file, expected, count
+            );
+        }
+    }
+
+    #[test]
+    fn cfg_branch_both_paths_assign() {
+        // r4 assigned on the fallthrough; read after the merge. Some path assigns
+        // it, so the conservative analysis stays silent.
+        let aliases = HashMap::new();
+        let src = "\
+bgtz r0 skip
+move r4 1
+skip:
+add r7 r4 2
+";
+        let ra = analyze(src, &aliases);
+        // r4 is assigned only on one path; may-analysis -> not flagged (no false alarm).
+        assert_eq!(rba_count(&ra, "r4"), 0);
     }
 }
