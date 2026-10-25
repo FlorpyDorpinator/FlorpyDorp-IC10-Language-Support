@@ -1,5 +1,12 @@
 ### Changelog Beginning 11-01-2025
 
+## [2.5.0] - Unreleased
+
+### ✨ New Features
+- **Custom Operators from mods** - Added ability to find and display help information from operators of custom mods.
+
+---
+
 ## [2.4.5] - 2026-07-05
 
 ### ✨ New Features

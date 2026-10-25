@@ -7,6 +7,10 @@ use tree_sitter::{Query, QueryCursor, Tree};
 use crate::instructions::LOGIC_TYPES;
 use crate::Range;
 
+/// Every instruction with its opcode: the game's (`operation`) and the ones the grammar doesn't
+/// know (`invalid_instruction`), which is how instructions from configuration parse.
+const INSTRUCTION_QUERY: &str = "(instruction operation: (_) @op) @instruction";
+
 #[derive(Debug, Clone)]
 pub struct OperationRecord {
     pub line_number: u32,
@@ -261,6 +265,19 @@ fn cfg_classify_control(
     label_lines: &HashMap<String, u32>,
     content: &str,
 ) -> CfgControl {
+    // An extra instruction's file says how it leaves; a return ends the path, as the call's own
+    // fall-through already covers the line after it.
+    if let Some(shape) = crate::instructions::shape(op_lower) {
+        use ic10lsp::extra_instructions::Flow;
+        let target = || cfg_resolve_target(shape.jump.and_then(|i| operands.get(i)), false, row, label_lines, content);
+        return match shape.flow {
+            None => CfgControl::Seq,
+            Some(Flow::Jump) => CfgControl::JumpAbs(target()),
+            Some(Flow::Branch) => CfgControl::BranchAbs(target()),
+            Some(Flow::Call) => CfgControl::Call(target()),
+            Some(Flow::Return) | Some(Flow::Halt) => CfgControl::Halt,
+        };
+    }
     match op_lower {
         "hcf" => CfgControl::Halt,
         "j" => CfgControl::JumpAbs(cfg_resolve_target(operands.get(0), false, row, label_lines, content)),
@@ -469,7 +486,7 @@ impl RegisterAnalyzer {
         // Query for all instructions and manually check the first operand
         let instruction_query = Query::new(
             tree_sitter_ic10::language(),
-            "(instruction (operation) @op) @instruction",
+            INSTRUCTION_QUERY,
         )
         .unwrap();
 
@@ -568,7 +585,7 @@ impl RegisterAnalyzer {
         // Query for all instructions and manually check operands
         let instruction_query = Query::new(
             tree_sitter_ic10::language(),
-            "(instruction (operation) @op) @instruction",
+            INSTRUCTION_QUERY,
         )
         .unwrap();
 
@@ -662,7 +679,7 @@ impl RegisterAnalyzer {
         // (e.g. JAL, Jal) is still recognised as assigning to ra.
         let instruction_query = Query::new(
             tree_sitter_ic10::language(),
-            "(instruction (operation) @op) @instruction",
+            INSTRUCTION_QUERY,
         )
         .unwrap();
 
@@ -695,6 +712,10 @@ impl RegisterAnalyzer {
     }
 
     fn is_assignment_operation(&self, operation: &str) -> bool {
+        // An extra instruction's file says whether it writes its first operand.
+        if let Some(shape) = crate::instructions::shape(operation) {
+            return shape.writes_first;
+        }
         // Case-insensitive match for operations that assign to their first register operand
         let op = operation.to_ascii_lowercase();
         matches!(
@@ -749,7 +770,7 @@ impl RegisterAnalyzer {
         // 2. Collect instructions in source order.
         let instr_query = match Query::new(
             tree_sitter_ic10::language(),
-            "(instruction (operation) @op) @instruction",
+            INSTRUCTION_QUERY,
         ) {
             Ok(q) => q,
             Err(_) => return,
@@ -1091,7 +1112,7 @@ impl RegisterAnalyzer {
         // Query for all instructions in order
         let instruction_query = Query::new(
             tree_sitter_ic10::language(),
-            "(instruction (operation) @op) @instruction",
+            INSTRUCTION_QUERY,
         )
         .unwrap();
 
@@ -1149,7 +1170,7 @@ impl RegisterAnalyzer {
         let mut cursor = QueryCursor::new();
         let instruction_query = Query::new(
             tree_sitter_ic10::language(),
-            "(instruction (operation) @op) @instruction",
+            INSTRUCTION_QUERY,
         )
         .unwrap();
 
@@ -1716,7 +1737,7 @@ mod tests {
             
             let instruction_query = Query::new(
                 tree_sitter_ic10::language(),
-                "(instruction (operation) @op) @instruction",
+                INSTRUCTION_QUERY,
             ).unwrap();
             
             let mut cursor = QueryCursor::new();

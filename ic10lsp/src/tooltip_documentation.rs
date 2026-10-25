@@ -182,7 +182,7 @@ pub(crate) fn get_related_instructions(instruction: &str) -> Option<&'static [&'
 }
 
 pub(crate) fn get_instruction_syntax(instruction: &str) -> String {
-    use crate::instructions::{InstructionSignature, INSTRUCTIONS};
+    use crate::instructions::InstructionSignature;
 
     // Explicit parameter label mapping derived from in‑game formatting conventions.
     // Only mnemonic differences are captured; first destination register (r?) usually left unlabeled.
@@ -431,8 +431,13 @@ pub(crate) fn get_instruction_syntax(instruction: &str) -> String {
         label.to_string()
     }
 
-    if let Some(InstructionSignature(params)) = INSTRUCTIONS.get(instruction) {
-        let labels = PARAM_LABELS.get(instruction).copied().or_else(|| {
+    if let Some(InstructionSignature(params)) = crate::instructions::signature(instruction) {
+        let labels = PARAM_LABELS
+            .get(instruction)
+            .copied()
+            // An extra instruction's file names its operands.
+            .or_else(|| crate::instructions::operand_names(instruction))
+            .or_else(|| {
             // Heuristic: generate sensible labels based on common patterns when not explicitly defined
             // - First REGISTER => "dest"
             // - Subsequent VALUEs => a, b, c in order
@@ -539,7 +544,7 @@ pub(crate) fn create_enhanced_instruction_hover(
     let mut markdown_parts = Vec::new();
 
     // Add instruction title and description
-    if let Some(doc) = crate::instructions::INSTRUCTION_DOCS.get(instruction) {
+    if let Some(doc) = crate::instructions::doc_with_source(instruction) {
         markdown_parts.push(format!("**{}**\n\n{}", instruction, doc));
     } else {
         markdown_parts.push(format!("**{}**", instruction));

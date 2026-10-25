@@ -362,13 +362,13 @@ pub async fn handle_hover(backend: &Backend, params: HoverParams) -> Result<Opti
         }
         "operation" | "invalid_instruction" => {
             let canonical_lowered;
-            let canonical: &str = if instructions::INSTRUCTIONS.contains_key(name) {
+            let canonical: &str = if instructions::is_instruction(name) {
                 name
             } else {
                 canonical_lowered = name.to_ascii_lowercase();
                 canonical_lowered.as_str()
             };
-            if let Some(_signature) = instructions::INSTRUCTIONS.get(canonical) {
+            if let Some(_signature) = instructions::signature(canonical) {
                 // Find the parent instruction node to analyze registers
                 let instruction_node = node.find_parent("instruction").unwrap_or(node);
 
@@ -408,7 +408,7 @@ pub async fn handle_hover(backend: &Backend, params: HoverParams) -> Result<Opti
 
                     let candidates = instructions::logictype_candidates(name);
 
-                    if let Some(signature) = instructions::INSTRUCTIONS.get(operation) {
+                    if let Some(signature) = instructions::signature(operation) {
                         if let Some(param_type) = signature.0.get(current_param) {
                             param_type.intersection(&candidates)
                         } else {
