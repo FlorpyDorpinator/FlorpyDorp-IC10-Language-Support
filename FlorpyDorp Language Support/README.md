@@ -367,6 +367,7 @@ checks it as you edit. Its `"name"` shows in each instruction's hover, as "From 
 | `type` | What the operand takes, as the game's help writes it: `r?`, `num`, `int`, `d?`, `logicType`, `slotLogicType`, `batchMode`, `reagentMode`, `str`, joined with `\|`. |
 | `role` | `read` (the default), `write` (the register it sets: the first operand only) or `jump` (where it jumps to). |
 | `optional` | It can be left off. Optional operands come last. |
+| `into` | A register, `r0` to `r15`, that the operand's value also goes into, like a call's arguments. Then a function reading it isn't flagged as reading it before it's set. |
 | `flow` | `jump` (like `j`), `branch` (like `beq`), `call` (like `jal`), `return` (like `j ra`) or `halt` (like `hcf`). Leave it out for an instruction that runs on to the next line. |
 
 ---

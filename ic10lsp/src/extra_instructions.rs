@@ -36,7 +36,7 @@ pub enum Flow {
     Branch,
     /// Goes to the jump operand, and comes back to the next line, as `jal` does.
     Call,
-    /// Goes back to the line after the call, as `j ra` does: the path ends here.
+    /// Goes back to the line after the call, as `j ra` does.
     Return,
     /// Stops the chip, as `hcf` does.
     Halt,
@@ -51,6 +51,8 @@ pub struct Shape {
     pub jump: Option<usize>,
     /// How control leaves it; `None` runs on to the next line.
     pub flow: Option<Flow>,
+    /// Operands whose value it also puts in a register (a call's arguments): (operand, register).
+    pub into: &'static [(usize, &'static str)],
 }
 
 /// One registered extra instruction.
@@ -112,6 +114,8 @@ struct OperandJson {
     role: Role,
     #[serde(default)]
     optional: bool,
+    #[serde(default)]
+    into: Option<String>,
 }
 
 #[derive(Clone, Copy, Default, PartialEq, Eq, Deserialize)]
@@ -213,6 +217,7 @@ fn build(
     let mut names: Vec<&'static str> = Vec::with_capacity(entry.operands.len());
     let mut writes_first = false;
     let mut jump = None;
+    let mut into: Vec<(usize, &'static str)> = Vec::new();
     let mut min_operands = 0;
     for (i, operand) in entry.operands.iter().enumerate() {
         let types = parse_type(&operand.typ)
@@ -239,6 +244,20 @@ fn build(
                 jump = Some(i);
             }
         }
+        if let Some(register) = &operand.into {
+            let register = register.trim();
+            let valid = register
+                .strip_prefix('r')
+                .and_then(|n| n.parse::<u8>().ok())
+                .is_some_and(|n| n <= 15 && register == format!("r{n}"));
+            if !valid {
+                return Err(format!("operand {}'s \"into\" is a register, r0 to r15", operand.name));
+            }
+            if operand.role != Role::Read {
+                return Err(format!("operand {} is read to go into {}: its role can only be read", operand.name, register));
+            }
+            into.push((i, &*Box::leak(register.to_string().into_boxed_str())));
+        }
         unions.push(Union(Box::leak(types.into_boxed_slice())));
         names.push(Box::leak(operand.name.clone().into_boxed_str()));
     }
@@ -257,6 +276,7 @@ fn build(
             writes_first,
             jump,
             flow: entry.flow,
+            into: Box::leak(into.into_boxed_slice()),
         },
         mod_name,
         source,
@@ -317,6 +337,7 @@ mod test {
         assert!(!get("finit").unwrap().shape.writes_first);
         assert_eq!(fcall.shape.jump, Some(1));
         assert_eq!(fcall.shape.flow, Some(Flow::Call));
+        assert_eq!(fcall.shape.into, &[(2, "r0"), (3, "r1"), (4, "r2"), (5, "r3"), (6, "r4")]);
         assert_eq!(fcall.operand_names[2], "a");
         assert_eq!(fcall.mod_name, "Example Calls");
         assert!(fcall.signature.0[2].match_type(DataType::Register));
@@ -337,10 +358,12 @@ mod test {
               "order": { "operands": [ { "name": "a", "type": "r?", "optional": true }, { "name": "b", "type": "r?" } ] },
               "nojump": { "operands": [], "flow": "jump" },
               "secondwrite": { "operands": [ { "name": "a", "type": "r?" }, { "name": "b", "type": "r?", "role": "write" } ] },
+              "badinto": { "operands": [ { "name": "a", "type": "num", "into": "r16" } ] },
               "add": { "operands": [] }
             } }"#,
         );
-        assert_eq!(warnings.len(), 5, "{warnings:?}");
+        assert_eq!(warnings.len(), 6, "{warnings:?}");
+        assert!(warnings.iter().any(|w| w.contains("badinto") && w.contains("r0 to r15")));
         assert!(warnings.iter().any(|w| w.contains("secondwrite") && w.contains("only the first operand")));
         assert!(warnings.iter().any(|w| w.contains("badtype") && w.contains("banana")));
         assert!(warnings.iter().any(|w| w.contains("order") && w.contains("optional operands come last")));

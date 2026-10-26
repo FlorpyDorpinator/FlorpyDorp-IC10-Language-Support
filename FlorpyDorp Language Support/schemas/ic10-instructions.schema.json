@@ -40,7 +40,12 @@
                   "default": "read",
                   "description": "read (the default); write: the register it sets (only the first operand); jump: where it jumps to (a line, label or register)."
                 },
-                "optional": { "type": "boolean", "default": false }
+                "optional": { "type": "boolean", "default": false },
+                "into": {
+                  "type": "string",
+                  "pattern": "^r([0-9]|1[0-5])$",
+                  "description": "A read operand whose value the instruction also puts in this register (r0 to r15), like a call's arguments. So a function reading that register isn't flagged as reading it before it's set."
+                }
               }
             }
           },

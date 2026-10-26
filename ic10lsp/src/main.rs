@@ -1103,6 +1103,22 @@ fret r15";
             let script = "finit 511 0\nj skip\nf:\nfret 1\nadd r1 r9 1\nskip:\nfcall r0 f\ns db Setting r0";
             assert!(!has_code(script, "register_read_before_assign", "r9"), "{:?}", messages(script));
         }
+
+        #[test]
+        fn a_function_sees_its_arguments_and_its_caller_sees_what_it_sets() {
+            let _guard = with_example_calls();
+            // The function reads a and b as r0 and r1, and sets r15 for the code after the call.
+            let script = "finit 511 0\nmain:\nfcall r2 f 1 2\nadd r3 r15 r2\ns db Setting r3\nj main\nf:\nmove r15 9\nadd r0 r0 r1\nfret r0\n";
+            for register in ["r0", "r1", "r15"] {
+                assert!(!has_code(script, "register_read_before_assign", register), "{register}: {:?}", messages(script));
+            }
+            // An alias line reads nothing, even with no jump that could reach it again.
+            let script = "alias dev r15\nfinit 511 0\nmain:\nfcall r0 find\nl r1 dev Setting\nyield\nj main\nfind:\nmove dev 5\nfret\n";
+            assert!(!has_code(script, "register_read_before_assign", "r15"), "{:?}", messages(script));
+            // An argument that isn't passed isn't set.
+            let script = "finit 511 0\nfcall r2 f 1\ns db Setting r2\nf:\nfret r1\n";
+            assert!(has_code(script, "register_read_before_assign", "r1"), "{:?}", messages(script));
+        }
     }
 }
 

@@ -13,11 +13,11 @@
       "operands": [
         { "name": "dest", "type": "r?", "role": "write" },
         { "name": "target", "type": "r?|int", "role": "jump" },
-        { "name": "a", "type": "r?|num", "optional": true },
-        { "name": "b", "type": "r?|num", "optional": true },
-        { "name": "c", "type": "r?|num", "optional": true },
-        { "name": "d", "type": "r?|num", "optional": true },
-        { "name": "e", "type": "r?|num", "optional": true }
+        { "name": "a", "type": "r?|num", "optional": true, "into": "r0" },
+        { "name": "b", "type": "r?|num", "optional": true, "into": "r1" },
+        { "name": "c", "type": "r?|num", "optional": true, "into": "r2" },
+        { "name": "d", "type": "r?|num", "optional": true, "into": "r3" },
+        { "name": "e", "type": "r?|num", "optional": true, "into": "r4" }
       ],
       "flow": "call"
     },

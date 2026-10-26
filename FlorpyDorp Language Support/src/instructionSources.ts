@@ -270,7 +270,7 @@ export function readInstructionFiles(paths: string[]): { files: InstructionFile[
 /** What the extension's own features (inline hints, branch arrows) need about an instruction. */
 export interface ClientInstruction {
     name: string;
-    operands: { name: string; type: string; role?: string; optional?: boolean }[];
+    operands: { name: string; type: string; role?: string; optional?: boolean; into?: string }[];
     flow?: 'jump' | 'branch' | 'call' | 'return' | 'halt';
     source: string;
 }
