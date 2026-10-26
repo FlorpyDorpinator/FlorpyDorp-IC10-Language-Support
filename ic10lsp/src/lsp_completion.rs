@@ -73,7 +73,7 @@ pub async fn handle_completion(
         let first_word = actual_line.split_whitespace().next().unwrap_or("");
 
         // Check if this line starts with a known instruction
-        if let Some(_signature) = instructions::INSTRUCTIONS.get(first_word) {
+        if let Some(_signature) = instructions::signature(first_word) {
             let param_count = text_up_to_cursor
                 .split_whitespace()
                 .count()
@@ -270,7 +270,7 @@ pub async fn handle_completion(
     if let Some(node) = node.find_parent("operation") {
         let raw = node.utf8_text(document.content.as_bytes()).unwrap();
         let lowered;
-        let text: &str = if instructions::INSTRUCTIONS.contains_key(raw) {
+        let text: &str = if instructions::is_instruction(raw) {
             raw
         } else {
             lowered = raw.to_ascii_lowercase();
@@ -283,7 +283,7 @@ pub async fn handle_completion(
     } else if let Some(node) = node.find_parent("invalid_instruction") {
         let raw = node.utf8_text(document.content.as_bytes()).unwrap();
         let lowered;
-        let text: &str = if instructions::INSTRUCTIONS.contains_key(raw) {
+        let text: &str = if instructions::is_instruction(raw) {
             raw
         } else {
             lowered = raw.to_ascii_lowercase();
@@ -362,7 +362,7 @@ pub async fn handle_completion(
 
                 let first_word = actual_line.split_whitespace().next().unwrap_or("");
 
-                if let Some(_signature) = instructions::INSTRUCTIONS.get(first_word) {
+                if let Some(_signature) = instructions::signature(first_word) {
                     // We found an instruction at the start of the line!
                     // Try to determine which parameter position we're at based on whitespace/text
                     let text_up_to_cursor = &actual_line[..cursor_col.min(actual_line.len())];
@@ -460,7 +460,7 @@ pub async fn handle_completion(
                         }
                     } else {
                         // Not typing in HASH - provide regular parameter completions
-                        if let Some(signature) = instructions::INSTRUCTIONS.get(first_word) {
+                        if let Some(signature) = instructions::signature(first_word) {
                             if param_count < signature.0.len() {
                                 let param_type = &signature.0[param_count];
 
@@ -479,7 +479,10 @@ pub async fn handle_completion(
                                 // Labels only show for:
                                 // - Jump instructions (j, jal, jr): parameter 0 (the jump target)
                                 // - Branch instructions (beq, bne, etc.): LAST parameter (the jump target)
-                                let should_show_labels = if is_jump {
+                                let extra_jump = instructions::shape(first_word).and_then(|s| s.jump);
+                                let should_show_labels = if let Some(jump) = extra_jump {
+                                    param_count == jump // an extra instruction's jump operand
+                                } else if is_jump {
                                     param_count == 0 // j/jal/jr first parameter
                                 } else if is_branch {
                                     param_count == signature.0.len() - 1 // Last parameter of branch
@@ -553,7 +556,7 @@ pub async fn handle_completion(
                 .utf8_text(file_data.document_data.content.as_bytes())
                 .unwrap();
             let lowered;
-            let text: &str = if instructions::INSTRUCTIONS.contains_key(raw) {
+            let text: &str = if instructions::is_instruction(raw) {
                 raw
             } else {
                 lowered = raw.to_ascii_lowercase();
@@ -590,7 +593,7 @@ pub async fn handle_completion(
                 }
             };
 
-            let Some(signature) = instructions::INSTRUCTIONS.get(text) else {
+            let Some(signature) = instructions::signature(text) else {
                 return Ok(None);
             };
 
@@ -1048,7 +1051,7 @@ pub async fn handle_completion(
 /// Provides instruction completions based on prefix matching
 fn instruction_completions(prefix: &str, completions: &mut Vec<CompletionItem>) {
     let start_entries = completions.len();
-    for (instruction, _signature) in instructions::INSTRUCTIONS.entries() {
+    for (instruction, _signature) in instructions::all_instructions() {
         if instruction.starts_with(prefix) {
             // Use labeled syntax but only show the operand suffix in the detail
             let full_syntax = crate::tooltip_documentation::get_instruction_syntax(instruction);
@@ -1069,10 +1072,8 @@ fn instruction_completions(prefix: &str, completions: &mut Vec<CompletionItem>) 
                     description: None,
                 }),
                 kind: Some(CompletionItemKind::FUNCTION),
-                documentation: instructions::INSTRUCTION_DOCS
-                    .get(instruction)
-                    .map(|x| Documentation::String(x.to_string())),
-                deprecated: Some(*instruction == "label"),
+                documentation: instructions::doc_with_source(instruction).map(Documentation::String),
+                deprecated: Some(instruction == "label"),
                 ..Default::default()
             });
         }

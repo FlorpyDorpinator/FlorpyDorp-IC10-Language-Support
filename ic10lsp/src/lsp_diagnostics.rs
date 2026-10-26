@@ -64,7 +64,7 @@ pub async fn check_types(backend: &Backend, uri: &Url, diagnostics: &mut Vec<Dia
             let operation = operation_node
                 .utf8_text(document.content.as_bytes())
                 .unwrap();
-            let Some(signature) = instructions::INSTRUCTIONS.get(operation) else {
+            let Some(signature) = instructions::signature(operation) else {
                 diagnostics.push(Diagnostic::new(
                     Range::from(operation_node.range()).into(),
                     Some(DiagnosticSeverity::ERROR),
@@ -76,6 +76,9 @@ pub async fn check_types(backend: &Backend, uri: &Url, diagnostics: &mut Vec<Dia
                 ));
                 continue;
             };
+            // Extra instructions can have optional operands: fewer than the signature is fine down to this.
+            let (min_operands, _) =
+                instructions::operand_range(operation).unwrap_or((signature.0.len(), signature.0.len()));
 
             let mut argument_count = 0;
             let mut tree_cursor = capture.walk();
@@ -400,7 +403,7 @@ pub async fn check_types(backend: &Backend, uri: &Url, diagnostics: &mut Vec<Dia
                 ));
                 continue;
             }
-            if argument_count != signature.0.len() {
+            if argument_count < min_operands {
                 diagnostics.push(Diagnostic::new(
                     Range::from(capture.range()).into(),
                     Some(DiagnosticSeverity::ERROR),
@@ -513,7 +516,7 @@ pub async fn run_diagnostics(backend: &Backend, uri: &Url) {
         for (capture, _) in captures {
             let node = capture.captures[0].node;
             let instruction_text = node.utf8_text(document.content.as_bytes()).unwrap();
-            if !instructions::INSTRUCTIONS.contains_key(instruction_text) {
+            if !instructions::is_instruction(instruction_text) {
                 diagnostics.push(Diagnostic::new(
                     Range::from(node.range()).into(),
                     Some(DiagnosticSeverity::ERROR),
@@ -727,20 +730,26 @@ pub async fn run_diagnostics(backend: &Backend, uri: &Url) {
             let operation = operation_node
                 .utf8_text(document.content.as_bytes())
                 .unwrap();
-            if !BRANCH_INSTRUCTIONS.contains(operation) {
-                continue;
-            }
-
-            tree_cursor.reset(capture);
-            let Some(last_operand) = capture
-                .children_by_field_name("operand", &mut tree_cursor)
-                .into_iter()
-                .last()
-            else {
+            // The game's branches jump to their last operand; an extra instruction says which.
+            let target_index = if BRANCH_INSTRUCTIONS.contains(operation) {
+                None
+            } else if let Some(jump) = instructions::shape(operation).and_then(|s| s.jump) {
+                Some(jump)
+            } else {
                 continue;
             };
-            if let Some(last_operand) = last_operand.child(0) {
-                if last_operand.kind() == "number" {
+
+            tree_cursor.reset(capture);
+            let mut operands = capture.children_by_field_name("operand", &mut tree_cursor);
+            let target = match target_index {
+                Some(i) => operands.nth(i),
+                None => operands.last(),
+            };
+            let Some(target) = target else {
+                continue;
+            };
+            if let Some(target) = target.child(0) {
+                if target.kind() == "number" {
                     diagnostics.push(Diagnostic::new(
                         Range::from(capture.range()).into(),
                         Some(DiagnosticSeverity::WARNING),
@@ -942,7 +951,7 @@ pub fn compute_diagnostics_for_text(content: &str) -> Vec<Diagnostic> {
         for (capture, _) in captures {
             let node = capture.captures[0].node;
             let instruction_text = node.utf8_text(content.as_bytes()).unwrap();
-            if !instructions::INSTRUCTIONS.contains_key(instruction_text) {
+            if !instructions::is_instruction(instruction_text) {
                 diagnostics.push(Diagnostic::new(
                     Range::from(node.range()).into(),
                     Some(DiagnosticSeverity::ERROR),
@@ -1062,7 +1071,9 @@ pub fn compute_diagnostics_for_text(content: &str) -> Vec<Diagnostic> {
             let capture = capture.captures[0].node;
             if let Some(operation_node) = capture.child_by_field_name("operation") {
                 let operation = operation_node.utf8_text(content.as_bytes()).unwrap();
-                if let Some(signature) = instructions::INSTRUCTIONS.get(operation) {
+                if let Some(signature) = instructions::signature(operation) {
+                    let (min_operands, _) = instructions::operand_range(operation)
+                        .unwrap_or((signature.0.len(), signature.0.len()));
                     let mut argument_count = 0;
                     let mut tree_cursor = capture.walk();
                     let operands = capture.children_by_field_name("operand", &mut tree_cursor);
@@ -1328,7 +1339,7 @@ pub fn compute_diagnostics_for_text(content: &str) -> Vec<Diagnostic> {
                             continue;
                         }
                     }
-                    if argument_count != signature.0.len() {
+                    if argument_count < min_operands {
                         diagnostics.push(Diagnostic::new(
                             Range::from(capture.range()).into(),
                             Some(DiagnosticSeverity::ERROR),

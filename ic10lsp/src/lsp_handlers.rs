@@ -83,7 +83,7 @@ pub async fn handle_semantic_tokens_full(
                 SemanticTokenType::KEYWORD
             } else if idx == invalid_keyword_idx {
                 let instruction_text = node.utf8_text(document.content.as_bytes()).unwrap();
-                if instructions::INSTRUCTIONS.contains_key(instruction_text) {
+                if instructions::is_instruction(instruction_text) {
                     SemanticTokenType::KEYWORD
                 } else {
                     continue;
@@ -179,6 +179,12 @@ pub async fn handle_semantic_tokens_full(
                                                     if idx_op == 0 {
                                                         branch_label_reference = true;
                                                     }
+                                                } else if instructions::shape(op_text)
+                                                    .and_then(|s| s.jump)
+                                                    == Some(idx_op)
+                                                {
+                                                    // an extra instruction's jump operand
+                                                    branch_label_reference = true;
                                                 }
                                             }
                                         }
@@ -394,7 +400,7 @@ pub async fn handle_signature_help(
         .utf8_text(document.content.as_bytes())
         .unwrap();
     let lowered;
-    let text: &str = if instructions::INSTRUCTIONS.contains_key(text_raw) {
+    let text: &str = if instructions::is_instruction(text_raw) {
         text_raw
     } else {
         lowered = text_raw.to_ascii_lowercase();
@@ -411,7 +417,7 @@ pub async fn handle_signature_help(
         document.content.as_bytes(),
     );
 
-    let Some(_signature) = instructions::INSTRUCTIONS.get(text) else {
+    let Some(_signature) = instructions::signature(text) else {
         return Ok(None);
     };
 
@@ -465,9 +471,7 @@ pub async fn handle_signature_help(
     Ok(Some(SignatureHelp {
         signatures: vec![SignatureInformation {
             label,
-            documentation: instructions::INSTRUCTION_DOCS
-                .get(text)
-                .map(|x| Documentation::String(x.to_string())),
+            documentation: instructions::doc_with_source(text).map(Documentation::String),
             parameters: Some(
                 parameters
                     .iter()

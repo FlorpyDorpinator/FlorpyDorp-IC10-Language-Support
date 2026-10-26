@@ -1,0 +1,9 @@
+{
+	// The unit tests: code that doesn't need VS Code, compiled on its own (`npm run test-unit`).
+	"extends": "./tsconfig.json",
+	"compilerOptions": {
+		"outDir": "out/unit",
+		"types": ["node", "mocha"]
+	},
+	"include": ["src/instructionSources.ts", "src/test/unit/**/*.ts"]
+}

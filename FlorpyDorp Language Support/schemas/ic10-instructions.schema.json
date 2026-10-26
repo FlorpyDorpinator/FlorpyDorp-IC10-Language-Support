@@ -1,0 +1,60 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "IC10 instructions from a mod",
+  "description": "Instructions a Stationeers mod adds to IC10. The IC10 extension for VS Code reads this file from enabled mods' folders, from packages named in ic10-lint.json, and from the ic10.lsp.instructionFiles setting.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["instructions"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "name": { "type": "string", "description": "The mod's name, shown in each instruction's hover (\"From the mod …\") and in messages." },
+    "modId": {
+      "type": "string",
+      "description": "Only in the extension's own catalogue (mods/): the <ModID> in the mod's About/About.xml, for mods that don't ship this file themselves."
+    },
+    "instructions": {
+      "type": "object",
+      "description": "Each instruction by name. Names are case-sensitive, as in the game; one of the game's own names is ignored.",
+      "propertyNames": { "pattern": "^[A-Za-z0-9_]+$" },
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "description": { "type": "string", "description": "What it does, for hovers and completion." },
+          "operands": {
+            "type": "array",
+            "description": "Its operands in order. Optional ones come last.",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["name", "type"],
+              "properties": {
+                "name": { "type": "string", "description": "Shown in hovers and hints, e.g. a(r?|num)." },
+                "type": {
+                  "type": "string",
+                  "description": "What it takes, in the game's help spelling, |-separated: r?, num, int, id, d?, logicType, slotLogicType, batchMode, reagentMode, str. A number also takes a register.",
+                  "pattern": "^\\s*(r\\?|num|int|id|d\\?|logicType|slotLogicType|logicSlotType|batchMode|reagentMode|str|name)\\s*(\\|\\s*(r\\?|num|int|id|d\\?|logicType|slotLogicType|logicSlotType|batchMode|reagentMode|str|name)\\s*)*$"
+                },
+                "role": {
+                  "enum": ["read", "write", "jump"],
+                  "default": "read",
+                  "description": "read (the default); write: the register it sets (only the first operand); jump: where it jumps to (a line, label or register)."
+                },
+                "optional": { "type": "boolean", "default": false },
+                "into": {
+                  "type": "string",
+                  "pattern": "^r([0-9]|1[0-5])$",
+                  "description": "A read operand whose value the instruction also puts in this register (r0 to r15), like a call's arguments. So a function reading that register isn't flagged as reading it before it's set."
+                }
+              }
+            }
+          },
+          "flow": {
+            "enum": ["jump", "branch", "call", "return", "halt"],
+            "description": "How control leaves it. jump: always to the jump operand (like j). branch: there or on to the next line (like beq). call: there, coming back to the next line (like jal). return: back after the call (like j ra). halt: stops (like hcf). Leave it out for an instruction that runs on to the next line."
+          }
+        }
+      }
+    }
+  }
+}

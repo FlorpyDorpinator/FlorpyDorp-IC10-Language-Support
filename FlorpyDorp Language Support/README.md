@@ -329,6 +329,49 @@ Press **Ctrl+Alt+T** to switch between the immersive Stationeers Editor Theme an
 
 ---
 
+## 🧩 Instructions for Mods
+
+Some mods add IC10 instructions. The extension learns them from an `ic10-instructions.json` file.
+
+**Where it finds the files:**
+
+1. **The mods enabled in your game.** The extension reads the game's `modconfig.xml`.
+2. **`ic10-lint.json`** in your workspace: each package in its `"extensions"` list that names a file with `"ic10Instructions"` in its `package.json`.
+3. **The VSCode `ic10.lsp.instructionFiles` setting**: any other files.
+
+The file the first source gives wins; the **IC10 Mod Instructions** output channel lists where each
+instruction came from.
+
+**For mod authors:** ship `ic10-instructions.json` in your mod's folder. The extension's JSON schema
+checks it as you edit. Its `"name"` shows in each instruction's hover, as "From the mod …".
+
+```json
+{
+  "name": "Example Math",
+  "instructions": {
+    "avg": {
+      "description": "Puts the average of a, b and (if given) c into r?.",
+      "operands": [
+        { "name": "dest", "type": "r?", "role": "write" },
+        { "name": "a", "type": "r?|num" },
+        { "name": "b", "type": "r?|num" },
+        { "name": "c", "type": "r?|num", "optional": true }
+      ]
+    }
+  }
+}
+```
+
+| Field | Means |
+| --- | --- |
+| `type` | What the operand takes, as the game's help writes it: `r?`, `num`, `int`, `d?`, `logicType`, `slotLogicType`, `batchMode`, `reagentMode`, `str`, joined with `\|`. |
+| `role` | `read` (the default), `write` (the register it sets: the first operand only) or `jump` (where it jumps to). |
+| `optional` | It can be left off. Optional operands come last. |
+| `into` | A register, `r0` to `r15`, that the operand's value also goes into, like a call's arguments. Then a function reading it isn't flagged as reading it before it's set. |
+| `flow` | `jump` (like `j`), `branch` (like `beq`), `call` (like `jal`), `return` (like `j ra`) or `halt` (like `hcf`). Leave it out for an instruction that runs on to the next line. |
+
+---
+
 ## 🔧 Settings
 
 You can customize behavior using these settings:
@@ -338,6 +381,8 @@ You can customize behavior using these settings:
 | `ic10.lsp.max_lines`     | Maximum allowed lines           | `128`   |
 | `ic10.lsp.max_columns`   | Maximum columns per line        | `90`    |
 | `ic10.lsp.max_bytes`     | Maximum total bytes             | `4096`  |
+| `ic10.lsp.instructionFiles` | More `ic10-instructions.json` files (see Instructions from Mods) | `[]` |
+| `ic10.stationeersFolder` | The game's `My Games/Stationeers` folder, if it isn't found | found |
 | `ic10.useRemoteLanguageServer` | Use a remote LSP (dev only) | `false` |
 
 ---

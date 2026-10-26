@@ -527,6 +527,71 @@ impl<'a> Union<'a> {
     }
 }
 
+// Lookups across the game's instructions and the extra ones from configuration
+// (`crate::extra_instructions`). Use these rather than `INSTRUCTIONS` / `INSTRUCTION_DOCS`, so mods'
+// instructions are known everywhere the game's are.
+
+/// An instruction's signature: the game's, or an extra one's (with every optional operand).
+pub fn signature(name: &str) -> Option<&'static InstructionSignature> {
+    INSTRUCTIONS
+        .get(name)
+        .or_else(|| crate::extra_instructions::get(name).map(|e| e.signature))
+}
+
+/// Whether `name` is an instruction, the game's or an extra one.
+pub fn is_instruction(name: &str) -> bool {
+    signature(name).is_some()
+}
+
+/// An instruction's description.
+pub fn doc(name: &str) -> Option<&'static str> {
+    INSTRUCTION_DOCS
+        .get(name)
+        .copied()
+        .or_else(|| crate::extra_instructions::get(name).map(|e| e.description))
+}
+
+/// The fewest and most operands an instruction takes; a game instruction takes exactly its signature's.
+pub fn operand_range(name: &str) -> Option<(usize, usize)> {
+    if let Some(signature) = INSTRUCTIONS.get(name) {
+        return Some((signature.0.len(), signature.0.len()));
+    }
+    crate::extra_instructions::get(name).map(|e| (e.min_operands, e.signature.0.len()))
+}
+
+/// What an extra instruction writes and where it jumps. `None` for the game's instructions, which
+/// the analysis knows by name.
+pub fn shape(name: &str) -> Option<crate::extra_instructions::Shape> {
+    crate::extra_instructions::get(name).map(|e| e.shape)
+}
+
+/// The mod an extra instruction comes from; `None` for the game's own.
+pub fn mod_name(name: &str) -> Option<&'static str> {
+    crate::extra_instructions::get(name).map(|e| e.mod_name)
+}
+
+/// An instruction's description, with the mod it comes from (if it's an extra one) on a line of
+/// its own: what hovers and completion show.
+pub fn doc_with_source(name: &str) -> Option<String> {
+    let doc = doc(name)?;
+    Some(match mod_name(name) {
+        Some(m) => format!("{doc}\n\n*From the mod {m}*"),
+        None => doc.to_string(),
+    })
+}
+
+/// An extra instruction's operand names (`a`, `target`), for hovers and hints.
+pub fn operand_names(name: &str) -> Option<&'static [&'static str]> {
+    crate::extra_instructions::get(name).map(|e| e.operand_names)
+}
+
+/// Every instruction, the game's and the extra ones, with its signature.
+pub fn all_instructions() -> Vec<(&'static str, &'static InstructionSignature)> {
+    let mut all: Vec<_> = INSTRUCTIONS.entries().map(|(name, sig)| (*name, sig)).collect();
+    all.extend(crate::extra_instructions::all().into_iter().map(|e| (e.name, e.signature)));
+    all
+}
+
 #[allow(dead_code)]
 pub fn logictype_candidates(text: &str) -> Vec<DataType> {
     let mut ret = Vec::with_capacity(3);

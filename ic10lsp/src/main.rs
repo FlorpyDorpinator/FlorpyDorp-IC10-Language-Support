@@ -204,6 +204,8 @@ impl LanguageServer for Backend {
                 .unwrap_or(config.suppress_register_warnings);
             
             self.client.log_message(MessageType::INFO, format!("Initial config - suppress_hash_diagnostics: {}", config.suppress_hash_diagnostics)).await;
+            drop(config);
+            self.apply_extra_instructions(&init_options).await;
         }
         
         let mut utf8_supported = false;
@@ -621,6 +623,8 @@ impl LanguageServer for Backend {
                 .unwrap_or(config.suppress_register_warnings);
 
             self.client.log_message(MessageType::INFO, format!("suppress_hash_diagnostics set to: {}", config.suppress_hash_diagnostics)).await;
+            drop(config);
+            self.apply_extra_instructions(&value).await;
         }
 
         // Only re-run diagnostics on a limited set of files to avoid overwhelming the server
@@ -699,6 +703,53 @@ impl LanguageServer for Backend {
 }
 
 impl Backend {
+    /// Register the instructions in `settings.extraInstructions` (the files the extension found,
+    /// as `[{ source, text }]`), if the settings have that key. Settings without it, like the
+    /// client's own `{ ic10: {...} }` notifications, leave the instructions as they are.
+    async fn apply_extra_instructions(&self, settings: &Value) {
+        let Some(files) = settings.get("extraInstructions") else {
+            return;
+        };
+        let files: Vec<ic10lsp::extra_instructions::InstructionFile> =
+            match serde_json::from_value(files.clone()) {
+                Ok(files) => files,
+                Err(e) => {
+                    self.client
+                        .log_message(MessageType::WARNING, format!("extraInstructions: {e}"))
+                        .await;
+                    return;
+                }
+            };
+        let warnings = ic10lsp::extra_instructions::set_extra_instructions(&files);
+        let names: Vec<_> = ic10lsp::extra_instructions::all()
+            .iter()
+            .map(|e| format!("{} ({})", e.name, e.source))
+            .collect();
+        self.client
+            .log_message(
+                MessageType::INFO,
+                format!("Extra instructions: {}", if names.is_empty() { "none".to_string() } else { names.join(", ") }),
+            )
+            .await;
+        for warning in &warnings {
+            self.client.log_message(MessageType::WARNING, warning).await;
+        }
+        if !warnings.is_empty() {
+            self.client
+                .show_message(
+                    MessageType::WARNING,
+                    format!(
+                        "IC10: {} problem(s) in instruction files; see the IC10 output. First: {}",
+                        warnings.len(),
+                        warnings[0]
+                    ),
+                )
+                .await;
+        }
+        // Cached diagnostics were worked out with the old instructions.
+        self.diagnostic_cache.clear();
+    }
+
     fn node_at_position<'a>(&'a self, position: Position, tree: &'a Tree) -> Option<Node<'a>> {
         self.node_at_range(
             tower_lsp::lsp_types::Range::new(position.into(), position.into()).into(),
@@ -936,6 +987,138 @@ sb StartButton Setting 34"#;
             "Unexpected Unknown identifier diagnostics: {:?}",
             diagnostics
         );
+    }
+
+    // Instructions from configuration: a made-up mod's file (finit, fcall, fret), as the extension
+    // would send it.
+    mod extra_instructions {
+        use super::*;
+        use ic10lsp::extra_instructions::{set_extra_instructions, InstructionFile};
+        use std::sync::{Mutex, MutexGuard};
+        use tower_lsp::lsp_types::{DiagnosticSeverity, NumberOrString};
+
+        const EXAMPLE_CALLS: &str = include_str!("../tests/fixtures/example-calls.ic10-instructions.json");
+
+        /// The instructions are global and tests run in parallel: each test here holds this.
+        static LOCK: Mutex<()> = Mutex::new(());
+
+        fn with_example_calls() -> MutexGuard<'static, ()> {
+            let guard = LOCK.lock().unwrap_or_else(|e| e.into_inner());
+            let warnings = set_extra_instructions(&[InstructionFile {
+                source: "example-calls.json".to_string(),
+                text: EXAMPLE_CALLS.to_string(),
+            }]);
+            assert_eq!(warnings, Vec::<String>::new());
+            guard
+        }
+
+        fn messages(script: &str) -> Vec<String> {
+            compute_diagnostics_for_text(script)
+                .iter()
+                .map(|d| d.message.clone())
+                .collect()
+        }
+
+        fn has_code(script: &str, code: &str, register: &str) -> bool {
+            compute_diagnostics_for_text(script).iter().any(|d| {
+                d.code == Some(NumberOrString::String(code.to_string())) && d.message.contains(register)
+            })
+        }
+
+        const CALL_DEMO: &str = "finit 511 16
+move r0 42
+move r1 43
+move r2 44
+move r3 45
+move r13 2
+move r14 8
+move r15 80
+fcall r0 fooCalc r1 r15 r14 r13
+s db Setting r0
+end:
+yield
+j end
+fooCalc:
+add r15 r1 r2
+mul r15 r15 r3
+fret r15";
+
+        #[test]
+        fn the_call_demo_has_no_errors_and_its_arguments_are_read() {
+            let _guard = with_example_calls();
+            let diagnostics = compute_diagnostics_for_text(CALL_DEMO);
+            let errors: Vec<_> = diagnostics
+                .iter()
+                .filter(|d| d.severity == Some(DiagnosticSeverity::ERROR))
+                .collect();
+            assert!(errors.is_empty(), "{errors:?}");
+            for register in ["r13", "r14"] {
+                assert!(!has_code(CALL_DEMO, "register_assigned_not_read", register), "{register}: {diagnostics:?}");
+            }
+        }
+
+        #[test]
+        fn without_the_file_they_are_invalid() {
+            let _guard = LOCK.lock().unwrap_or_else(|e| e.into_inner());
+            set_extra_instructions(&[]);
+            assert!(messages("finit 511 16").contains(&"Invalid instruction".to_string()));
+        }
+
+        #[test]
+        fn optional_operands_can_be_left_off_but_not_exceeded() {
+            let _guard = with_example_calls();
+            // Each script ends in a newline, as a file does: the grammar can't end a file mid-line.
+            let errors = |script: &str| -> Vec<String> {
+                compute_diagnostics_for_text(&format!("{script}\n"))
+                    .into_iter()
+                    .filter(|d| d.severity == Some(DiagnosticSeverity::ERROR))
+                    .map(|d| d.message)
+                    .collect()
+            };
+            assert_eq!(errors("start:\nfcall r0 start"), Vec::<String>::new());
+            assert_eq!(errors("start:\nfcall r0 start 1 2 3 4 5"), Vec::<String>::new());
+            assert_eq!(errors("fret"), Vec::<String>::new());
+            assert!(errors("start:\nfcall r0 start 1 2 3 4 5 6")[0].starts_with("Superfluous argument"));
+            let fret = errors("fret r0 r1");
+            assert!(fret.iter().any(|e| e.starts_with("Superfluous argument")), "{fret:?}");
+            assert_eq!(errors("finit 511"), vec!["Invalid number of arguments".to_string()]);
+            assert!(errors("start:\nfcall 5 start").iter().any(|e| e.starts_with("Type mismatch")));
+        }
+
+        #[test]
+        fn a_call_writes_its_register_and_jumps_to_its_target() {
+            let _guard = with_example_calls();
+            // r1 is written by the fcall, so reading it after isn't a read before assignment.
+            let script = "finit 511 0\nfcall r1 f\ns db Setting r1\nyield\nf:\nfret 5";
+            assert!(!has_code(script, "register_read_before_assign", "r1"), "{:?}", messages(script));
+            // f is only reached through the call: its read of r9 (never assigned) is found.
+            let script = "finit 511 0\nj skip\nf:\nadd r1 r9 1\nfret r1\nskip:\nfcall r0 f\ns db Setting r0";
+            assert!(has_code(script, "register_read_before_assign", "r9"), "{:?}", messages(script));
+        }
+
+        #[test]
+        fn a_return_does_not_fall_through() {
+            let _guard = with_example_calls();
+            // The add is only reached by falling through the fret, so it's dead code: not flagged.
+            let script = "finit 511 0\nj skip\nf:\nfret 1\nadd r1 r9 1\nskip:\nfcall r0 f\ns db Setting r0";
+            assert!(!has_code(script, "register_read_before_assign", "r9"), "{:?}", messages(script));
+        }
+
+        #[test]
+        fn a_function_sees_its_arguments_and_its_caller_sees_what_it_sets() {
+            let _guard = with_example_calls();
+            // The function reads a and b as r0 and r1, and sets r15 for the code after the call.
+            let script = "finit 511 0\nmain:\nfcall r2 f 1 2\nadd r3 r15 r2\ns db Setting r3\nj main\nf:\nmove r15 9\nadd r0 r0 r1\nfret r0\n";
+            for register in ["r0", "r1", "r15"] {
+                assert!(!has_code(script, "register_read_before_assign", register), "{register}: {:?}", messages(script));
+            }
+            // An alias line reads nothing, even with no jump that could reach it again.
+            let script = "alias dev r15\nfinit 511 0\nmain:\nfcall r0 find\nl r1 dev Setting\nyield\nj main\nfind:\nmove dev 5\nfret\n";
+            assert!(!has_code(script, "register_read_before_assign", "r15"), "{:?}", messages(script));
+            // An argument that isn't passed isn't set.
+            let script = "finit 511 0\nfcall r2 f 1\ns db Setting r2\nf:\nfret r1\n";
+            assert!(has_code(script, "register_read_before_assign", "r1"), "{:?}", messages(script));
+        }
     }
 }
 

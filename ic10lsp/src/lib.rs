@@ -6,5 +6,7 @@
 //!
 //! ## Modules
 //! - `instructions` - All IC10 instruction definitions, signatures, and documentation
+//! - `extra_instructions` - Instructions from configuration (mods' `ic10-instructions.json` files)
 
+pub mod extra_instructions;
 pub mod instructions;

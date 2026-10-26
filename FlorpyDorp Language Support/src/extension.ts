@@ -38,6 +38,11 @@ import {
     ExecuteCommandParams
 } from 'vscode-languageclient/node';
 import { getGlobalTracker, resetGlobalTracker } from './benchmarking';
+import { ExtraInstructions } from './extraInstructions';
+import { hintTokens, jumpOperand } from './instructionSources';
+
+/** Instructions from mods (their ic10-instructions.json files); set up on activation. */
+let extraInstructions: ExtraInstructions | undefined;
 
 // ============================================================================
 // Helper Functions
@@ -106,7 +111,9 @@ function getLSPIC10Configurations(): any {
         },
         suppressHashDiagnostics: config.get('suppressHashDiagnostics'),
         enableControlFlowAnalysis: config.get('enableControlFlowAnalysis'),
-        suppressRegisterWarnings: config.get('suppressRegisterWarnings')
+        suppressRegisterWarnings: config.get('suppressRegisterWarnings'),
+        // The mods' instruction files, [{ source, text }]: the server reads and checks them.
+        extraInstructions: extraInstructions?.files ?? []
     };
 }
 
@@ -156,6 +163,10 @@ export function activate(context: vscode.ExtensionContext) {
 
     // Activate Notification through VSCode Notifications
     vscode.window.showInformationMessage('IC10 Language Server is now active!');
+
+    extraInstructions = new ExtraInstructions(context);
+    context.subscriptions.push(extraInstructions);
+    const extras = extraInstructions;
 
     // Determine the correct binary name based on platform and architecture
     let serverBinary: string;
@@ -687,6 +698,10 @@ export function activate(context: vscode.ExtensionContext) {
     scheduleDiagnosticsSync(initialDiagnosticsEnabled);
     void startClient();
 
+    // Mods' instructions reach the server as settings, now and whenever they change.
+    context.subscriptions.push(extras.onDidChange(() => scheduleConfigSync()));
+    void extras.refresh();
+
     // Register configuration changes to keep the server in sync.
     context.subscriptions.push(
         vscode.workspace.onDidChangeConfiguration((e: vscode.ConfigurationChangeEvent) => {
@@ -881,6 +896,7 @@ export function activate(context: vscode.ExtensionContext) {
         };
             // Show dynamic inline hints for remaining operands as you type.
             context.subscriptions.push(vscode.languages.registerInlayHintsProvider({ language: 'ic10', scheme: 'file' }, {
+                onDidChangeInlayHints: extras.onDidChange,
                 provideInlayHints(document: vscode.TextDocument, range: vscode.Range): vscode.InlayHint[] {
                     const hints: vscode.InlayHint[] = [];
                     for (let line = range.start.line; line <= range.end.line; line++) {
@@ -892,7 +908,9 @@ export function activate(context: vscode.ExtensionContext) {
                         if (m[2].trimStart().startsWith(':')) continue;
                         
                         const opcode = m[1].toLowerCase();
-                        const sig = signatureMap[opcode] ?? computeSignature(opcode);
+                        // A mod's instruction (names are case-sensitive, as in the game) has its operands in its file.
+                        const extra = extras.instructions.get(m[1]);
+                        const sig = extra ? hintTokens(extra).join(' ') : signatureMap[opcode] ?? computeSignature(opcode);
                         if (!sig) continue;
                         // Truncate at comment
                         let after = m[2];
@@ -1360,18 +1378,22 @@ export function activate(context: vscode.ExtensionContext) {
         if (!match) return null;
         
         const opcode = match[1].toLowerCase();
-        if (!absoluteBranchOpcodes.has(opcode)) return null;
-        
+        // A mod's instruction that jumps says which operand is its target.
+        const extra = extras.instructions.get(match[1]);
+        const extraTarget = extra ? jumpOperand(extra) : undefined;
+        if (extra ? extraTarget === undefined : !absoluteBranchOpcodes.has(opcode)) return null;
+
         const operandsStr = match[2].trim();
-        
+
         // Extract operands, skip comments
         const beforeComment = operandsStr.split('#')[0].trim();
         const operands = beforeComment.split(/\s+/);
-        
+
         if (operands.length === 0) return null;
-        
-        // The target is always the last operand for branch instructions
-        const targetOperand = operands[operands.length - 1];
+
+        // The target is the last operand for the game's branch instructions
+        const targetOperand = extraTarget !== undefined ? operands[extraTarget] : operands[operands.length - 1];
+        if (targetOperand === undefined) return null;
         
         // Check if target is a number (direct line number)
         const numericLineNumber = parseInt(targetOperand, 10);

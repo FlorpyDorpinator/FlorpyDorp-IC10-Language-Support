@@ -7,6 +7,10 @@ use tree_sitter::{Query, QueryCursor, Tree};
 use crate::instructions::LOGIC_TYPES;
 use crate::Range;
 
+/// Every instruction with its opcode: the game's (`operation`) and the ones the grammar doesn't
+/// know (`invalid_instruction`), which is how instructions from configuration parse.
+const INSTRUCTION_QUERY: &str = "(instruction operation: (_) @op) @instruction";
+
 #[derive(Debug, Clone)]
 pub struct OperationRecord {
     pub line_number: u32,
@@ -69,6 +73,7 @@ enum CfgControl {
     BranchAbs(CfgTarget),// b*: conditional, absolute, target + fallthrough
     BranchRel(CfgTarget),// br*: conditional, relative, target + fallthrough
     Call(CfgTarget),     // jal: sets ra, target + fallthrough (subroutine return)
+    Return,              // an extra instruction's return: the line after each call
     Halt,                // hcf: no successors
 }
 
@@ -261,6 +266,20 @@ fn cfg_classify_control(
     label_lines: &HashMap<String, u32>,
     content: &str,
 ) -> CfgControl {
+    // An extra instruction's file says how it leaves; a return goes back after every call, so
+    // what the function sets reaches the code after its calls.
+    if let Some(shape) = crate::instructions::shape(op_lower) {
+        use ic10lsp::extra_instructions::Flow;
+        let target = || cfg_resolve_target(shape.jump.and_then(|i| operands.get(i)), false, row, label_lines, content);
+        return match shape.flow {
+            None => CfgControl::Seq,
+            Some(Flow::Jump) => CfgControl::JumpAbs(target()),
+            Some(Flow::Branch) => CfgControl::BranchAbs(target()),
+            Some(Flow::Call) => CfgControl::Call(target()),
+            Some(Flow::Return) => CfgControl::Return,
+            Some(Flow::Halt) => CfgControl::Halt,
+        };
+    }
     match op_lower {
         "hcf" => CfgControl::Halt,
         "j" => CfgControl::JumpAbs(cfg_resolve_target(operands.get(0), false, row, label_lines, content)),
@@ -469,7 +488,7 @@ impl RegisterAnalyzer {
         // Query for all instructions and manually check the first operand
         let instruction_query = Query::new(
             tree_sitter_ic10::language(),
-            "(instruction (operation) @op) @instruction",
+            INSTRUCTION_QUERY,
         )
         .unwrap();
 
@@ -568,7 +587,7 @@ impl RegisterAnalyzer {
         // Query for all instructions and manually check operands
         let instruction_query = Query::new(
             tree_sitter_ic10::language(),
-            "(instruction (operation) @op) @instruction",
+            INSTRUCTION_QUERY,
         )
         .unwrap();
 
@@ -662,7 +681,7 @@ impl RegisterAnalyzer {
         // (e.g. JAL, Jal) is still recognised as assigning to ra.
         let instruction_query = Query::new(
             tree_sitter_ic10::language(),
-            "(instruction (operation) @op) @instruction",
+            INSTRUCTION_QUERY,
         )
         .unwrap();
 
@@ -695,6 +714,10 @@ impl RegisterAnalyzer {
     }
 
     fn is_assignment_operation(&self, operation: &str) -> bool {
+        // An extra instruction's file says whether it writes its first operand.
+        if let Some(shape) = crate::instructions::shape(operation) {
+            return shape.writes_first;
+        }
         // Case-insensitive match for operations that assign to their first register operand
         let op = operation.to_ascii_lowercase();
         matches!(
@@ -749,7 +772,7 @@ impl RegisterAnalyzer {
         // 2. Collect instructions in source order.
         let instr_query = match Query::new(
             tree_sitter_ic10::language(),
-            "(instruction (operation) @op) @instruction",
+            INSTRUCTION_QUERY,
         ) {
             Ok(q) => q,
             Err(_) => return,
@@ -803,8 +826,23 @@ impl RegisterAnalyzer {
             if op_lower == "jal" {
                 writes.push("ra".to_string());
             }
+            // A call's arguments: the registers it puts operands' values in.
+            if let Some(shape) = crate::instructions::shape(op) {
+                for (i, reg) in shape.into {
+                    if *i < operands.len() {
+                        writes.push(reg.to_string());
+                    }
+                }
+            }
 
-            let start_idx = if is_assign { 1 } else { 0 };
+            // An alias only names a register: it reads nothing when it runs.
+            let start_idx = if op_lower == "alias" {
+                operands.len()
+            } else if is_assign {
+                1
+            } else {
+                0
+            };
             for operand in operands.iter().skip(start_idx) {
                 if let Some(rd) = cfg_resolve_read_operand(*operand, content, aliases) {
                     reads.push(rd);
@@ -823,6 +861,11 @@ impl RegisterAnalyzer {
             instrs.iter().position(|ci| ci.row >= target_row)
         };
         let mut succ: Vec<Vec<usize>> = vec![Vec::new(); n];
+        // A return can come back after any call.
+        let return_to: Vec<usize> = (0..n)
+            .filter(|&i| matches!(instrs[i].control, CfgControl::Call(_)) && i + 1 < n)
+            .map(|i| i + 1)
+            .collect();
         for i in 0..n {
             let next = if i + 1 < n { Some(i + 1) } else { None };
             let add_target = |list: &mut Vec<usize>, t: CfgTarget| match t {
@@ -844,6 +887,7 @@ impl RegisterAnalyzer {
                     }
                 }
                 CfgControl::Halt => {}
+                CfgControl::Return => succ[i].extend(return_to.iter().copied()),
                 CfgControl::JumpAbs(t) | CfgControl::JumpRel(t) => {
                     let mut list = std::mem::take(&mut succ[i]);
                     add_target(&mut list, t);
@@ -1091,7 +1135,7 @@ impl RegisterAnalyzer {
         // Query for all instructions in order
         let instruction_query = Query::new(
             tree_sitter_ic10::language(),
-            "(instruction (operation) @op) @instruction",
+            INSTRUCTION_QUERY,
         )
         .unwrap();
 
@@ -1149,7 +1193,7 @@ impl RegisterAnalyzer {
         let mut cursor = QueryCursor::new();
         let instruction_query = Query::new(
             tree_sitter_ic10::language(),
-            "(instruction (operation) @op) @instruction",
+            INSTRUCTION_QUERY,
         )
         .unwrap();
 
@@ -1716,7 +1760,7 @@ mod tests {
             
             let instruction_query = Query::new(
                 tree_sitter_ic10::language(),
-                "(instruction (operation) @op) @instruction",
+                INSTRUCTION_QUERY,
             ).unwrap();
             
             let mut cursor = QueryCursor::new();

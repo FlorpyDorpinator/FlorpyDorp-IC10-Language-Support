@@ -1,0 +1,32 @@
+{
+  "name": "Example Calls",
+  "instructions": {
+    "finit": {
+      "description": "Sets up function calls: a stack at address base, saving count registers per call.",
+      "operands": [
+        { "name": "base", "type": "r?|int" },
+        { "name": "count", "type": "r?|int" }
+      ]
+    },
+    "fcall": {
+      "description": "Calls the function at target with up to five arguments; its result goes into dest.",
+      "operands": [
+        { "name": "dest", "type": "r?", "role": "write" },
+        { "name": "target", "type": "r?|int", "role": "jump" },
+        { "name": "a", "type": "r?|num", "optional": true, "into": "r0" },
+        { "name": "b", "type": "r?|num", "optional": true, "into": "r1" },
+        { "name": "c", "type": "r?|num", "optional": true, "into": "r2" },
+        { "name": "d", "type": "r?|num", "optional": true, "into": "r3" },
+        { "name": "e", "type": "r?|num", "optional": true, "into": "r4" }
+      ],
+      "flow": "call"
+    },
+    "fret": {
+      "description": "Returns from the last fcall, with an optional result.",
+      "operands": [
+        { "name": "value", "type": "r?|num", "optional": true }
+      ],
+      "flow": "return"
+    }
+  }
+}
